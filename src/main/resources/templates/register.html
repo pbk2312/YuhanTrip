@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <title>Register - SB Admin</title>
+    <link href="https://use.fontawesome.com/releases/v6.3.0/css/all.css" rel="stylesheet" crossorigin="anonymous"/>
+    <link th:href="@{/css/styles.css}"
+          href="../css/styles.css" rel="stylesheet">
+    <script th:src="@{/js/scripts.js}"></script>
+</head>
+<body class="bg-primary">
+<div id="layoutAuthentication">
+    <div id="layoutAuthentication_content">
+        <main>
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-7">
+                        <div class="card shadow-lg border-0 rounded-lg mt-5">
+                            <div class="card-header"><h3 class="text-center font-weight-light my-4">Create Account</h3>
+                            </div>
+                            <div class="card-body">
+                                <form th:action="@{/member/register}" th:object="${memberRequestDTO}" method="post">
+                                <div class="row">
+                                        <div class="col-md-8">
+                                            <div class="form-floating mb-3">
+                                                <input class="form-control" id="inputEmail" type="email"
+                                                       th:field="*{email}"
+                                                       placeholder="name@example.com" required/>
+                                                <label for="inputEmail">Email address</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-floating mb-3">
+                                                <button id="sendVerificationEmailButton" class="btn btn-primary"
+                                                        type="button">Send Verification Email
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 추가: 인증번호 입력란 -->
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="inputCertificationNumber" type="text"
+                                               th:field="*{certificationNumber}"
+                                               placeholder="Enter certification number" required/>
+                                        <label for="inputCertificationNumber">인증번호</label>
+                                    </div>
+                                    <!-- 추가: 인증번호 확인 버튼 -->
+                                    <div class="form-floating mb-3">
+                                        <button id="verifyCertificationButton" class="btn btn-primary" type="button">
+                                            인증번호 확인
+                                        </button>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="inputPassword" type="password"
+                                               th:field="*{password}" placeholder="Create a password" required/>
+                                        <label for="inputPassword">Password</label>
+                                    </div>
+                                    <!-- 추가: 비밀번호 확인란 -->
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="inputCheckPassword" type="password"
+                                               th:field="*{checkPassword}" placeholder="Confirm your password"
+                                               required/>
+                                        <label for="inputCheckPassword">Confirm Password</label>
+                                    </div>
+                                    <!-- 추가: 회원가입 버튼 -->
+                                    <div class="mt-4 mb-0">
+                                        <div class="d-grid">
+                                            <button class="btn btn-primary btn-block" type="submit">Create Account
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="card-footer text-center py-3">
+                                <div class="small"><a th:href="@{/login}">Have an account? Go to login</a></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+</body>
+
+
+<div id="layoutAuthentication_footer">
+    <footer class="py-4 bg-light mt-auto">
+        <div class="container-fluid px-4">
+            <div class="d-flex align-items-center justify-content-between small">
+                <div class="text-muted">Copyright &copy; Your Website 2023</div>
+                <div>
+                    <a href="#">Privacy Policy</a>
+                    &middot;
+                    <a href="#">Terms &amp; Conditions</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+</div>
+<!-- Bootstrap 및 스크립트 파일의 경로를 올바르게 수정 -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+<!-- Thymeleaf 템플릿에서 스크립트 파일을 불러올 때는 'th:src'를 사용하지 않습니다. -->
+<script src="/js/scripts.js"></script>
+<script>
+    // Send Verification Email 버튼 클릭 시 이메일 인증번호 요청을 보냄
+    document.getElementById('sendVerificationEmailButton').addEventListener('click', function () {
+        var email = document.getElementById('inputEmail').value;
+        requestVerificationEmail(email);
+    });
+
+    // 이메일 인증번호 요청을 보내는 함수
+    function requestVerificationEmail(email) {
+        fetch('/email/sendCertificationMail', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({email: email})
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('이메일 인증번호 요청에 실패했습니다.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data); // 서버에서 반환한 응답 처리
+            })
+            .catch(error => {
+                console.error('에러:', error);
+            });
+    }
+
+
+    document.getElementById('verifyCertificationButton').addEventListener('click', function () {
+        // 이메일과 인증번호 가져오기
+        var email = document.getElementById('inputEmail').value;
+        var certificationNumber = document.getElementById('inputCertificationNumber').value;
+
+        // 이메일 인증 요청 보내기
+        verifyEmail(email, certificationNumber);
+    });
+
+    // 이메일 인증 요청을 보내는 함수
+    function verifyEmail(email, certificationNumber) {
+        fetch('/email/verifyEmail', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: email,
+                certificationNumber: certificationNumber
+            })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('이메일 인증에 실패했습니다.');
+                }
+                return response.text();
+            })
+            .then(data => {
+                console.log(data); // 서버에서 반환한 응답 처리
+                alert("이메일 인증이 완료되었습니다.");
+            })
+            .catch(error => {
+                console.error('에러:', error);
+                alert("이메일 인증에 실패했습니다.");
+            });
+    }
+
+</script>
+</body>
+</html>
