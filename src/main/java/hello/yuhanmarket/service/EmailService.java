@@ -2,7 +2,7 @@ package hello.yuhanmarket.service;
 
 
 import hello.yuhanmarket.domain.EmailCertification;
-import hello.yuhanmarket.dto.EmailRequestDTO;
+import hello.yuhanmarket.dto.email.EmailRequestDTO;
 import hello.yuhanmarket.email.EmailProvider;
 import hello.yuhanmarket.repository.EmailRepository;
 import hello.yuhanmarket.repository.MemberRepository;
@@ -11,7 +11,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
 import java.util.Random;
 
 @Service

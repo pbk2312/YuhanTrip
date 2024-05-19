@@ -1,4 +1,4 @@
-package hello.yuhanmarket.dto;
+package hello.yuhanmarket.dto.email;
 
 import hello.yuhanmarket.domain.EmailCertification;
 import lombok.AllArgsConstructor;

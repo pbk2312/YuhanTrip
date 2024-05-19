@@ -1,15 +1,12 @@
 package hello.yuhanmarket.repository;
 
 import hello.yuhanmarket.domain.EmailCertification;
-import hello.yuhanmarket.dto.EmailRequestDTO;
+import hello.yuhanmarket.dto.email.EmailRequestDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.Optional;
 import java.util.Random;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class EmailRepositoryTest {

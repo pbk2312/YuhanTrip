@@ -1,4 +1,4 @@
-package hello.yuhanmarket.dto;
+package hello.yuhanmarket.dto.token;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

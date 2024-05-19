@@ -24,7 +24,7 @@
                             </div>
                             <div class="card-body">
                                 <form th:action="@{/member/register}" th:object="${memberRequestDTO}" method="post">
-                                <div class="row">
+                                    <div class="row">
                                         <div class="col-md-8">
                                             <div class="form-floating mb-3">
                                                 <input class="form-control" id="inputEmail" type="email"
@@ -126,25 +126,26 @@
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('이메일 인증번호 요청에 실패했습니다.');
+                    return response.text().then(text => {
+                        throw new Error(text);
+                    });
                 }
-                return response.json();
+                return response.text();
             })
             .then(data => {
                 console.log(data); // 서버에서 반환한 응답 처리
+                alert(data); // 성공 메시지 표시
             })
             .catch(error => {
                 console.error('에러:', error);
+                alert(error.message); // 실패 메시지 표시
             });
     }
 
-
+    // Verify Certification 버튼 클릭 시 이메일 인증 요청을 보냄
     document.getElementById('verifyCertificationButton').addEventListener('click', function () {
-        // 이메일과 인증번호 가져오기
         var email = document.getElementById('inputEmail').value;
         var certificationNumber = document.getElementById('inputCertificationNumber').value;
-
-        // 이메일 인증 요청 보내기
         verifyEmail(email, certificationNumber);
     });
 
@@ -162,20 +163,21 @@
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('이메일 인증에 실패했습니다.');
+                    return response.text().then(text => {
+                        throw new Error(text);
+                    });
                 }
                 return response.text();
             })
             .then(data => {
                 console.log(data); // 서버에서 반환한 응답 처리
-                alert("이메일 인증이 완료되었습니다.");
+                alert(data); // 성공 메시지 표시
             })
             .catch(error => {
                 console.error('에러:', error);
-                alert("이메일 인증에 실패했습니다.");
+                alert(error.message); // 실패 메시지 표시
             });
     }
-
 </script>
 </body>
 </html>

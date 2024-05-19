@@ -1,7 +1,7 @@
 package hello.yuhanmarket.controller;
 
-import hello.yuhanmarket.dto.EmailRequestDTO;
-import hello.yuhanmarket.dto.EmailVerificationRequestDTO;
+import hello.yuhanmarket.dto.email.EmailRequestDTO;
+import hello.yuhanmarket.dto.email.EmailVerificationRequestDTO;
 import hello.yuhanmarket.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,22 +23,22 @@ public class EmailController {
     @PostMapping("/sendCertificationMail")
     public ResponseEntity<String> sendCertificationMail(@RequestBody EmailRequestDTO emailRequestDTO) {
         try {
-            String result = emailService.sendCertificationMail(emailRequestDTO);
-            return ResponseEntity.ok(result);
+            emailService.sendCertificationMail(emailRequestDTO);
+            return new ResponseEntity<>("이메일 전송이 완료되었습니다.", HttpStatus.OK);
         } catch (Exception e) {
             log.error("이메일 전송 실패: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이메일 전송에 실패했습니다.");
+            return new ResponseEntity<>("이메일 전송에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PostMapping("/verifyEmail")
     public ResponseEntity<String> verifyEmail(@RequestBody EmailVerificationRequestDTO emailVerificationRequestDTO) {
         try {
-            String result = emailService.verifyEmail(emailVerificationRequestDTO.getEmail(), emailVerificationRequestDTO.getCertificationNumber());
-            return ResponseEntity.ok(result);
+            emailService.verifyEmail(emailVerificationRequestDTO.getEmail(), emailVerificationRequestDTO.getCertificationNumber());
+            return new ResponseEntity<>("인증번호 인증이 완료되었습니다.", HttpStatus.OK);
         } catch (Exception e) {
             log.error("이메일 인증 실패: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이메일 인증에 실패했습니다.");
+            return new ResponseEntity<>("이메일 인증에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

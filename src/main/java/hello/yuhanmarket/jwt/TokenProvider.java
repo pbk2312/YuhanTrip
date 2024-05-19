@@ -1,6 +1,6 @@
 package hello.yuhanmarket.jwt;
 
-import hello.yuhanmarket.dto.TokenDTO;
+import hello.yuhanmarket.dto.token.TokenDTO;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;

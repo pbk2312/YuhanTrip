@@ -1,4 +1,4 @@
-package hello.yuhanmarket.dto;
+package hello.yuhanmarket.dto.register;
 
 import hello.yuhanmarket.domain.Member;
 import lombok.AllArgsConstructor;

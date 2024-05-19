@@ -1,8 +1,7 @@
 package hello.yuhanmarket.controller;
 
-import hello.yuhanmarket.dto.LoginRequestDTO;
-import hello.yuhanmarket.dto.MemberRequestDTO;
-import hello.yuhanmarket.repository.MemberRepository;
+import hello.yuhanmarket.dto.LoginDTO;
+import hello.yuhanmarket.dto.register.MemberRequestDTO;
 import hello.yuhanmarket.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -43,7 +42,7 @@ public class MemberController {
     }
 
     @GetMapping("/login")
-    public String showLogin(@ModelAttribute LoginRequestDTO loginRequestDTO) {
+    public String showLogin(@ModelAttribute LoginDTO loginDTO) {
         return "login";
     }
 
