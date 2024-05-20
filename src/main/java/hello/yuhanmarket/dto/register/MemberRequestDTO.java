@@ -1,6 +1,7 @@
 package hello.yuhanmarket.dto.register;
 
 import hello.yuhanmarket.domain.Member;
+import hello.yuhanmarket.domain.MemberRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,11 +33,17 @@ public class MemberRequestDTO {
     @NotBlank
     private String certificationNumber; // 추가: 인증번호 필드
 
+    @NotBlank
+    private MemberRole memberRole;
+
+
+
     public Member toMember(PasswordEncoder passwordEncoder) {
         // 회원 객체를 생성하고 반환
         return Member.builder()
                 .email(email)
                 .password(passwordEncoder.encode(password))
+                .memberRole(MemberRole.MEMBER)
                 .build();
     }
 

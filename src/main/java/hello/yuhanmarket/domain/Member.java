@@ -23,6 +23,9 @@ public class Member {
     private String email;
     private String password;
 
+    @Enumerated(EnumType.STRING)
+    private MemberRole memberRole;
+
 
 
     public Member toMember(PasswordEncoder passwordEncoder) {
@@ -30,6 +33,7 @@ public class Member {
         return Member.builder()
                 .email(email)
                 .password(passwordEncoder.encode(password))
+                .memberRole(memberRole)
                 .build();
     }
 

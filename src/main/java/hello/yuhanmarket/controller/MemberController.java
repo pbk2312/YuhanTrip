@@ -2,15 +2,15 @@ package hello.yuhanmarket.controller;
 
 import hello.yuhanmarket.dto.LoginDTO;
 import hello.yuhanmarket.dto.register.MemberRequestDTO;
+import hello.yuhanmarket.dto.token.TokenDTO;
 import hello.yuhanmarket.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.apache.coyote.Response;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Log4j2
 @Controller
@@ -45,5 +45,15 @@ public class MemberController {
     public String showLogin(@ModelAttribute LoginDTO loginDTO) {
         return "login";
     }
+
+
+    @PostMapping("/login")
+    public ResponseEntity<TokenDTO> login(@RequestBody LoginDTO loginDTO) {
+        log.info("로그인 요청...");
+        TokenDTO tokenDTO = memberService.login(loginDTO);
+        log.info("로그인이 완료되었습니다. 반환된 토큰: {}", tokenDTO);
+        return ResponseEntity.ok(tokenDTO);
+    }
+
 
 }
