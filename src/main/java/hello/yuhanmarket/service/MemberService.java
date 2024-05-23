@@ -4,6 +4,7 @@ import hello.yuhanmarket.domain.EmailCertification;
 import hello.yuhanmarket.domain.Member;
 import hello.yuhanmarket.domain.RefreshToken;
 import hello.yuhanmarket.dto.LoginDTO;
+import hello.yuhanmarket.dto.LogoutDTO;
 import hello.yuhanmarket.dto.register.MemberRequestDTO;
 import hello.yuhanmarket.dto.token.TokenDTO;
 import hello.yuhanmarket.jwt.TokenProvider;
@@ -18,6 +19,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -90,6 +93,15 @@ public class MemberService {
         // 5. 토큰 발급
         log.info("로그인 완료: 사용자 아이디={}", authentication.getName());
         return tokenDTO;
+    }
+
+    @Transactional
+    public String logout(LogoutDTO logoutDTO) {
+
+        String email = logoutDTO.getEmail();
+        refreshTokenRepository.deleteByEmail(email);
+
+        return "로그아웃 되었습니다.";
     }
 
 

@@ -1,6 +1,7 @@
 package hello.yuhanmarket.controller;
 
 import hello.yuhanmarket.dto.LoginDTO;
+import hello.yuhanmarket.dto.LogoutDTO;
 import hello.yuhanmarket.dto.register.MemberRequestDTO;
 import hello.yuhanmarket.dto.token.TokenDTO;
 import hello.yuhanmarket.service.MemberService;
@@ -55,5 +56,15 @@ public class MemberController {
         return ResponseEntity.ok(tokenDTO);
     }
 
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestBody LogoutDTO logoutDTO) {
+        log.info("로그아웃 요청");
+        memberService.logout(logoutDTO);
+        log.info("로그아웃 완료");
+
+        return ResponseEntity.ok("로그아웃 완료");
+
+    }
 
 }
