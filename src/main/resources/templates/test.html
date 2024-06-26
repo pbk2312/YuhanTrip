@@ -1,0 +1,23 @@
+<!-- 이미지를 표시할 Thymeleaf 템플릿 예제 -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Test Images</title>
+</head>
+<body>
+<h1>Test Images</h1>
+
+<div th:each="item : ${items}">
+    <div th:text="${item.title}" style="font-weight: bold;"></div>
+    <div th:text="${item.content}"></div>
+
+    <!-- 상품 이미지 표시 -->
+    <div th:each="image : ${item.itemImages}">
+        <!-- 이미지 URL에서 "/images" 부분 제거 -->
+        <img th:src="@{${image.imageUrl.replace('/images', '')}}" style="max-width: 200px; max-height: 200px; margin-bottom: 10px;">
+    </div>
+
+    <hr>
+</div>
+</body>
+</html>

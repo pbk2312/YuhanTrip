@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
@@ -31,11 +31,10 @@
                        data-toggle="dropdown" aria-expanded="false">Shop</a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <li><a class="dropdown-item" href="#!">All Products</a></li>
-                        <li>
-                            <hr class="dropdown-divider"/>
-                        </li>
+                        <li><hr class="dropdown-divider"/></li>
                         <li><a class="dropdown-item" href="#!">Popular Items</a></li>
                         <li><a class="dropdown-item" href="#!">New Arrivals</a></li>
+                        <li><a class="dropdown-item" th:href="@{/board/item/new}">Add New Item</a></li> <!-- Added this line -->
                     </ul>
                 </li>
             </ul>
@@ -52,7 +51,7 @@
     <div class="container px-4 px-lg-5 my-5">
         <div class="text-center text-white">
             <h1 class="display-4 fw-bolder">Shop in style</h1>
-            <p class="lead fw-normal text-white-50 mb-0">With this shop hompeage template</p>
+            <p class="lead fw-normal text-white-50 mb-0">With this shop homepage template</p>
         </div>
     </div>
 </header>
@@ -67,11 +66,6 @@
 
 <script src="js/scripts.js">
 </script>
-
-<!-- Logout button -->
-<form class="form-inline my-2 my-lg-0">
-    <button class="btn btn-outline-dark my-2 my-sm-0" type="button" onclick="confirmLogout()">Logout</button>
-</form>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
