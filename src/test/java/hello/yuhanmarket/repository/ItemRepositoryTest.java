@@ -1,7 +1,6 @@
 package hello.yuhanmarket.repository;
 
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
+
 import hello.yuhanmarket.domain.shopping.Item;
 import hello.yuhanmarket.domain.shopping.ItemSellStatus;
 import org.junit.jupiter.api.DisplayName;
