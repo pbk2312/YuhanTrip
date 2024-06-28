@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <title>Shop Homepage - Start Bootstrap Template</title>
+    <!-- Favicon-->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico"/>
+    <!-- Bootstrap icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet"/>
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link th:href="@{/css/homestyles.css}" href="../css/homestyles.css" rel="stylesheet">
+    <script th:src="@{/js/homescripts.js}"></script>
+</head>
+<body>
+<div class="container">
+    <h1 class="mt-4">Item Registration Form</h1>
+    <form th:action="@{/items/new}" th:object="${itemFormDTO}" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="itemNm">상품명</label>
+            <input type="text" id="itemNm" name="itemNm" class="form-control" placeholder="상품명을 입력하세요" required>
+        </div>
+        <div class="form-group">
+            <label for="price">가격</label>
+            <input type="number" id="price" name="price" class="form-control" placeholder="가격을 입력하세요" required>
+        </div>
+        <div class="form-group">
+            <label for="itemDetail">상품 상세 설명</label>
+            <textarea id="itemDetail" name="itemDetail" class="form-control" placeholder="상품 상세 설명을 입력하세요" required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="stockNumber">재고 수량</label>
+            <input type="number" id="stockNumber" name="stockNumber" class="form-control" placeholder="재고 수량을 입력하세요" required>
+        </div>
+        <div class="form-group">
+            <label for="itemSellStatus">상품 판매 상태</label>
+            <select id="itemSellStatus" name="itemSellStatus" class="form-control" required>
+                <option value="SELL">판매중</option>
+                <option value="SOLD_OUT">품절</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="itemImg">상품 이미지</label>
+            <input type="file" id="itemImg" name="itemImgDtoList" class="form-control" multiple>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">등록</button>
+    </form>
+</div>
+</body>
+</html>

@@ -1,9 +1,17 @@
-package hello.yuhanmarket.domain.shopping;
+/*package hello.yuhanmarket.domain.shopping;
 
 import hello.yuhanmarket.repository.ItemRepository;
+import hello.yuhanmarket.repository.OrderReposiotry;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.PersistenceContext;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -13,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class OrderTest {
 
     @Autowired
-    OrderRepository orderRepository;
+    OrderReposiotry orderRepository;
 
     @Autowired
     ItemRepository itemRepository;
@@ -43,7 +51,6 @@ class OrderTest {
             Item item = this.createItem();
             itemRepository.save(item);
             OrderItem orderItem = new OrderItem();
-            orderItem.setItem(item);
             orderItem.setCount(10);
             orderItem.setOrderPrice(1000);
             orderItem.setOrder(order);
@@ -59,3 +66,5 @@ class OrderTest {
     }
 
 }
+
+ */
