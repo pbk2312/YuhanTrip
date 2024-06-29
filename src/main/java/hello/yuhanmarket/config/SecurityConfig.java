@@ -57,8 +57,8 @@ public class SecurityConfig {
                         .requestMatchers("/member/**").permitAll() // 특정 URL 패턴의 요청은 모든 사용자에게 허용
                         .requestMatchers("/email/**").permitAll() // 특정 URL 패턴의 요청은 모든 사용자에게 허용
                         .requestMatchers("/market/**").permitAll() // 특정 URL 패턴의 요청은 모든 사용자에게 허용 (수정된 부분)
-                        .requestMatchers("/board/**").permitAll() // 특정 URL 패턴의 요청은 모든 사용자에게 허용 (수정된 부분)
-                        .requestMatchers("/Board/**").permitAll()
+                        .requestMatchers("/admin/**").authenticated() // 특정 URL 패턴의 요청은 모든 사용자에게 허용 (수정된 부분)
+                        .requestMatchers("/board/**").permitAll()
                         .requestMatchers("/thymeleaf/**").permitAll()
                         .anyRequest().authenticated() // 그 외의 모든 요청은 인증이 필요
                 )
