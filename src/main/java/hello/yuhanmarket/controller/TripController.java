@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/market")
-public class MarketController {
+@RequestMapping("/trip")
+public class TripController {
 
 
     @GetMapping("/home")

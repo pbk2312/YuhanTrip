@@ -1,7 +1,5 @@
-/*package hello.yuhanmarket.domain.shopping;
+package hello.yuhanmarket.domain.shopping;
 
-import hello.yuhanmarket.repository.ItemRepository;
-import hello.yuhanmarket.repository.OrderReposiotry;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
@@ -13,11 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
 @Transactional
-
 class OrderTest {
 
     @Autowired
@@ -26,10 +21,14 @@ class OrderTest {
     @Autowired
     ItemRepository itemRepository;
 
+    @Autowired
+    OrderItemRepository orderItemRepository;
+
     @PersistenceContext
     EntityManager em;
 
-    public Item createItem(){
+    // Item 생성 메서드
+    public Item createItem() {
         Item item = new Item();
         item.setItemNm("테스트 상품");
         item.setPrice(10000);
@@ -41,13 +40,27 @@ class OrderTest {
         return item;
     }
 
+    // Order 생성 메서드
+    public Order createOrder() {
+        Order order = new Order();
+        for (int i = 0; i < 3; i++) {
+            Item item = this.createItem();
+            itemRepository.save(item);
+            OrderItem orderItem = new OrderItem();
+            orderItem.setCount(10);
+            orderItem.setOrderPrice(1000);
+            orderItem.setOrder(order);
+            order.getOrderItems().add(orderItem);
+        }
+        return order;
+    }
+
     @Test
     @DisplayName("영속성 전이 테스트")
     public void cascadeTest() {
-
         Order order = new Order();
 
-        for(int i=0;i<3;i++){
+        for (int i = 0; i < 3; i++) {
             Item item = this.createItem();
             itemRepository.save(item);
             OrderItem orderItem = new OrderItem();
@@ -65,6 +78,20 @@ class OrderTest {
         assertEquals(3, savedOrder.getOrderItems().size());
     }
 
-}
+    @Test
+    @DisplayName("지연 로딩 테스트")
+    public void lazyLoadingTest() {
+        Order order = this.createOrder();
+        orderRepository.saveAndFlush(order);
+        Long orderItemId = order.getOrderItems().get(0).getId();
+        em.flush();
+        em.clear();
 
- */
+        OrderItem orderItem = orderItemRepository.findById(orderItemId)
+                .orElseThrow(EntityNotFoundException::new);
+        System.out.println("Order class : " + orderItem.getOrder().getClass());
+        System.out.println("===========================");
+        orderItem.getOrder().getOrderDate();
+        System.out.println("===========================");
+    }
+}

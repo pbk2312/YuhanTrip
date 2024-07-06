@@ -13,7 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class Member {
+public class Member extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,6 +41,8 @@ public class Member {
         return new UsernamePasswordAuthenticationToken(email, password);
         // 사용자 로그인 기능 처리하기 위한 메서드
     }
+
+
 
 }
 

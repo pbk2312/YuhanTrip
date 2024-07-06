@@ -6,10 +6,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
 @EnableJpaRepositories(basePackages = "hello.yuhanmarket.repository")
-public class YuhanMarketApplication {
+public class YuhanTripApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(YuhanMarketApplication.class, args);
+        SpringApplication.run(YuhanTripApplication.class, args);
     }
 
 }
