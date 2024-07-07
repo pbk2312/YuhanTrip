@@ -56,7 +56,7 @@ public class SecurityConfig {
                         .requestMatchers("/mypage/**").authenticated() // 특정 URL 패턴의 요청은 인증이 필요
                         .requestMatchers("/member/**").permitAll() // 특정 URL 패턴의 요청은 모든 사용자에게 허용
                         .requestMatchers("/email/**").permitAll() // 특정 URL 패턴의 요청은 모든 사용자에게 허용
-                        .requestMatchers("/market/**").permitAll() // 특정 URL 패턴의 요청은 모든 사용자에게 허용 (수정된 부분)
+                        .requestMatchers("/home/**").permitAll() // 특정 URL 패턴의 요청은 모든 사용자에게 허용 (수정된 부분)
                         .requestMatchers("/admin/**").authenticated() // 특정 URL 패턴의 요청은 모든 사용자에게 허용 (수정된 부분)
                         .requestMatchers("/board/**").permitAll()
                         .requestMatchers("/thymeleaf/**").permitAll()

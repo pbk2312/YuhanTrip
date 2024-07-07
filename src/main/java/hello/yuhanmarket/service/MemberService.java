@@ -3,14 +3,18 @@ package hello.yuhanmarket.service;
 import hello.yuhanmarket.domain.EmailCertification;
 import hello.yuhanmarket.domain.Member;
 import hello.yuhanmarket.domain.RefreshToken;
+import hello.yuhanmarket.domain.ResetToken;
 import hello.yuhanmarket.dto.LoginDTO;
 import hello.yuhanmarket.dto.LogoutDTO;
+import hello.yuhanmarket.dto.email.EmailRequestDTO;
 import hello.yuhanmarket.dto.register.MemberRequestDTO;
 import hello.yuhanmarket.dto.token.TokenDTO;
+import hello.yuhanmarket.email.EmailProvider;
 import hello.yuhanmarket.jwt.TokenProvider;
 import hello.yuhanmarket.repository.EmailRepository;
 import hello.yuhanmarket.repository.MemberRepository;
 import hello.yuhanmarket.repository.RefreshTokenRepository;
+import hello.yuhanmarket.repository.ResetTokenReposiotry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +38,8 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final ResetTokenReposiotry resetTokenReposiotry;
+    private final EmailProvider emailProvider;
 
     public String register(MemberRequestDTO memberRequestDTO) {
         String email = memberRequestDTO.getEmail();
@@ -104,5 +111,43 @@ public class MemberService {
         return "로그아웃 되었습니다.";
     }
 
+    public String sendPasswordResetEamil(EmailRequestDTO emailRequestDTO) {
+
+        memberRepository.findByEmail(emailRequestDTO.getEmail())
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원 입니다."));
+
+        // 임시 비밀번호 생성
+        String resetToken = generateResetToken();
+
+        // ResetToken 엔티티 생성 및 저장
+        ResetToken tokenEntity = new ResetToken();
+        tokenEntity.setEmail(emailRequestDTO.getEmail());
+        tokenEntity.setResetToken(resetToken);
+        resetTokenReposiotry.save(tokenEntity);
+
+        // 비밀번호 재설정 링크
+        String resetLink = "http://localhost:8080/member/updatePassword?token=" + resetToken + "&email=" + emailRequestDTO.getEmail();
+
+        // 이메일 보내기
+        boolean emailSent = emailProvider.sendCertificationMail(emailRequestDTO.getEmail(), resetLink);
+        if (!emailSent) {
+            throw new RuntimeException("이메일 발송에 실패했습니다.");
+        }
+
+        return "비밀번호 재설정 이메일 전송 성공";
+    }
+
+
+    // 임시 비밀번호 생성 메서드
+    private String generateResetToken() {
+        int length = 20; // 임시 비밀번호 길이
+        StringBuilder sb = new StringBuilder();
+        Random random = new Random();
+        for (int i = 0; i < length; i++) {
+            char randomChar = (char) (random.nextInt(26) + 'a'); // 알파벳 소문자 랜덤 생성
+            sb.append(randomChar);
+        }
+        return sb.toString();
+    }
 
 }
