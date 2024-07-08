@@ -7,6 +7,7 @@ import hello.yuhanmarket.domain.ResetToken;
 import hello.yuhanmarket.dto.LoginDTO;
 import hello.yuhanmarket.dto.LogoutDTO;
 import hello.yuhanmarket.dto.email.EmailRequestDTO;
+import hello.yuhanmarket.dto.register.MemberChangePasswordDTO;
 import hello.yuhanmarket.dto.register.MemberRequestDTO;
 import hello.yuhanmarket.dto.token.TokenDTO;
 import hello.yuhanmarket.email.EmailProvider;
@@ -111,7 +112,7 @@ public class MemberService {
         return "로그아웃 되었습니다.";
     }
 
-    public String sendPasswordResetEamil(EmailRequestDTO emailRequestDTO) {
+    public String sendPasswordResetEmail(EmailRequestDTO emailRequestDTO) {
 
         memberRepository.findByEmail(emailRequestDTO.getEmail())
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 회원 입니다."));
@@ -129,12 +130,31 @@ public class MemberService {
         String resetLink = "http://localhost:8080/member/updatePassword?token=" + resetToken + "&email=" + emailRequestDTO.getEmail();
 
         // 이메일 보내기
-        boolean emailSent = emailProvider.sendCertificationMail(emailRequestDTO.getEmail(), resetLink);
+        boolean emailSent = emailProvider.sendPasswordResetEmail(emailRequestDTO, resetLink);
         if (!emailSent) {
             throw new RuntimeException("이메일 발송에 실패했습니다.");
         }
 
         return "비밀번호 재설정 이메일 전송 성공";
+    }
+
+    // 비밀번호 재설정
+    @Transactional
+    public String memberChangePassword(MemberChangePasswordDTO memberChangePasswordDTO) {
+        String email = memberChangePasswordDTO.getEmail();
+        String password = memberChangePasswordDTO.getPassword();
+        String checkPassword = memberChangePasswordDTO.getCheckPassword();
+
+        if (!password.equals(checkPassword)) {
+            throw new RuntimeException("입력한 비밀번호가 일치하지 않습니다.");
+        }
+
+        //비밀번호 암호화
+        String hashedPassword = passwordEncoder.encode(password);
+
+        memberRepository.updatePasswordByEmail(email, hashedPassword);
+
+        return "비밀번호 변경이 완료되었습니다.";
     }
 
 

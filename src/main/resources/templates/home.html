@@ -32,16 +32,17 @@
                        data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <li><a class="dropdown-item" href="#!">All Products</a></li>
-                        <li><hr class="dropdown-divider"/></li>
+                        <li>
+                            <hr class="dropdown-divider"/>
+                        </li>
                         <li><a class="dropdown-item" href="#!">Popular Items</a></li>
                         <li><a class="dropdown-item" href="#!">New Arrivals</a></li>
-                        <li><a class="dropdown-item" id="addNewItem" href="#">Add New Item</a></li> <!-- Modified this line -->
                     </ul>
                 </li>
             </ul>
-            <!-- Logout button -->
+            <!-- Authentication buttons -->
             <form class="form-inline my-2 my-lg-0">
-                <button class="btn btn-outline-dark my-2 my-sm-0" type="button" onclick="confirmLogout()">Logout</button>
+                <button id="authButton" class="btn btn-outline-dark my-2 my-sm-0" type="button"></button>
             </form>
         </div>
     </div>
@@ -51,7 +52,7 @@
 <header class="bg-dark py-5">
     <div class="container px-4 px-lg-5 my-5">
         <div class="text-center text-white">
-            <h1 class="display-4 fw-bolder">Accomodation in style</h1>
+            <h1 class="display-4 fw-bolder">Accommodation in style</h1>
             <p class="lead fw-normal text-white-50 mb-0">With this shop homepage template</p>
         </div>
     </div>
@@ -71,66 +72,18 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const accessToken = localStorage.getItem('accessToken');
-        if (!accessToken) {
-            alert('로그인이 필요합니다!');
-            window.location.href = '/member/login'; // 로그인 페이지로 이동
-        } else {
-            // 액세스 토큰이 있으면 /market/home으로 GET 요청을 보냄
-            fetchHome(accessToken);
-        }
+        const authButton = document.getElementById('authButton');
 
-        // Add event listener for the "Add New Item" button
-        document.getElementById('addNewItem').addEventListener('click', (event) => {
-            event.preventDefault(); // Prevent the default link behavior
-            addItem(accessToken);
-        });
+        if (accessToken) {
+            authButton.textContent = 'Logout';
+            authButton.onclick = confirmLogout;
+            fetchHome(accessToken);
+        } else {
+            authButton.textContent = 'Login';
+            authButton.onclick = () => window.location.href = '/member/login';
+        }
     });
 
-    function fetchHome(accessToken) {
-        fetch('/market/home', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${accessToken}`
-            }
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('접근이 거부되었습니다.');
-                }
-                return response.text();
-            })
-            .then(html => {
-                document.documentElement.innerHTML = html; // 서버에서 받은 HTML로 DOM 업데이트
-            })
-            .catch(error => {
-                console.error('에러:', error);
-                alert('접근이 거부되었습니다.');
-                window.location.href = '/member/login'; // 접근이 거부되면 로그인 페이지로 이동
-            });
-    }
-
-    function addItem(accessToken) {
-        fetch('/admin/item/new', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${accessToken}`
-            }
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('접근이 거부되었습니다.');
-                }
-                return response.text();
-            })
-            .then(html => {
-                document.documentElement.innerHTML = html; // 서버에서 받은 HTML로 DOM 업데이트
-            })
-            .catch(error => {
-                console.error('에러:', error);
-                alert('접근이 거부되었습니다.');
-                window.location.href = '/member/login'; // 접근이 거부되면 로그인 페이지로 이동
-            });
-    }
 
     function confirmLogout() {
         if (confirm("로그아웃 하시겠습니까?")) {
@@ -139,16 +92,13 @@
     }
 
     function logout() {
-        // AccessToken 삭제
         deleteAccessToken();
-        // 로그인 페이지로 리디렉션
-        window.location.href = "/member/login";
+        document.getElementById('authButton').textContent = 'Login';
+        document.getElementById('authButton').onclick = () => window.location.href = '/member/login';
     }
 
     function deleteAccessToken() {
-        // localStorage에서 AccessToken 삭제
         localStorage.removeItem('accessToken');
-        // 세션 기반의 AccessToken을 사용한다면 서버 측에 해당 세션을 무효화하는 요청을 보내는 것이 좋음
     }
 </script>
 </body>

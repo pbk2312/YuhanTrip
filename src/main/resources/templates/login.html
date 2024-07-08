@@ -33,7 +33,7 @@
                                         <label for="inputPassword">Password</label>
                                     </div>
                                     <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
-                                        <a class="small" href="#">Forgot Password?</a>
+                                        <a class="small" th:href="@{/member/sendResetPasswordEmail}">Forgot Password?</a>
                                         <button type="button" class="btn btn-primary" id="loginButton">Login</button>
                                     </div>
                                 </form>
@@ -72,7 +72,6 @@
         login(email, password);
     });
 
-
     function login(email, password) {
         fetch('/member/login', {
             method: 'POST',
@@ -93,7 +92,7 @@
                 const accessToken = data.accessToken;
                 localStorage.setItem('accessToken', accessToken);
                 alert('로그인 성공');
-                window.location.href = '/market/home';
+                window.location.href = '/home/homepage';
             })
             .catch(error => {
                 console.error('로그인 오류:', error);
@@ -101,7 +100,7 @@
             });
     }
 
-    // accessToken을 헤더에 포함하여 /market/home 엔드포인트에 요청
+    // accessToken을 헤더에 포함하여 /home 엔드포인트에 요청
     function fetchHome() {
         const accessToken = localStorage.getItem('accessToken');
         if (!accessToken) {
@@ -110,7 +109,7 @@
             return;
         }
 
-        fetch('/market/home', {
+        fetch('/home/homepage', {
             headers: {
                 'Authorization': `Bearer ${accessToken}`
             }
