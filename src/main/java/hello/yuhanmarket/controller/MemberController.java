@@ -85,9 +85,12 @@ public class MemberController {
         }
     }
 
+
     @GetMapping("/updatePassword")
     public String updatePassword(@RequestParam("token") String resetToken,
-                                 @RequestParam("email") String email) {
+                                 @RequestParam("email") String email,
+                                 Model model,
+                                 RedirectAttributes redirectAttributes) {
 
         // ResetToken을 검증합니다.
         ResetToken storedToken = resetTokenReposiotry.findByEmail(email)
@@ -105,15 +108,42 @@ public class MemberController {
         }
 
         // ResetToken이 유효하고 만료되지 않았다면 비밀번호 재설정 페이지로 이동합니다.
-        return "updatePassword";
+        // 이메일과 토큰을 모델에 추가하여 비밀번호 재설정 페이지에 사용할 수 있도록 합니다.
+        model.addAttribute("email", email);
+        model.addAttribute("resetToken", resetToken);
 
+        return "updatePassword";
     }
 
-    @PostMapping("/updatePassword/{email}")
-    public String changePassword(@PathVariable("email") String email, @RequestBody MemberChangePasswordDTO memberChangePasswordDTO) {
-        memberChangePasswordDTO.setEmail(email); // 이메일 설정은 클라이언트가 보낸 JSON 데이터에서 설정
+    @PostMapping("/updatePassword")
+    public String changePassword(@RequestParam("token") String resetToken,
+                                 @RequestParam("email") String email,
+                                 @RequestBody MemberChangePasswordDTO memberChangePasswordDTO,
+                                 RedirectAttributes redirectAttributes) {
+
+        // ResetToken을 검증합니다.
+        ResetToken storedToken = resetTokenReposiotry.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("ResetToken을 찾을 수 없습니다."));
+
+        // 저장된 토큰과 요청된 토큰이 일치하는지 확인합니다.
+        if (!storedToken.getResetToken().equals(resetToken)) {
+            throw new RuntimeException("유효하지 않은 ResetToken입니다.");
+        }
+
+        // 만료 여부를 검사합니다.
+        LocalDateTime expiryDate = storedToken.getExpiryDate();
+        if (expiryDate != null && expiryDate.isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("ResetToken이 만료되었습니다.");
+        }
+
+        // 비밀번호 변경을 수행합니다.
+        memberChangePasswordDTO.setEmail(email); // 클라이언트가 보낸 JSON 데이터에서 이메일 설정
         memberService.memberChangePassword(memberChangePasswordDTO);
-        // 비밀번호 변경 성공 후 리다이렉트
+
+        // 비밀번호 변경 성공 메시지를 플래시 어트리뷰트에 추가하여 한 번만 사용할 수 있도록 합니다.
+        redirectAttributes.addFlashAttribute("successMessage", "비밀번호 변경이 완료되었습니다.");
+
+        // 비밀번호 변경 후 홈 페이지로 리다이렉트합니다.
         return "redirect:/home/homepage";
     }
 

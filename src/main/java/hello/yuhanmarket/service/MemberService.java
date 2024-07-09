@@ -149,10 +149,16 @@ public class MemberService {
             throw new RuntimeException("입력한 비밀번호가 일치하지 않습니다.");
         }
 
+        log.info("비밀번호 일치,비밀번호 인코딩");
+
         //비밀번호 암호화
         String hashedPassword = passwordEncoder.encode(password);
 
+        log.info("비밀번호 암호화 완료");
+
         memberRepository.updatePasswordByEmail(email, hashedPassword);
+
+        log.info("성공적으로 DB에 반영");
 
         return "비밀번호 변경이 완료되었습니다.";
     }
