@@ -85,12 +85,10 @@ public class MemberController {
         }
     }
 
-
     @GetMapping("/updatePassword")
     public String updatePassword(@RequestParam("token") String resetToken,
                                  @RequestParam("email") String email,
-                                 Model model,
-                                 RedirectAttributes redirectAttributes) {
+                                 Model model) {
 
         // ResetToken을 검증합니다.
         ResetToken storedToken = resetTokenReposiotry.findByEmail(email)
@@ -118,7 +116,7 @@ public class MemberController {
     @PostMapping("/updatePassword")
     public String changePassword(@RequestParam("token") String resetToken,
                                  @RequestParam("email") String email,
-                                 @RequestBody MemberChangePasswordDTO memberChangePasswordDTO,
+                                 @ModelAttribute MemberChangePasswordDTO memberChangePasswordDTO,
                                  RedirectAttributes redirectAttributes) {
 
         // ResetToken을 검증합니다.
