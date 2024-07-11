@@ -6,6 +6,7 @@ import hello.yuhanmarket.domain.RefreshToken;
 import hello.yuhanmarket.domain.ResetToken;
 import hello.yuhanmarket.dto.LoginDTO;
 import hello.yuhanmarket.dto.LogoutDTO;
+import hello.yuhanmarket.dto.WithdrawalMembershipDTO;
 import hello.yuhanmarket.dto.email.EmailRequestDTO;
 import hello.yuhanmarket.dto.register.MemberChangePasswordDTO;
 import hello.yuhanmarket.dto.register.MemberRequestDTO;
@@ -163,6 +164,24 @@ public class MemberService {
         return "비밀번호 변경이 완료되었습니다.";
     }
 
+    @Transactional
+    public String deleteAccount(WithdrawalMembershipDTO withdrawalMembershipDTO) {
+        Member member = memberRepository.findByEmail(withdrawalMembershipDTO.getEmail()).orElseThrow(() -> new RuntimeException("존재하지 않는 회원 입니다."));
+        if (!passwordEncoder.matches(withdrawalMembershipDTO.getPassword(),member.getPassword())){
+            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+
+        }
+        // 해당 회원의 RefreshToken을 삭제합니다.
+        refreshTokenRepository.deleteByEmail(member.getEmail());
+
+        memberRepository.delete(member);
+
+        log.info("회원 정보 삭제...");
+
+
+        return "회원 정보가 정상적으로 삭제되었습니다.";
+
+    }
 
     // 임시 비밀번호 생성 메서드
     private String generateResetToken() {

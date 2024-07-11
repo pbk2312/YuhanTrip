@@ -3,6 +3,7 @@ package hello.yuhanmarket.controller;
 import hello.yuhanmarket.domain.ResetToken;
 import hello.yuhanmarket.dto.LoginDTO;
 import hello.yuhanmarket.dto.LogoutDTO;
+import hello.yuhanmarket.dto.WithdrawalMembershipDTO;
 import hello.yuhanmarket.dto.email.EmailRequestDTO;
 import hello.yuhanmarket.dto.register.MemberChangePasswordDTO;
 import hello.yuhanmarket.dto.register.MemberRequestDTO;
@@ -11,7 +12,10 @@ import hello.yuhanmarket.repository.ResetTokenReposiotry;
 import hello.yuhanmarket.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -144,5 +148,46 @@ public class MemberController {
         // 비밀번호 변경 후 홈 페이지로 리다이렉트합니다.
         return "redirect:/home/homepage";
     }
+
+
+    @GetMapping("/withdrawalMembership")
+    public String withdrawalMembershipForm(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+
+        WithdrawalMembershipDTO withdrawalMembershipDTO = new WithdrawalMembershipDTO();
+        withdrawalMembershipDTO.setEmail(userDetails.getUsername());
+        model.addAttribute("withdrawalMembershipDTO", withdrawalMembershipDTO);
+
+        return "withdrawalMembership";
+    }
+
+    @PostMapping("/deleteAccount")
+    public ResponseEntity<Void> deleteAccount(@RequestBody WithdrawalMembershipDTO withdrawalMembershipDTO,
+                                              @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            // 사용자가 인증되지 않은 경우 처리
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        log.info("회원탈퇴 이메일 : {}", userDetails.getUsername());
+
+        withdrawalMembershipDTO.setEmail(userDetails.getUsername());
+
+        try {
+            String message = memberService.deleteAccount(withdrawalMembershipDTO);
+
+            if ("회원 정보가 정상적으로 삭제되었습니다.".equals(message)) {
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.badRequest().build();
+            }
+        } catch (Exception e) {
+            log.error("회원 탈퇴 중 오류 발생: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
+
+
 
 }

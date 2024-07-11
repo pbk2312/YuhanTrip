@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delete Account - SB Admin</title>
+  <link rel="stylesheet" href="../css/styles.css">
+  <script src="../js/scripts.js"></script>
+  <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="container">
+  <div class="card card-register mx-auto mt-5">
+    <div class="card-header">Delete Your Account</div>
+    <div class="card-body">
+      <form id="deleteAccountForm" action="/deleteAccount" method="post">
+        <div class="form-group">
+          <div class="form-label-group">
+            <input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password" required autofocus>
+            <label for="inputPassword">Password</label>
+          </div>
+        </div>
+        <!-- 추가: email input hidden으로 추가 -->
+        <input type="hidden" id="inputEmail" name="email">
+        <button type="submit" class="btn btn-primary btn-block">Delete Account</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const deleteAccountForm = document.getElementById('deleteAccountForm');
+    const emailInput = document.getElementById('inputEmail');
+
+    // withdrawalMembershipDTO 객체에서 email을 가져와서 hidden input에 설정
+    const withdrawalMembershipDTO = /* 이 객체는 서버 측에서 모델에 담긴 것으로 가정 */ {
+      email: 'user@example.com' // 예시: 실제로는 서버에서 모델로 가져와야 함
+    };
+    emailInput.value = withdrawalMembershipDTO.email;
+
+    deleteAccountForm.onsubmit = async (event) => {
+      event.preventDefault();
+      const formData = new FormData(deleteAccountForm);
+
+      const data = {};
+      formData.forEach((value, key) => {
+        data[key] = value;
+      });
+
+      try {
+        const response = await fetch(deleteAccountForm.action, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+          alert('Your account has been deleted successfully.');
+          window.location.href = '/home/homepage'; // 성공적인 경우 리디렉션
+        } else {
+          alert('Error deleting your account. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error deleting account:', error);
+        alert('Error deleting your account. Please try again.');
+      }
+    };
+  });
+</script>
+</body>
+</html>
