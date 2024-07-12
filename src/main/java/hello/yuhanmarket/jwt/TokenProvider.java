@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 public class TokenProvider {
 
 
-
     private final CustomUserDetailsService customUserDetailsService;
 
     private static final String AUTHORITIES_KEY = "auth";
@@ -42,7 +41,6 @@ public class TokenProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
         this.customUserDetailsService = customUserDetailsService;
     }
-
 
 
     public TokenDTO generateTokenDto(Authentication authentication) {
@@ -83,16 +81,24 @@ public class TokenProvider {
         Claims claims = parseClaims(accessToken);
 
         if (claims == null || claims.getSubject() == null) {
+            log.error("토큰이 올바르지 않습니다. Claims: {}, Subject: {}", claims, claims != null ? claims.getSubject() : "null");
             throw new RuntimeException("토큰이 올바르지 않습니다.");
         }
 
         // 권한 정보 가져오기
         Collection<? extends GrantedAuthority> authorities = extractAuthorities(claims);
 
+        log.info("토큰에서 추출한 사용자 이름: {}", claims.getSubject());
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(claims.getSubject());
+
+        if (userDetails == null) {
+            log.error("유저 정보를 찾을 수 없습니다. 사용자 이름: {}", claims.getSubject());
+            throw new RuntimeException("유저 정보를 찾을 수 없습니다.");
+        }
 
         return new UsernamePasswordAuthenticationToken(userDetails, accessToken, authorities);
     }
+
 
     private Collection<? extends GrantedAuthority> extractAuthorities(Claims claims) {
         // 토큰에서 권한 정보 추출

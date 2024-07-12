@@ -58,6 +58,7 @@ public class SecurityConfig {
                         .requestMatchers("/accomodation/**").permitAll()
                         .requestMatchers("/updatePassword/**").permitAll()
                         .requestMatchers("/member/withdrawalMembership").authenticated()
+                        .requestMatchers("/member/deleteAccount").authenticated()
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
                 )
