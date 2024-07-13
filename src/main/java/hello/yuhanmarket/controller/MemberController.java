@@ -163,9 +163,13 @@ public class MemberController {
     @PostMapping("/deleteAccount")
     public ResponseEntity<Void> deleteAccount(@RequestBody WithdrawalMembershipDTO withdrawalMembershipDTO,
                                               @AuthenticationPrincipal UserDetails userDetails) {
+
+        log.info("회원 탈퇴를 진행합니다...");
+
         // 사용자 인증 상태 확인
         if (userDetails == null) {
             log.info("사용자가 인증되지 않았습니다.");
+
             // 사용자가 인증되지 않은 경우 처리
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
