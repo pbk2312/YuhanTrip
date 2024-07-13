@@ -1,8 +1,8 @@
 package hello.yuhanmarket.domain.shopping;
 
-import hello.yuhanmarket.domain.Member;
-import hello.yuhanmarket.domain.MemberRole;
-import hello.yuhanmarket.repository.MemberRepository;
+import hello.yuhanTrip.domain.Member;
+import hello.yuhanTrip.domain.MemberRole;
+import hello.yuhanTrip.repository.MemberRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;

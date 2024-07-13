@@ -1,7 +1,8 @@
 package hello.yuhanmarket.repository;
 
-import hello.yuhanmarket.domain.EmailCertification;
-import hello.yuhanmarket.dto.email.EmailRequestDTO;
+import hello.yuhanTrip.domain.EmailCertification;
+import hello.yuhanTrip.dto.email.EmailRequestDTO;
+import hello.yuhanTrip.repository.EmailRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
