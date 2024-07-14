@@ -1,19 +1,16 @@
 package hello.yuhanTrip.controller;
 
-
-import com.fasterxml.jackson.core.JsonProcessingException;
+import hello.yuhanTrip.domain.Accommodation;
 import hello.yuhanTrip.service.Accomodation.AccommodationService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-//
+
 @RestController
 public class AccommodationController {
-
 
     private final AccommodationService accommodationService;
 
@@ -22,15 +19,24 @@ public class AccommodationController {
     }
 
     @GetMapping("/accommodations")
-    public List<Map<String, Object>> getAccommodations(
-            @RequestParam int areaCode,
-            @RequestParam String state,
-            @RequestParam int contentTypeId,
-            @RequestParam int numOfRows) throws URISyntaxException, JsonProcessingException {
-        return accommodationService.getData(areaCode, state, contentTypeId, numOfRows);
+    public List<Accommodation> getAccommodations(@RequestParam(defaultValue = "10") int numOfRows) {
+        try {
+            // 데이터베이스에 데이터 저장
+            accommodationService.saveDataToDatabase(numOfRows);
+
+            // API로부터 숙소 데이터 가져오기
+            List<Accommodation> accommodations = accommodationService.getData(numOfRows);
+
+            if (accommodations.isEmpty()) {
+                System.out.println("조회된 숙소 정보가 없습니다.");
+            }
+
+            return accommodations;
+        } catch (Exception e) {
+            // 예외 처리: 로깅 및 예외 상황에 대한 응답 처리
+            System.err.println("숙소 정보 조회 중 오류 발생: " + e.getMessage());
+            e.printStackTrace(); // 로깅: 발생한 예외를 콘솔에 출력
+            return Collections.emptyList(); // 오류 발생 시 빈 리스트 반환
+        }
     }
-
-
-
-
 }

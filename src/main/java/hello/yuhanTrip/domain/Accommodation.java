@@ -19,28 +19,27 @@ public class Accommodation {
     private Long id;
 
     private String addr1;
-    private String cpyrhtDivCd;
-    private String mapy;
-    private String mlevel;
-    private String modifiedtime;
-    private String sigungucode;
-    private String tel;
-    private String title;
-    private String contentid;
-    private String contenttypeid;
-    private String createdtime;
-    private String benikia;
-    private String goodstay;
-    private String hanok;
-    private String firstimage;
-    private String firstimage2;
-    private String mapx;
     private String addr2;
     private String areacode;
-    private String booktour;
+    private String benikia;
     private String cat1;
     private String cat2;
     private String cat3;
-
+    private String contentid;
+    private String contenttypeid;
+    private String createdtime;
+    private String firstimage;
+    private String firstimage2;
+    private String cpyrhtDivCd;
+    private String goodstay;
+    private String hanok;
+    private String mapx;
+    private String mapy;
+    private String mlevel;
+    private String modifiedtime;
+    private String tel;
+    private String title;
+    private String booktour;
+    private String sigungucode;
 }
 

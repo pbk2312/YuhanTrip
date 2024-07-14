@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Accommodations</title>
+</head>
+<body>
+<h1>Accommodations</h1>
+<table>
+    <thead>
+    <tr>
+        <th>Title</th>
+        <th>Address</th>
+        <th>Telephone</th>
+        <th>Image</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="accommodation : ${accommodations}">
+        <td th:text="${accommodation.title}">Title</td>
+        <td th:text="${accommodation.addr1}">Address</td>
+        <td th:text="${accommodation.tel}">Telephone</td>
+        <td><img th:src="${accommodation.firstimage}" alt="Image" width="100"/></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
