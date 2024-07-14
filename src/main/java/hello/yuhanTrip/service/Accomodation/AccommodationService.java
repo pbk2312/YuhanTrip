@@ -14,7 +14,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -53,16 +52,17 @@ public class AccommodationService {
 
         // Build URI with parameters
         URI uri = UriComponentsBuilder.fromHttpUrl(url)
+                .queryParam("numOfRows", numOfRows)
                 .queryParam("MobileOS", "ETC")
                 .queryParam("MobileApp", "Test")
-                .queryParam("serviceKey", SERVICE_KEY)
                 .queryParam("_type", "json")
-                .queryParam("numOfRows", numOfRows)
+                .queryParam("serviceKey", SERVICE_KEY)
                 .build()
+                .encode()
                 .toUri();
 
         // 로그 출력
-        System.out.println("Request URI: " + uri.toString());
+        System.out.println("Request URL: " + uri.toString());
 
         try {
             ResponseEntity<String> responseEntity = restTemplate.getForEntity(uri, String.class);
