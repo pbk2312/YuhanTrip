@@ -37,8 +37,8 @@ public class AccommodationService {
     }
 
     @Transactional
-    public void saveDataToDatabase(int numOfRows) {
-        List<Accommodation> accommodations = getData(numOfRows);
+    public void saveDataToDatabase() {
+        List<Accommodation> accommodations = getData();
         if (!accommodations.isEmpty()) {
             accommodationRepository.saveAll(accommodations);
             System.out.println("데이터베이스에 숙소 정보를 저장했습니다.");
@@ -47,12 +47,11 @@ public class AccommodationService {
         }
     }
 
-    public List<Accommodation> getData(int numOfRows) {
+    public List<Accommodation> getData() {
         String url = "https://apis.data.go.kr/B551011/KorService1/searchStay1";
 
         // Build URI with parameters
         URI uri = UriComponentsBuilder.fromHttpUrl(url)
-                .queryParam("numOfRows", numOfRows)
                 .queryParam("MobileOS", "ETC")
                 .queryParam("MobileApp", "Test")
                 .queryParam("_type", "json")

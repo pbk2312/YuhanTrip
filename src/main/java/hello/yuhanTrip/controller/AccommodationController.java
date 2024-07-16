@@ -19,13 +19,13 @@ public class AccommodationController {
     }
 
     @GetMapping("/accommodations")
-    public List<Accommodation> getAccommodations(@RequestParam(defaultValue = "10") int numOfRows) {
+    public List<Accommodation> getAccommodations() {
         try {
             // 데이터베이스에 데이터 저장
-            accommodationService.saveDataToDatabase(numOfRows);
+            accommodationService.saveDataToDatabase();
 
             // API로부터 숙소 데이터 가져오기
-            List<Accommodation> accommodations = accommodationService.getData(numOfRows);
+            List<Accommodation> accommodations = accommodationService.getData();
 
             if (accommodations.isEmpty()) {
                 System.out.println("조회된 숙소 정보가 없습니다.");
