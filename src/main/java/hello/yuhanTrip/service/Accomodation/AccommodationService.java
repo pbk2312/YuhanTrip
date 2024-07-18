@@ -11,13 +11,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.net.URISyntaxException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,46 +35,63 @@ public class AccommodationService {
 
     @Transactional
     public void saveDataToDatabase() {
-        List<Accommodation> accommodations = getData();
-        if (!accommodations.isEmpty()) {
-            accommodationRepository.saveAll(accommodations);
-            System.out.println("데이터베이스에 숙소 정보를 저장했습니다.");
+        List<Accommodation> allAccommodations = getAllData();
+        if (!allAccommodations.isEmpty()) {
+            try {
+                accommodationRepository.saveAll(allAccommodations);
+                System.out.println("데이터베이스에 숙소 정보를 저장했습니다.");
+            } catch (Exception e) {
+                System.err.println("데이터베이스에 숙소 정보를 저장하는 중 오류가 발생했습니다: " + e.getMessage());
+            }
         } else {
             System.out.println("저장할 숙소 정보가 없습니다.");
         }
     }
 
-    public List<Accommodation> getData() {
-        String url = "https://apis.data.go.kr/B551011/KorService1/searchStay1";
+    public List<Accommodation> getAllData() {
+        List<Accommodation> allAccommodations = new ArrayList<>();
+        int page = 1;
+        int size = 10; // 기본 페이지 사이즈
 
-        // Build URI with parameters
-        URI uri = UriComponentsBuilder.fromHttpUrl(url)
-                .queryParam("MobileOS", "ETC")
-                .queryParam("MobileApp", "Test")
-                .queryParam("_type", "json")
-                .queryParam("serviceKey", SERVICE_KEY)
-                .build()
-                .encode()
-                .toUri();
+        while (true) {
+            List<Accommodation> accommodations = getData(page, size);
+            if (accommodations.isEmpty()) {
+                break;
+            }
+            allAccommodations.addAll(accommodations);
+            page++;
+        }
+
+        return allAccommodations;
+    }
+
+    public List<Accommodation> getData(int page, int size) {
+
+        String encodedServiceKey = SERVICE_KEY.replace("+", "%2B"); // '+'를 '%2B'로 인코딩
+
+        String url = String.format("https://apis.data.go.kr/B551011/KorService1/searchStay1?numOfRows=%d&pageNo=%d&MobileOS=ETC&MobileApp=Test&_type=json&serviceKey=%s", size, page, encodedServiceKey);
 
         // 로그 출력
-        System.out.println("Request URL: " + uri.toString());
+        System.out.println("요청 URL: " + url);
 
         try {
+            URI uri = new URI(url);
             ResponseEntity<String> responseEntity = restTemplate.getForEntity(uri, String.class);
 
-            System.out.println("Response Status Code: " + responseEntity.getStatusCode());
-            System.out.println("Response Body: " + responseEntity.getBody());
+            System.out.println("응답 상태 코드: " + responseEntity.getStatusCode());
+            System.out.println("응답 본문: " + responseEntity.getBody());
 
             if (responseEntity.getStatusCode() == HttpStatus.OK) {
                 String responseBody = responseEntity.getBody();
-                // Parse JSON response
+                // JSON 응답 파싱
                 return parseResponse(responseBody);
             } else {
                 System.err.println("API 호출이 실패했습니다. 상태 코드: " + responseEntity.getStatusCodeValue());
             }
         } catch (HttpClientErrorException.NotFound e) {
             System.err.println("API 호출이 실패했습니다. 404 Not Found 에러: " + e.getMessage());
+        } catch (URISyntaxException e) {
+            System.err.println("URI 문법 오류: " + e.getMessage());
         } catch (Exception e) {
             System.err.println("API 호출 중 오류가 발생했습니다: " + e.getMessage());
         }
