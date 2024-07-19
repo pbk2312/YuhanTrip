@@ -13,6 +13,43 @@
     <!-- Core theme CSS (includes Bootstrap)-->
     <link th:href="@{/css/homestyles.css}" href="../css/homestyles.css" rel="stylesheet">
     <script th:src="@{/js/homescripts.js}"></script>
+    <style>
+        .card img {
+            height: 200px;
+            object-fit: cover;
+        }
+        .card-title {
+            font-size: 1.25rem;
+        }
+        .pagination {
+            justify-content: center;
+        }
+        .centered-button {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .btn-custom {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.25rem;
+            border-radius: 50px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        .btn-custom:hover {
+            background: linear-gradient(135deg, #0056b3, #00408d);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            text-decoration: none;
+        }
+        .btn-custom:focus, .btn-custom:active {
+            outline: none;
+            box-shadow: 0 0 0 0.25rem rgba(38, 143, 255, 0.5);
+        }
+    </style>
 </head>
 <body>
 <!-- Navigation-->
@@ -59,10 +96,19 @@
     </div>
 </header>
 
+<!-- Main Content-->
+<div class="container">
+    <!-- 숙소 예약 버튼 추가 -->
+    <div class="centered-button">
+        <a class="btn btn-custom" href="/accommodation/accommodations">숙소 예약</a>
+    </div>
+</div>
+
 <!-- Footer-->
 <footer class="py-5 bg-dark">
     <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
 </footer>
+
 <!-- jQuery, Popper.js, and Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
@@ -134,6 +180,5 @@
         // 이 함수는 필요에 따라 구현할 수 있습니다.
     }
 </script>
-
 </body>
 </html>
