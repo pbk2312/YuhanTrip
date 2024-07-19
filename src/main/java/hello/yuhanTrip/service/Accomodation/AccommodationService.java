@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import hello.yuhanTrip.domain.Accommodation;
 import hello.yuhanTrip.repository.AccommodationRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -35,7 +38,7 @@ public class AccommodationService {
 
     @Transactional
     public void saveDataToDatabase() {
-        List<Accommodation> allAccommodations = getAllData();
+        List<Accommodation> allAccommodations = fetchAllDataFromAPI();
         if (!allAccommodations.isEmpty()) {
             try {
                 accommodationRepository.saveAll(allAccommodations);
@@ -48,13 +51,22 @@ public class AccommodationService {
         }
     }
 
-    public List<Accommodation> getAllData() {
+    public Page<Accommodation> getAccommodations(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return accommodationRepository.findAll(pageable);
+    }
+
+    public boolean isDatabaseEmpty() {
+        return accommodationRepository.count() == 0;
+    }
+
+    private List<Accommodation> fetchAllDataFromAPI() {
         List<Accommodation> allAccommodations = new ArrayList<>();
         int page = 1;
         int size = 10; // 기본 페이지 사이즈
 
         while (true) {
-            List<Accommodation> accommodations = getData(page, size);
+            List<Accommodation> accommodations = getDataFromAPI(page, size);
             if (accommodations.isEmpty()) {
                 break;
             }
@@ -65,7 +77,7 @@ public class AccommodationService {
         return allAccommodations;
     }
 
-    public List<Accommodation> getData(int page, int size) {
+    private List<Accommodation> getDataFromAPI(int page, int size) {
 
         String encodedServiceKey = SERVICE_KEY.replace("+", "%2B"); // '+'를 '%2B'로 인코딩
 

@@ -53,7 +53,7 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").authenticated()
                         .requestMatchers("/board/**").permitAll()
                         .requestMatchers("/thymeleaf/**").permitAll()
-                        .requestMatchers("/accomodation/**").permitAll()
+                        .requestMatchers("/accommodation/**").permitAll()
                         .requestMatchers("/updatePassword/**").permitAll()
                         .requestMatchers("/member/withdrawalMembership").authenticated()
                         .requestMatchers("/member/deleteAccount").authenticated()
