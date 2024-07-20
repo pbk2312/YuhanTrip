@@ -23,22 +23,24 @@ public class AccommodationController {
     public String listAccommodations(Model model,
                                      @RequestParam(defaultValue = "0") int page,
                                      @RequestParam(defaultValue = "10") int size) {
+
+        log.info("숙소 리스트를 조회합니다.... 페이지: {}, 사이즈: {}", page, size);
+
         // 페이지 번호와 사이즈 검증
-        if (page < 0) page = 0;
-        if (size <= 0) size = 10;
+        page = Math.max(page, 0);
+        size = Math.max(size, 1);
 
         Page<Accommodation> accommodationsPage = accommodationService.getAccommodations(page, size);
 
-        // 페이지 번호 검증
-        int currentPage = Math.max(page, 0); // Ensure page number is not negative
-        if (accommodationsPage.getTotalPages() > 0 && currentPage >= accommodationsPage.getTotalPages()) {
-            currentPage = accommodationsPage.getTotalPages() - 1;
-        }
+        int totalPages = accommodationsPage.getTotalPages();
+        int currentPage = page;
 
         model.addAttribute("accommodations", accommodationsPage.getContent());
         model.addAttribute("pageNumber", currentPage);
-        model.addAttribute("totalPages", accommodationsPage.getTotalPages());
+        model.addAttribute("totalPages", totalPages);
         model.addAttribute("pageSize", size);
+        log.info("현재 페이지: {}, 전체 페이지: {}", currentPage, totalPages);
+
         return "accommodations";
     }
 }

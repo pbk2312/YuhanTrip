@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hello.yuhanTrip.domain.Accommodation;
 import hello.yuhanTrip.repository.AccommodationRepository;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,6 +22,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Log4j2
 public class AccommodationService {
 
     @Value("${service.key}")
@@ -42,12 +44,12 @@ public class AccommodationService {
         if (!allAccommodations.isEmpty()) {
             try {
                 accommodationRepository.saveAll(allAccommodations);
-                System.out.println("데이터베이스에 숙소 정보를 저장했습니다.");
+                log.info("데이터베이스에 숙소 정보를 저장했습니다.");
             } catch (Exception e) {
-                System.err.println("데이터베이스에 숙소 정보를 저장하는 중 오류가 발생했습니다: " + e.getMessage());
+                log.info("데이터베이스에 숙소 정보를 저장하는 중 오류가 발생했습니다: " + e.getMessage());
             }
         } else {
-            System.out.println("저장할 숙소 정보가 없습니다.");
+            log.info("저장할 숙소 정보가 없습니다.");
         }
     }
 
@@ -84,28 +86,28 @@ public class AccommodationService {
         String url = String.format("https://apis.data.go.kr/B551011/KorService1/searchStay1?numOfRows=%d&pageNo=%d&MobileOS=ETC&MobileApp=Test&_type=json&serviceKey=%s", size, page, encodedServiceKey);
 
         // 로그 출력
-        System.out.println("요청 URL: " + url);
+        log.info("요청 URL: " + url);
 
         try {
             URI uri = new URI(url);
             ResponseEntity<String> responseEntity = restTemplate.getForEntity(uri, String.class);
 
-            System.out.println("응답 상태 코드: " + responseEntity.getStatusCode());
-            System.out.println("응답 본문: " + responseEntity.getBody());
+            log.info("응답 상태 코드: " + responseEntity.getStatusCode());
+            log.info("응답 본문: " + responseEntity.getBody());
 
             if (responseEntity.getStatusCode() == HttpStatus.OK) {
                 String responseBody = responseEntity.getBody();
                 // JSON 응답 파싱
                 return parseResponse(responseBody);
             } else {
-                System.err.println("API 호출이 실패했습니다. 상태 코드: " + responseEntity.getStatusCodeValue());
+                log.error("API 호출이 실패했습니다. 상태 코드: " + responseEntity.getStatusCodeValue());
             }
         } catch (HttpClientErrorException.NotFound e) {
-            System.err.println("API 호출이 실패했습니다. 404 Not Found 에러: " + e.getMessage());
+            log.error("API 호출이 실패했습니다. 404 Not Found 에러: " + e.getMessage());
         } catch (URISyntaxException e) {
-            System.err.println("URI 문법 오류: " + e.getMessage());
+            log.error("URI 문법 오류: " + e.getMessage());
         } catch (Exception e) {
-            System.err.println("API 호출 중 오류가 발생했습니다: " + e.getMessage());
+            log.error("API 호출 중 오류가 발생했습니다: " + e.getMessage());
         }
 
         return Collections.emptyList();
@@ -138,7 +140,7 @@ public class AccommodationService {
             }
 
         } catch (JsonProcessingException e) {
-            System.err.println("JSON 파싱 중 오류가 발생했습니다: " + e.getMessage());
+            log.error("JSON 파싱 중 오류가 발생했습니다: " + e.getMessage());
         }
 
         return Collections.emptyList();
@@ -179,7 +181,7 @@ public class AccommodationService {
 
             return accommodation;
         } catch (Exception e) {
-            System.err.println("Accommodation 매핑 중 오류가 발생했습니다: " + e.getMessage());
+            log.error("Accommodation 매핑 중 오류가 발생했습니다: " + e.getMessage());
             return null;
         }
     }

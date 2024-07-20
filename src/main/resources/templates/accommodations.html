@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
     <meta name="description" content=""/>
     <meta name="author" content=""/>
-    <title>Yuhan Trip - Accommodations</title>
+    <title>Yuhan Trip - 숙소 리스트</title>
     <!-- Favicon-->
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico"/>
     <!-- Bootstrap icons-->
@@ -13,51 +13,42 @@
     <!-- Core theme CSS (includes Bootstrap)-->
     <link th:href="@{/css/homestyles.css}" href="../css/homestyles.css" rel="stylesheet">
     <script th:src="@{/js/homescripts.js}"></script>
-    <style>
-        .card img {
-            height: 200px;
-            object-fit: cover;
-        }
-        .card-title {
-            font-size: 1.25rem;
-        }
-        .pagination {
-            justify-content: center;
-        }
-    </style>
 </head>
 <body>
 <div class="container">
-    <h1 class="mt-4">숙소 정보들</h1>
-    <div class="row row-cols-1 row-cols-md-3 g-4 mt-4">
-        <div class="col" th:each="accommodation : ${accommodations}">
-            <div class="card h-100">
-                <img th:if="${accommodation.firstimage}" th:src="${accommodation.firstimage}" class="card-img-top" alt="Image">
-                <div th:if="${accommodation.firstimage == null}" class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
-                    <span>No image</span>
-                </div>
-                <div class="card-body">
-                    <h5 class="card-title" th:text="${accommodation.title}">Title</h5>
-                </div>
-            </div>
-        </div>
-    </div>
+    <h1 class="mt-4">숙소 리스트</h1>
+    <table class="table table-striped mt-4">
+        <thead>
+        <tr>
+            <th>숙소 이름</th>
+            <th>이미지</th>
+            <th>지도</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="accommodation : ${accommodations}">
+            <td th:text="${accommodation.title}">숙소 이름</td>
+            <td>
+                <img th:if="${accommodation.firstimage}" th:src="${accommodation.firstimage}" alt="이미지" width="200">
+                <span th:if="${accommodation.firstimage == null}">이미지 없음</span>
+            </td>
+            <td>
+                <a th:href="'https://www.google.com/maps/search/?api=1&query=' + ${accommodation.mapy} + ',' + ${accommodation.mapx}" target="_blank">지도 보기</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 
-    <nav class="mt-4">
+    <nav>
         <ul class="pagination">
-            <!-- Previous Button -->
             <li class="page-item" th:classappend="${pageNumber == 0} ? 'disabled'">
-                <a class="page-link" th:href="@{|/accommodation/accommodations?page=${pageNumber - 1}&size=${pageSize}|}" aria-disabled="${pageNumber == 0}">Previous</a>
+                <a class="page-link" th:href="@{|/accommodation/accommodations?page=${pageNumber - 1}&size=${pageSize}|}">이전</a>
             </li>
-
-            <!-- Page Numbers -->
             <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${i == pageNumber} ? 'active'">
-                <a class="page-link" th:href="@{|/accommodation/accommodations?page=${i}&size=${pageSize}|}" th:text="${i + 1}"></a>
+                <a class="page-link" th:href="@{|/accommodation/accommodations?page=${i}&size=${pageSize}|}" th:text="${i + 1}">1</a>
             </li>
-
-            <!-- Next Button -->
-            <li class="page-item" th:classappend="${pageNumber + 1 >= totalPages} ? 'disabled'">
-                <a class="page-link" th:href="@{|/accommodation/accommodations?page=${pageNumber + 1}&size=${pageSize}|}" aria-disabled="${pageNumber + 1 >= totalPages}">Next</a>
+            <li class="page-item" th:classappend="${pageNumber + 1 == totalPages} ? 'disabled'">
+                <a class="page-link" th:href="@{|/accommodation/accommodations?page=${pageNumber + 1}&size=${pageSize}|}">다음</a>
             </li>
         </ul>
     </nav>
