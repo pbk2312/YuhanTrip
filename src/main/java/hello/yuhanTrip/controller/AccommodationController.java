@@ -35,11 +35,18 @@ public class AccommodationController {
         int totalPages = accommodationsPage.getTotalPages();
         int currentPage = page;
 
+        // 페이지 번호 범위 계산
+        int startPage = Math.max(0, currentPage - 5);
+        int endPage = Math.min(totalPages - 1, currentPage + 5);
+
         model.addAttribute("accommodations", accommodationsPage.getContent());
-        model.addAttribute("pageNumber", currentPage);
+        model.addAttribute("currentPage", currentPage);
         model.addAttribute("totalPages", totalPages);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
         model.addAttribute("pageSize", size);
-        log.info("현재 페이지: {}, 전체 페이지: {}", currentPage, totalPages);
+
+        log.info("현재 페이지: {}, 전체 페이지: {}, 시작 페이지: {}, 끝 페이지: {}", currentPage, totalPages, startPage, endPage);
 
         return "accommodations";
     }
