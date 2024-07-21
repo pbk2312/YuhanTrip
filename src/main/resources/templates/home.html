@@ -55,7 +55,7 @@
 <!-- Navigation-->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container px-4 px-lg-5">
-        <a class="navbar-brand" href="#!">Start Bootstrap</a>
+        <a class="navbar-brand" href="#!">YuhanTrip</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -100,14 +100,9 @@
 <div class="container">
     <!-- 숙소 예약 버튼 추가 -->
     <div class="centered-button">
-        <a class="btn btn-custom" href="/accommodation/accommodations">숙소 예약</a>
+        <button class="btn btn-custom" id="accommodationButton">숙소 예약</button>
     </div>
 </div>
-
-<!-- Footer-->
-<footer class="py-5 bg-dark">
-    <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
-</footer>
 
 <!-- jQuery, Popper.js, and Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -120,6 +115,7 @@
         const accessToken = localStorage.getItem('accessToken');
         const authButton = document.getElementById('authButton');
         const deleteAccountButton = document.getElementById('deleteAccountButton');
+        const accommodationButton = document.getElementById('accommodationButton');
 
         if (accessToken) {
             authButton.textContent = 'Logout';
@@ -131,6 +127,30 @@
             authButton.textContent = 'Login';
             authButton.onclick = () => window.location.href = '/member/login';
         }
+
+        accommodationButton.onclick = () => {
+            if (accessToken) {
+                // 페이지를 이동하기 전에 fetch를 통해 토큰을 전달
+                fetch('/accommodation/accommodations', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                }).then(response => {
+                    if (response.ok) {
+                        // 성공적으로 응답을 받은 후 페이지를 이동
+                        window.location.href = '/accommodation/accommodations';
+                    } else {
+                        alert('숙소 예약 페이지를 여는 데 실패했습니다.');
+                    }
+                }).catch(error => {
+                    console.error('Error:', error);
+                    alert('숙소 예약 페이지를 여는 데 문제가 발생했습니다.');
+                });
+            } else {
+                alert('로그인 후 시도해주세요.');
+            }
+        };
     });
 
     function confirmLogout() {

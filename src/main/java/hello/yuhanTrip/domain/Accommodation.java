@@ -1,12 +1,11 @@
 package hello.yuhanTrip.domain;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -41,5 +40,10 @@ public class Accommodation {
     private String title;
     private String booktour;
     private String sigungucode;
+    private String price;
+
+    @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reservation> reservations;
+
 }
 

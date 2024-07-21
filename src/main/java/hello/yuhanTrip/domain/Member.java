@@ -6,6 +6,8 @@ import lombok.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -13,7 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class Member extends BaseEntity{
+public class Member {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,6 +28,9 @@ public class Member extends BaseEntity{
     @Enumerated(EnumType.STRING)
     private MemberRole memberRole;
 
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reservation> reservations;
 
 
     public Member toMember(PasswordEncoder passwordEncoder) {

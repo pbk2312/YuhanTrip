@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="description" content="숙소 상세 정보"/>
+    <meta name="author" content="Yuhan Trip"/>
+    <title th:text="${accommodation.title} + ' - 숙소 상세 정보'">숙소 상세 정보</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico"/>
+    <!-- Bootstrap icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet"/>
+    <!-- Core theme CSS (includes Bootstrap) -->
+    <link th:href="@{/css/homestyles.css}" href="../css/homestyles.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+        .navbar {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .navbar-nav .nav-link {
+            margin-right: 20px;
+            color: #495057;
+        }
+        .navbar-nav .nav-link:hover {
+            color: #007bff;
+        }
+        .card {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .card-img-top {
+            height: 400px;
+            object-fit: cover;
+        }
+        .card-body {
+            text-align: center;
+            padding: 20px;
+            background-color: #ffffff;
+        }
+        .card-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .info-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px; /* Reduced gap for closer positioning */
+        }
+        .details {
+            margin-bottom: 40px;
+        }
+        .details h2 {
+            font-size: 1.5rem;
+            color: #343a40;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .details p {
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+        .details strong {
+            color: #343a40;
+        }
+        .price-section {
+            text-align: center;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .price-card {
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #e83e8c; /* Change color here */
+            color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .price-card h3 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0;
+        }
+        .map-button, .reservation-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 500;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .map-button:hover, .reservation-button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+        .map-button i, .reservation-button i {
+            margin-right: 8px;
+        }
+        footer {
+            background-color: #343a40;
+            color: #ffffff;
+            padding: 20px 0;
+        }
+        footer p {
+            margin: 0;
+        }
+        .alert {
+            display: none;
+            margin-top: 20px;
+        }
+        .alert-show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container px-4 px-lg-5">
+        <a class="navbar-brand" href="#!">YuhanTrip</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                <li class="nav-item"><a class="nav-link" href="/home/homepage">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="#!">All Products</a></li>
+                        <li><hr class="dropdown-divider"/></li>
+                        <li><a class="dropdown-item" href="#!">Popular Items</a></li>
+                        <li><a class="dropdown-item" href="#!">New Arrivals</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <form class="d-flex">
+                <button class="btn btn-outline-dark" type="submit">
+                    <i class="bi-cart-fill me-1"></i>
+                    Cart
+                    <span class="badge bg-dark text-white ms-1 rounded-pill">0</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<!-- Accommodation Detail Section -->
+<section class="py-5">
+    <div class="container">
+        <!-- 숙소의 이미지와 제목 -->
+        <div class="card mb-4">
+            <img th:src="@{${accommodation.firstimage}}" class="card-img-top" alt="숙소 이미지">
+            <div class="card-body">
+                <h1 class="card-title" th:text="${accommodation.title}">숙소 제목</h1>
+            </div>
+        </div>
+
+        <!-- 가격 섹션 (상단으로 이동) -->
+        <div class="price-section">
+            <div class="price-card">
+                <h3 th:text="${accommodation.price} + '원'">가격</h3>
+            </div>
+        </div>
+
+        <!-- 상세 정보 섹션 -->
+        <div class="info-container">
+            <!-- 숙소의 상세 정보 -->
+            <div class="details">
+                <h2>상세 정보</h2>
+                <p><strong>주소:</strong> <span th:text="${accommodation.addr1} + ' ' + ${accommodation.addr2}">주소</span></p>
+                <p><strong>전화번호:</strong> <span th:text="${accommodation.tel}">전화번호</span></p>
+                <p><strong>카테고리:</strong> <span th:text="${accommodation.cat1} + ' > ' + ${accommodation.cat2} + ' > ' + ${accommodation.cat3}">카테고리</span></p>
+                <p><strong>구역 코드:</strong> <span th:text="${accommodation.areacode}">구역 코드</span></p>
+                <p><strong>특징:</strong> <span th:text="${accommodation.goodstay}">특징</span></p>
+                <p><strong>한옥 여부:</strong> <span th:text="${accommodation.hanok}">한옥 여부</span></p>
+                <p><strong>출처:</strong> <span th:text="${accommodation.cpyrhtDivCd}">출처</span></p>
+                <!-- 지도 링크 -->
+                <p><strong>지도 보기:</strong>
+                    <a th:href="'https://www.google.com/maps/search/?api=1&query=' + ${accommodation.mapy} + ',' + ${accommodation.mapx}" target="_blank" class="map-button">
+                        <i class="bi bi-map"></i> View on Google Maps
+                    </a>
+                </p>
+                <!-- 예약하기 버튼 -->
+                <p><strong>예약하기:</strong>
+                    <button id="reservationButton" class="reservation-button">
+                        <i class="bi bi-calendar-check"></i> 예약하기
+                    </button>
+                </p>
+                <!-- 로그인 메시지 -->
+                <div id="loginMessage" class="alert alert-danger">
+                    로그인 후 예약할 수 있습니다. <a href="/member/login">로그인 페이지로 이동</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="py-5">
+    <div class="container">
+        <p class="m-0 text-center">Copyright &copy; Your Website 2023</p>
+    </div>
+</footer>
+
+<!-- Bootstrap core JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.getElementById('reservationButton').addEventListener('click', function() {
+        const token = localStorage.getItem('accessToken'); // Retrieve token from localStorage or other secure storage
+        const url = '/accommodation/reservation';
+        const loginMessage = document.getElementById('loginMessage');
+
+        if (!token) {
+            loginMessage.classList.add('alert-show');
+            return;
+        }
+
+        window.location.href = url; // Redirect to the reservation page
+    });
+</script>
+</body>
+</html>

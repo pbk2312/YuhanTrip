@@ -33,10 +33,15 @@
         .card-img-top {
             height: 200px; /* Set a fixed height for images */
             object-fit: cover; /* Ensure images cover the card without distortion */
+            cursor: pointer; /* Pointer cursor for clickable image */
         }
 
         .card-body {
             text-align: center; /* Center text inside the card body */
+        }
+
+        .card-title {
+            cursor: pointer; /* Show pointer cursor to indicate it's clickable */
         }
     </style>
 </head>
@@ -44,13 +49,13 @@
 <!-- Navigation -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container px-4 px-lg-5">
-        <a class="navbar-brand" href="#!">Start Bootstrap</a>
+        <a class="navbar-brand" href="#!">YuhanTrip</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span
                 class="navbar-toggler-icon"></span></button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-                <li class="nav-item"><a class="nav-link active" aria-current="page" href="#!">Home</a></li>
+                <li class="nav-item"><a class="nav-link active" aria-current="page" href="/home/homepage">Home</a></li>
                 <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
@@ -82,16 +87,17 @@
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-4">
             <!-- Example of a card -->
             <div class="col" th:each="accommodation : ${accommodations}">
-                <div class="card">
-                    <!-- Check if image exists, otherwise use default image -->
-                    <img th:if="${accommodation.firstimage}" th:src="@{${accommodation.firstimage}}" class="card-img-top" alt="이미지">
-                    <img th:unless="${accommodation.firstimage}" src="/house-540796_1280.jpg" class="card-img-top" alt="기본 이미지">
-                    <div class="card-body">
-                        <h5 class="card-title" th:text="${accommodation.title}">숙소 이름</h5>
-                        <p class="card-text" th:text="${accommodation.addr1}">주소</p>
-                        <a th:href="@{/accommodation/reservation}" class="btn btn-primary">예약하기</a>
+                <a th:href="@{|/accommodation/info?id=${accommodation.id}|}" class="text-decoration-none text-dark">
+                    <div class="card">
+                        <!-- Check if image exists, otherwise use default image -->
+                        <img th:if="${accommodation.firstimage}" th:src="@{${accommodation.firstimage}}" class="card-img-top" alt="이미지">
+                        <img th:unless="${accommodation.firstimage}" src="/house-540796_1280.jpg" class="card-img-top" alt="기본 이미지">
+                        <div class="card-body">
+                            <h5 class="card-title" th:text="${accommodation.title}">숙소 이름</h5>
+                            <p class="card-text" th:text="${accommodation.addr1}">주소</p>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
             <!-- End of card example -->
         </div>

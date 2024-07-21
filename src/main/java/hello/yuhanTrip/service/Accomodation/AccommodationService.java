@@ -185,4 +185,17 @@ public class AccommodationService {
             return null;
         }
     }
+
+
+    public Accommodation getAccommodationInfo(Long id) {
+
+        Accommodation accommodation = accommodationRepository.findById(id).orElseThrow(() -> new RuntimeException("존재하지 않는 숙소입니다."));
+
+        log.info("숙소 이름 = {}", accommodation.getTitle());
+
+        return accommodation;
+
+
+    }
+
 }
