@@ -201,7 +201,7 @@
                 </p>
                 <!-- 예약하기 버튼 -->
                 <p><strong>예약하기:</strong>
-                    <button id="reservationButton" class="reservation-button">
+                    <button id="reservationButton" class="reservation-button" th:data-id="${accommodation.id}">
                         <i class="bi bi-calendar-check"></i> 예약하기
                     </button>
                 </p>
@@ -226,7 +226,8 @@
 <script>
     document.getElementById('reservationButton').addEventListener('click', function() {
         const token = localStorage.getItem('accessToken'); // Retrieve token from localStorage or other secure storage
-        const url = '/accommodation/reservation';
+        const accommodationId = this.getAttribute('data-id'); // Get the accommodation ID from the button attribute
+        const url = `/accommodation/reservation?id=${accommodationId}`;
         const loginMessage = document.getElementById('loginMessage');
 
         if (!token) {
@@ -234,7 +235,7 @@
             return;
         }
 
-        window.location.href = url; // Redirect to the reservation page
+        window.location.href = url; // Redirect to the reservation page with query parameter
     });
 </script>
 </body>

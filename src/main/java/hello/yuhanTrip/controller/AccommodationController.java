@@ -3,6 +3,7 @@ package hello.yuhanTrip.controller;
 import hello.yuhanTrip.domain.Accommodation;
 import hello.yuhanTrip.domain.Member;
 import hello.yuhanTrip.domain.Reservation;
+import hello.yuhanTrip.dto.ReservationDTO;
 import hello.yuhanTrip.repository.MemberRepository;
 import hello.yuhanTrip.repository.ReservationRepository;
 import hello.yuhanTrip.service.Accomodation.AccommodationService;
@@ -87,29 +88,28 @@ public class AccommodationController {
 
 
 
+
     @GetMapping("/reservation")
     public String getReservation(
             @RequestParam("id") Long id,
             Model model,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
-        log.info("인증된 사용자 : {}", userDetails.getUsername());
 
-        // 현재 로그인한 사용자의 정보를 가져옵니다.
-        Member member = memberRepository.findByEmail(userDetails.getUsername()).orElseThrow(() -> new RuntimeException("회원정보가 없다"));
 
         // 예약 정보를 가져옵니다.
-        Reservation reservation = reservationRepository.findById(id).orElseThrow(() -> new RuntimeException("숙소 정보 존재"));
-
+        Accommodation accommodation = accommodationService.getAccommodationInfo(id);
 
         // 숙소 정보를 가져옵니다.
-        Accommodation accommodation = reservation.getAccommodation();
-
-        // 모델에 예약 정보와 숙소 정보를 담습니다.
-        model.addAttribute("reservation", reservation);
-        model.addAttribute("accommodation", accommodation);
+        ReservationDTO reservationDTO = new ReservationDTO();
+        reservationDTO.setId(accommodation.getId());
+        reservationDTO.setAccommodationTitle(accommodation.getTitle());
+        reservationDTO.setAccommodationAddr1(accommodation.getAddr1());
+        reservationDTO.setAccommodationAddr2(accommodation.getAddr2());
+        reservationDTO.setPrice(accommodation.getPrice());
+        // 모델에 예약 정보를 담습니다.
+        model.addAttribute("reservationDTO", reservationDTO);
 
         return "reservation";
     }
-
 }

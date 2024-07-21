@@ -53,7 +53,7 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").authenticated()
                         .requestMatchers("/accommodation/accommodations").permitAll()
                         .requestMatchers("/accommodation/info").permitAll()
-                        .requestMatchers("/accommodation/reservation").authenticated()
+                        .requestMatchers("/accommodation/reservation").permitAll()
                         .requestMatchers("/updatePassword/**").permitAll()
                         .requestMatchers("/member/withdrawalMembership").authenticated()
                         .requestMatchers("/member/deleteAccount").authenticated()
