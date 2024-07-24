@@ -223,20 +223,48 @@
 
 <!-- Bootstrap core JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+
 <script>
     document.getElementById('reservationButton').addEventListener('click', function() {
-        const token = localStorage.getItem('accessToken'); // Retrieve token from localStorage or other secure storage
-        const accommodationId = this.getAttribute('data-id'); // Get the accommodation ID from the button attribute
-        const url = `/accommodation/reservation?id=${accommodationId}`;
-        const loginMessage = document.getElementById('loginMessage');
+        const token = localStorage.getItem('accessToken'); // Get token from localStorage
+        const accommodationId = this.getAttribute('data-id'); // Get accommodation ID from button
+        const url = `/accommodation/reservation?id=${accommodationId}`; // Construct the URL with ID
+        const loginMessage = document.getElementById('loginMessage'); // Element to show login message
 
         if (!token) {
-            loginMessage.classList.add('alert-show');
+            loginMessage.classList.add('alert-show'); // Show login message if no token
             return;
         }
 
-        window.location.href = url; // Redirect to the reservation page with query parameter
+        // Fetch the reservation page content
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`, // Include JWT token in Authorization header
+                'Content-Type': 'application/json' // Set content type to JSON
+            },
+            credentials: 'include' // Include credentials for session maintenance
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.text(); // Return the HTML content as text
+                } else {
+                    throw new Error('Failed to load the reservation page');
+                }
+            })
+            .then(html => {
+                document.body.innerHTML = html; // Inject the HTML content into the page
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                loginMessage.classList.add('alert-show'); // Show login message on error
+            });
     });
 </script>
+
+
+
 </body>
 </html>

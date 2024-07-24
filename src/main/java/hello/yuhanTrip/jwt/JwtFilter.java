@@ -12,11 +12,13 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
+    private static int filterInvocationCount = 0;
     public static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer";
 
@@ -25,15 +27,20 @@ public class JwtFilter extends OncePerRequestFilter {
     // Jwt 토큰의 인증 정보를 현재 쓰레드의 SecurityContext 에 저장하는 역할 수행
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        log.info("요청 URI: {}에 대한 JWT 필터 시작", request.getRequestURI());
+        String requestId = UUID.randomUUID().toString(); // 요청 ID 생성
+        long startTime = System.currentTimeMillis(); // 요청 시작 시간
+
+        log.info("Request ID: {} - 요청 URI: {}에 대한 JWT 필터 시작", requestId, request.getRequestURI());
+
+        filterInvocationCount++;
 
         // Request Header에서 토큰을 꺼낸다
         String jwt = tokenResolve(request);
 
         if (jwt == null) {
-            log.info("요청 헤더에 JWT 토큰이 없음");
+            log.info("Request ID: {} - 요청 헤더에 JWT 토큰이 없음", requestId);
         } else {
-            log.info("JWT 토큰 발견: {}", jwt);
+            log.info("Request ID: {} - JWT 토큰 발견: {}", requestId, jwt);
         }
 
         // validate로 토큰 유효성을 검사
@@ -41,17 +48,18 @@ public class JwtFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(jwt) && tokenProvider.validate(jwt)) {
             Authentication authentication = tokenProvider.getAuthentication(jwt);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            log.info("유효한 JWT 토큰. 인증 정보 설정: {}", authentication.getName());
+            log.info("Request ID: {} - 유효한 JWT 토큰. 인증 정보 설정: {}", requestId, authentication.getName());
         } else {
             if (StringUtils.hasText(jwt)) {
-                log.info("유효하지 않은 JWT 토큰");
+                log.info("Request ID: {} - 유효하지 않은 JWT 토큰", requestId);
             }
         }
 
         // 다음 필터로 요청 전달
         filterChain.doFilter(request, response);
 
-        log.info("요청 URI: {}에 대한 JWT 필터 종료", request.getRequestURI());
+        long duration = System.currentTimeMillis() - startTime; // 요청 처리 시간
+        log.info("Request ID: {} - 요청 URI: {}에 대한 JWT 필터 종료. 처리 시간: {} ms", requestId, request.getRequestURI(), duration);
     }
 
     // 요청 헤더에서 토큰 정보 꺼내기
@@ -61,5 +69,13 @@ public class JwtFilter extends OncePerRequestFilter {
             return bearerToken.substring(7); // "Bearer" 접두사 제거하고 JWT 문자열 반환
         }
         return null;
+    }
+
+    public static int getFilterInvocationCount() {
+        return filterInvocationCount;
+    }
+
+    public static void resetFilterInvocationCount() {
+        filterInvocationCount = 0;
     }
 }

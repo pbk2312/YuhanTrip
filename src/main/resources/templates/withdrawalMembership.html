@@ -14,14 +14,13 @@
   <div class="card card-register mx-auto mt-5">
     <div class="card-header">Delete Your Account</div>
     <div class="card-body">
-      <form id="deleteAccountForm" action="/member/deleteAccount" method="post">
+      <form id="deleteAccountForm" action="/mypage/deleteAccount" method="post">
         <div class="form-group">
           <div class="form-label-group">
             <input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password" required autofocus>
             <label for="inputPassword">Password</label>
           </div>
         </div>
-        <!-- 추가: email input hidden으로 추가 -->
         <input type="hidden" id="inputEmail" name="email">
         <button type="submit" class="btn btn-primary btn-block">Delete Account</button>
       </form>
@@ -34,40 +33,42 @@
     const deleteAccountForm = document.getElementById('deleteAccountForm');
     const emailInput = document.getElementById('inputEmail');
 
-    // withdrawalMembershipDTO 객체에서 email을 가져와서 hidden input에 설정
-    const withdrawalMembershipDTO = /* 이 객체는 서버 측에서 모델에 담긴 것으로 가정 */ {
-      email: 'user@example.com' // 예시: 실제로는 서버에서 모델로 가져와야 함
+    // 서버 측에서 이메일을 가져와서 hidden input에 설정
+    const withdrawalMembershipDTO = {
+      email: 'user@example.com' // 예시, 실제로는 서버에서 가져와야 함
     };
     emailInput.value = withdrawalMembershipDTO.email;
 
     deleteAccountForm.onsubmit = async (event) => {
       event.preventDefault();
-      const formData = new FormData(deleteAccountForm);
 
+      // FormData를 JSON으로 변환
+      const formData = new FormData(deleteAccountForm);
       const data = {};
       formData.forEach((value, key) => {
         data[key] = value;
       });
 
-      // localStorage에서 accessToken 가져오기
       const accessToken = localStorage.getItem('accessToken');
+      console.log('Access Token:', accessToken); // 액세스 토큰 확인
 
       try {
         const response = await fetch(deleteAccountForm.action, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}` // Authorization 헤더에 토큰 추가
+            'Authorization': accessToken ? `Bearer ${accessToken}` : ''
           },
           body: JSON.stringify(data)
         });
 
         if (response.ok) {
-          // 탈퇴 성공 시 localStorage에서 accessToken 삭제
           localStorage.removeItem('accessToken');
           alert('Your account has been deleted successfully.');
           window.location.href = '/home/homepage'; // 성공적인 경우 리디렉션
         } else {
+          const errorText = await response.text();
+          console.error('Error response:', errorText);
           alert('Error deleting your account. Please try again.');
         }
       } catch (error) {

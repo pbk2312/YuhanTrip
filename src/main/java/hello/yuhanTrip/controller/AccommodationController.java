@@ -16,8 +16,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 
 @Controller
@@ -112,4 +116,55 @@ public class AccommodationController {
 
         return "reservation";
     }
+
+
+
+
+    @PostMapping("/reservation/submit")
+    public String submitReservation(
+            @RequestParam("accommodationId") Long accommodationId,
+            @RequestParam("checkInDate") LocalDate checkInDate,
+            @RequestParam("checkOutDate") LocalDate checkOutDate,
+            @RequestParam("specialRequests") String specialRequests,
+            @RequestParam("name") String name,
+            @RequestParam("phoneNumber") String phoneNumber,
+            @RequestParam("price") BigDecimal price,
+            Model model,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        log.info("숙소 예약 유저 : {}", userDetails != null ? userDetails.getUsername() : "No user details");
+
+        if (userDetails == null) {
+            return "error/401"; // 인증되지 않은 사용자
+        }
+
+        String username = userDetails.getUsername();
+        Member member = memberRepository.findByEmail(username)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid user"));
+
+        Accommodation accommodation = accommodationService.getAccommodationInfo(accommodationId);
+        if (accommodation == null) {
+            return "error/404";
+        }
+
+        Reservation reservation = Reservation.builder()
+                .member(member)
+                .accommodation(accommodation)
+                .checkInDate(checkInDate)
+                .checkOutDate(checkOutDate)
+                .reservationDate(LocalDate.now())
+                .specialRequests(specialRequests)
+                .name(name)
+                .phoneNumber(phoneNumber)
+                .price(price)
+                .build();
+
+        reservationRepository.save(reservation);
+
+        model.addAttribute("message", "예약이 성공적으로 완료되었습니다.");
+
+        return "redirect:/accommodation/accommodations";
+    }
+
+
 }
