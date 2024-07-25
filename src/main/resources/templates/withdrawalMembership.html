@@ -1,82 +1,52 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Delete Account - SB Admin</title>
-  <link rel="stylesheet" href="../css/styles.css">
-  <script src="../js/scripts.js"></script>
-  <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원 탈퇴</title>
+    <script>
+        function submitForm(event) {
+            event.preventDefault(); // 기본 폼 제출 동작 방지
+
+            const form = document.getElementById('withdrawalForm');
+            const formData = new FormData(form);
+            const data = {
+                email: formData.get('email'),
+                password: formData.get('password')
+            };
+
+            const accessToken = localStorage.getItem('accessToken');
+
+            fetch('/mypage/deleteAccount', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + accessToken
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = '/home/homepage'; // 성공 시 리다이렉트
+                    } else {
+                        return response.text().then(text => {
+                            alert('계정 삭제에 실패했습니다: ' + text);
+                        });
+                    }
+                })
+                .catch(error => {
+                    alert('서버와의 통신에 실패했습니다: ' + error.message);
+                });
+        }
+    </script>
 </head>
 <body>
-<div class="container">
-  <div class="card card-register mx-auto mt-5">
-    <div class="card-header">Delete Your Account</div>
-    <div class="card-body">
-      <form id="deleteAccountForm" action="/mypage/deleteAccount" method="post">
-        <div class="form-group">
-          <div class="form-label-group">
-            <input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password" required autofocus>
-            <label for="inputPassword">Password</label>
-          </div>
-        </div>
-        <input type="hidden" id="inputEmail" name="email">
-        <button type="submit" class="btn btn-primary btn-block">Delete Account</button>
-      </form>
-    </div>
-  </div>
-</div>
-
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const deleteAccountForm = document.getElementById('deleteAccountForm');
-    const emailInput = document.getElementById('inputEmail');
-
-    // 서버 측에서 이메일을 가져와서 hidden input에 설정
-    const withdrawalMembershipDTO = {
-      email: 'user@example.com' // 예시, 실제로는 서버에서 가져와야 함
-    };
-    emailInput.value = withdrawalMembershipDTO.email;
-
-    deleteAccountForm.onsubmit = async (event) => {
-      event.preventDefault();
-
-      // FormData를 JSON으로 변환
-      const formData = new FormData(deleteAccountForm);
-      const data = {};
-      formData.forEach((value, key) => {
-        data[key] = value;
-      });
-
-      const accessToken = localStorage.getItem('accessToken');
-      console.log('Access Token:', accessToken); // 액세스 토큰 확인
-
-      try {
-        const response = await fetch(deleteAccountForm.action, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': accessToken ? `Bearer ${accessToken}` : ''
-          },
-          body: JSON.stringify(data)
-        });
-
-        if (response.ok) {
-          localStorage.removeItem('accessToken');
-          alert('Your account has been deleted successfully.');
-          window.location.href = '/home/homepage'; // 성공적인 경우 리디렉션
-        } else {
-          const errorText = await response.text();
-          console.error('Error response:', errorText);
-          alert('Error deleting your account. Please try again.');
-        }
-      } catch (error) {
-        console.error('Error deleting account:', error);
-        alert('Error deleting your account. Please try again.');
-      }
-    };
-  });
-</script>
+<h1>회원 탈퇴</h1>
+<form id="withdrawalForm" onsubmit="submitForm(event)">
+    <input type="hidden" name="email" value="${email}" />
+    <label for="password">비밀번호:</label>
+    <input type="password" id="password" name="password" required />
+    <button type="submit">탈퇴</button>
+</form>
 </body>
 </html>

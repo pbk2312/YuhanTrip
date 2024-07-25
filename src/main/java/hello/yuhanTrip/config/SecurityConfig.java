@@ -57,7 +57,7 @@ public class SecurityConfig {
                         .requestMatchers("/updatePassword/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/house-540796_1280.jpg").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .with(new JwtSecurityConfig(tokenProvider), jwtSecurityConfig -> {
