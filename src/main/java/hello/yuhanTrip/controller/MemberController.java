@@ -153,6 +153,13 @@ public class MemberController {
     @GetMapping("/withdrawalMembership")
     public String withdrawalMembershipForm(@AuthenticationPrincipal UserDetails userDetails, Model model) {
 
+        if (userDetails == null) {
+            // 인증되지 않은 경우 로그인 페이지로 리다이렉트
+            return "redirect:/member/login";
+        }
+        log.info("회원 탈퇴 시도 유저 : {}", userDetails.getUsername());
+
+
         WithdrawalMembershipDTO withdrawalMembershipDTO = new WithdrawalMembershipDTO();
         model.addAttribute("withdrawalMembershipDTO", withdrawalMembershipDTO);
 
