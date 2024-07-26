@@ -96,14 +96,14 @@
 <!-- Header-->
 <header class="bg-dark py-5">
     <div class="container px-4 px-lg-5 my-5">
-        <div class="text-center text-white">
+        <div class="text-centext-white">
             <h1 class="display-4 fw-bolder">Accommodation in style</h1>
             <p class="lead fw-normal text-white-50 mb-0">With this shop homepage template</p>
         </div>
     </div>
 </header>
 
-<!-- Main Content-->
+<!-- Main Content-->ter
 <div class="container">
     <!-- 숙소 예약 버튼 추가 -->
     <div class="centered-button">
@@ -120,6 +120,7 @@
 
 
 <script>
+
     document.addEventListener('DOMContentLoaded', () => {
         const accessToken = localStorage.getItem('accessToken');
         const authButton = document.getElementById('authButton');
@@ -131,40 +132,19 @@
             authButton.onclick = confirmLogout;
             deleteAccountButton.style.display = 'block';
             deleteAccountButton.onclick = () => {
-                fetch('/mypage/withdrawalMembership', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`,
-                        'Content-Type': 'application/json'
-                    }
-                })
-                    .then(response => {
-                        if (response.ok) {
-                            return response.text();
-                        } else {
-                            throw new Error('Failed to load the page');
-                        }
-                    })
-                    .then(html => {
-                        document.body.innerHTML = html;
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        window.location.href = '/member/login'; // 에러 발생 시 로그인 페이지로 리다이렉트
-                    });
+                window.location.href = '/member/withdrawalMembership'; // 페이지를 새로 로드
             };
         } else {
             authButton.textContent = 'Login';
             authButton.onclick = () => window.location.href = '/member/login';
-            if (window.location.pathname === '/mypage/withdrawalMembership') {
-                window.location.href = '/member/login';
+            if (window.location.pathname === '/member/withdrawalMembership') {
+                window.location.href = '/member/login'; // 로그인 페이지로 리다이렉트
             }
         }
 
         accommodationButton.onclick = () => {
             window.location.href = '/accommodation/accommodations';
         };
-
     });
 
     function confirmLogout() {

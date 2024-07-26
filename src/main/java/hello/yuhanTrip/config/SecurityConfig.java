@@ -46,8 +46,9 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/mypage/**").authenticated()
                         .requestMatchers("/member/**").permitAll()
+                        .requestMatchers("/member/withdrawalMembership").authenticated()
+                        .requestMatchers("/member/deleteAccount").authenticated()
                         .requestMatchers("/email/**").permitAll()
                         .requestMatchers("/home/**").permitAll()
                         .requestMatchers("/admin/**").authenticated()

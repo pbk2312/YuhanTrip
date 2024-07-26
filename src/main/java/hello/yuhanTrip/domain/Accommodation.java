@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -40,7 +41,7 @@ public class Accommodation {
     private String title;
     private String booktour;
     private String sigungucode;
-    private String price;
+    private BigDecimal price;
 
     @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reservation> reservations;

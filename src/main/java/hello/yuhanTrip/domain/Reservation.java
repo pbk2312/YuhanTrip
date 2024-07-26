@@ -15,6 +15,7 @@ import java.time.LocalDate;
 public class Reservation {
 
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "reservation_id")
@@ -38,17 +39,16 @@ public class Reservation {
     private LocalDate reservationDate;
 
     @Column(name = "special_requests")
-    private String specialRequests; // 요청 사항을 저장할 필드
+    private String specialRequests;
 
     @Column(name = "name", nullable = false)
-    private String name; // 고객의 이름을 저장할 필드
+    private String name;
 
     @Column(name = "phone_number", nullable = false)
-    private String phoneNumber; // 고객의 전화번호를 저장할 필드
+    private String phoneNumber;
 
     @Column(name = "price", nullable = false)
-    private BigDecimal price; // 예약된 숙소의 총 가격
-
+    private BigDecimal price;
 
 
 }
