@@ -72,6 +72,8 @@ public class AccommodationController {
     @GetMapping("/info")
     public String getAccommodationInfo(@RequestParam("id") Long id, Model model) {
 
+
+
         log.info("숙소 정보를 가져옵니다... = {}", id);
 
         // 숙소 정보를 가져옵니다.
@@ -101,6 +103,14 @@ public class AccommodationController {
     ) {
 
 
+        if (userDetails == null) {
+            // 인증되지 않은 경우 로그인 페이지로 리다이렉트
+            return "redirect:/member/login";
+        }
+
+        log.info("로그인된 사용자 : {} " ,userDetails.getUsername());
+
+
         // 예약 정보를 가져옵니다.
         Accommodation accommodation = accommodationService.getAccommodationInfo(id);
 
@@ -108,9 +118,8 @@ public class AccommodationController {
         ReservationDTO reservationDTO = new ReservationDTO();
         reservationDTO.setId(accommodation.getId());
         reservationDTO.setAccommodationTitle(accommodation.getTitle());
-        reservationDTO.setAccommodationAddr1(accommodation.getAddr1());
-        reservationDTO.setAccommodationAddr2(accommodation.getAddr2());
         reservationDTO.setPrice(accommodation.getPrice());
+        reservationDTO.setLocalDate(LocalDate.now());
         // 모델에 예약 정보를 담습니다.
         model.addAttribute("reservationDTO", reservationDTO);
 
@@ -128,7 +137,7 @@ public class AccommodationController {
             @RequestParam("specialRequests") String specialRequests,
             @RequestParam("name") String name,
             @RequestParam("phoneNumber") String phoneNumber,
-            @RequestParam("price") BigDecimal price,
+            @RequestParam("price") int price,
             Model model,
             @AuthenticationPrincipal UserDetails userDetails
     ) {

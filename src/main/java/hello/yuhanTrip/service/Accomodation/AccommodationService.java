@@ -38,10 +38,20 @@ public class AccommodationService {
         this.accommodationRepository = accommodationRepository;
     }
 
+
     @Transactional
     public void saveDataToDatabase() {
         List<Accommodation> allAccommodations = fetchAllDataFromAPI();
         if (!allAccommodations.isEmpty()) {
+            // Random 객체 생성
+            Random random = new Random();
+
+            // 각 숙박 정보에 대해 랜덤 가격 설정
+            for (Accommodation accommodation : allAccommodations) {
+                int randomPrice = 100_000 + random.nextInt(100_001); // 100000 ~ 200000 사이의 랜덤 값 생성
+                accommodation.setPrice(randomPrice);
+            }
+
             try {
                 accommodationRepository.saveAll(allAccommodations);
                 log.info("데이터베이스에 숙소 정보를 저장했습니다.");

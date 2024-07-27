@@ -47,8 +47,10 @@ public class Reservation {
     @Column(name = "phone_number", nullable = false)
     private String phoneNumber;
 
+
+
     @Column(name = "price", nullable = false)
-    private BigDecimal price;
+    private int price; // 예약된 숙소의 총 가격
 
 
 }

@@ -41,7 +41,7 @@ public class Accommodation {
     private String title;
     private String booktour;
     private String sigungucode;
-    private BigDecimal price;
+    private int price; // 1박 가격
 
     @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reservation> reservations;
