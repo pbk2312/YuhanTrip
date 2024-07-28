@@ -2,6 +2,7 @@ package hello.yuhanTrip.jwt;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final TokenProvider tokenProvider;
 
-    // Jwt 토큰의 인증 정보를 현재 쓰레드의 SecurityContext 에 저장하는 역할 수행
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String requestId = UUID.randomUUID().toString(); // 요청 ID 생성
@@ -34,11 +34,11 @@ public class JwtFilter extends OncePerRequestFilter {
 
         filterInvocationCount++;
 
-        // Request Header에서 토큰을 꺼낸다
-        String jwt = tokenResolve(request);
+        // Request Header와 쿠키에서 토큰을 꺼낸다
+        String jwt = resolveToken(request);
 
         if (jwt == null) {
-            log.info("Request ID: {} - 요청 헤더에 JWT 토큰이 없음", requestId);
+            log.info("Request ID: {} - 요청 헤더와 쿠키에 JWT 토큰이 없음", requestId);
         } else {
             log.info("Request ID: {} - JWT 토큰 발견: {}", requestId, jwt);
         }
@@ -62,12 +62,24 @@ public class JwtFilter extends OncePerRequestFilter {
         log.info("Request ID: {} - 요청 URI: {}에 대한 JWT 필터 종료. 처리 시간: {} ms", requestId, request.getRequestURI(), duration);
     }
 
-    // 요청 헤더에서 토큰 정보 꺼내기
-    private String tokenResolve(HttpServletRequest request) {
-        String bearerToken = request.getHeader(AUTHORIZATION_HEADER); // 요청 헤더에서 "Authorization" 값을 가져옴
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) { // 헤더 값이 존재하고 "Bearer"로 시작하는지 확인
-            return bearerToken.substring(7); // "Bearer" 접두사 제거하고 JWT 문자열 반환
+    // 요청 헤더와 쿠키에서 토큰 정보 꺼내기
+    private String resolveToken(HttpServletRequest request) {
+        // 헤더에서 토큰 정보 꺼내기
+        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
+            return bearerToken.substring(BEARER_PREFIX.length()).trim();
         }
+
+        // 쿠키에서 토큰 정보 꺼내기
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("accessToken".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+
         return null;
     }
 

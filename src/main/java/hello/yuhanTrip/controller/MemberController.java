@@ -7,13 +7,17 @@ import hello.yuhanTrip.dto.WithdrawalMembershipDTO;
 import hello.yuhanTrip.dto.email.EmailRequestDTO;
 import hello.yuhanTrip.dto.register.MemberChangePasswordDTO;
 import hello.yuhanTrip.dto.token.TokenDTO;
+import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.repository.ResetTokenReposiotry;
 import hello.yuhanTrip.service.MemberService;
 import hello.yuhanTrip.dto.register.MemberRequestDTO;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -32,6 +36,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final ResetTokenReposiotry resetTokenReposiotry;
+    private final TokenProvider tokenProvider;
 
     @GetMapping("/register")
     public String showRegisterForm(@ModelAttribute MemberRequestDTO memberRequestDTO) {
@@ -56,17 +61,34 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TokenDTO> login(@RequestBody LoginDTO loginDTO) {
+    public ResponseEntity<TokenDTO> login(@RequestBody LoginDTO loginDTO, HttpServletResponse response) {
         log.info("로그인 요청...");
         TokenDTO tokenDTO = memberService.login(loginDTO);
         log.info("로그인이 완료되었습니다. 반환된 토큰: {}", tokenDTO);
+
+        // 쿠키에 accessToken 저장
+        Cookie accessTokenCookie = new Cookie("accessToken", tokenDTO.getAccessToken());
+        accessTokenCookie.setHttpOnly(true); // 클라이언트 측 스크립트에서 접근 불가
+        accessTokenCookie.setSecure(true); // HTTPS에서만 전송
+        accessTokenCookie.setPath("/"); // 모든 경로에서 쿠키 전송
+        accessTokenCookie.setMaxAge(60 * 60); // 쿠키 유효 기간 설정 (60분)
+        response.addCookie(accessTokenCookie);
+
         return ResponseEntity.ok(tokenDTO);
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestBody LogoutDTO logoutDTO) {
+    public ResponseEntity<String> logout(@RequestBody LogoutDTO logoutDTO, HttpServletResponse response) {
         log.info("로그아웃 요청");
         memberService.logout(logoutDTO);
+        // 쿠키에서 accessToken 삭제
+        Cookie accessTokenCookie = new Cookie("accessToken", null);
+        accessTokenCookie.setHttpOnly(true); // 클라이언트 측 스크립트에서 접근 불가
+        accessTokenCookie.setSecure(true); // HTTPS에서만 전송
+        accessTokenCookie.setPath("/"); // 모든 경로에서 쿠키 전송
+        accessTokenCookie.setMaxAge(0); // 쿠키 즉시 삭제
+        response.addCookie(accessTokenCookie);
+
         log.info("로그아웃 완료");
         return ResponseEntity.ok("로그아웃 완료");
     }
@@ -149,16 +171,16 @@ public class MemberController {
         return "redirect:/home/homepage";
     }
 
-
     @GetMapping("/withdrawalMembership")
-    public String withdrawalMembershipForm(@AuthenticationPrincipal UserDetails userDetails, Model model) {
-
-        if (userDetails == null) {
-            // 인증되지 않은 경우 로그인 페이지로 리다이렉트
+    public String getWithdrawalMembershipForm(@CookieValue(value = "accessToken", required = false) String accessToken,
+                                              Model model) {
+        if (accessToken == null || !tokenProvider.validate(accessToken)) {
             return "redirect:/member/login";
         }
-        log.info("회원 탈퇴 시도 유저 : {}", userDetails.getUsername());
 
+        Authentication authentication = tokenProvider.getAuthentication(accessToken);
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        log.info("회원 탈퇴 시도 유저 : {}", userDetails.getUsername());
 
         WithdrawalMembershipDTO withdrawalMembershipDTO = new WithdrawalMembershipDTO();
         model.addAttribute("withdrawalMembershipDTO", withdrawalMembershipDTO);
@@ -166,35 +188,40 @@ public class MemberController {
         return "withdrawalMembership";
     }
 
-
     @PostMapping("/deleteAccount")
     public ResponseEntity<Void> deleteAccount(@RequestBody WithdrawalMembershipDTO withdrawalMembershipDTO,
-                                              @AuthenticationPrincipal UserDetails userDetails) {
-
+                                              @CookieValue(value = "accessToken", required = false) String accessToken,
+                                              HttpServletResponse response) {
         log.info("회원 탈퇴를 진행합니다...");
 
-        // 사용자 인증 상태 확인
-        if (userDetails == null) {
+        if (accessToken == null || !tokenProvider.validate(accessToken)) {
             log.info("사용자가 인증되지 않았습니다.");
-
-            // 사용자가 인증되지 않은 경우 처리
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        // 로그인된 사용자의 이메일 확인
+        Authentication authentication = tokenProvider.getAuthentication(accessToken);
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         log.info("회원탈퇴 이메일: {}", userDetails.getUsername());
 
-        // WithdrawalMembershipDTO에 이메일 설정
         withdrawalMembershipDTO.setEmail(userDetails.getUsername());
 
         try {
-            // 계정 삭제 서비스 호출
             String message = memberService.deleteAccount(withdrawalMembershipDTO);
 
-            // 계정 삭제 결과에 따른 응답 처리
             if ("회원 정보가 정상적으로 삭제되었습니다.".equals(message)) {
+                log.info("회원 정보가 정상적으로 삭제되었습니다.");
+
+                // 쿠키에서 accessToken 삭제
+                Cookie accessTokenCookie = new Cookie("accessToken", null);
+                accessTokenCookie.setHttpOnly(true); // 클라이언트 측 스크립트에서 접근 불가
+                accessTokenCookie.setSecure(true); // HTTPS에서만 전송
+                accessTokenCookie.setPath("/"); // 모든 경로에서 쿠키 전송
+                accessTokenCookie.setMaxAge(0); // 쿠키 즉시 삭제
+                response.addCookie(accessTokenCookie);
+
                 return ResponseEntity.ok().build();
             } else {
+                log.warn("회원 탈퇴 실패: {}", message);
                 return ResponseEntity.badRequest().build();
             }
         } catch (Exception e) {
@@ -202,8 +229,4 @@ public class MemberController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
 }
-
-
-

@@ -11,17 +11,18 @@ import hello.yuhanTrip.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Controller
@@ -73,7 +74,6 @@ public class AccommodationController {
     public String getAccommodationInfo(@RequestParam("id") Long id, Model model) {
 
 
-
         log.info("숙소 정보를 가져옵니다... = {}", id);
 
         // 숙소 정보를 가져옵니다.
@@ -93,8 +93,6 @@ public class AccommodationController {
     }
 
 
-
-
     @GetMapping("/reservation")
     public String getReservation(
             @RequestParam("id") Long id,
@@ -108,7 +106,7 @@ public class AccommodationController {
             return "redirect:/member/login";
         }
 
-        log.info("로그인된 사용자 : {} " ,userDetails.getUsername());
+        log.info("로그인된 사용자 : {} ", userDetails.getUsername());
 
 
         // 예약 정보를 가져옵니다.
@@ -127,25 +125,17 @@ public class AccommodationController {
     }
 
 
-
-
     @PostMapping("/reservation/submit")
-    public String submitReservation(
+    public ResponseEntity<Map<String, Object>> submitReservation(
             @RequestParam("accommodationId") Long accommodationId,
             @RequestParam("checkInDate") LocalDate checkInDate,
             @RequestParam("checkOutDate") LocalDate checkOutDate,
             @RequestParam("specialRequests") String specialRequests,
             @RequestParam("name") String name,
             @RequestParam("phoneNumber") String phoneNumber,
-            @RequestParam("price") int price,
-            Model model,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
-        log.info("숙소 예약 유저 : {}", userDetails != null ? userDetails.getUsername() : "No user details");
-
-        if (userDetails == null) {
-            return "error/401"; // 인증되지 않은 사용자
-        }
+        log.info("숙소 예약 유저 : {}", userDetails.getUsername());
 
         String username = userDetails.getUsername();
         Member member = memberRepository.findByEmail(username)
@@ -153,26 +143,42 @@ public class AccommodationController {
 
         Accommodation accommodation = accommodationService.getAccommodationInfo(accommodationId);
         if (accommodation == null) {
-            return "error/404";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "숙소를 찾을 수 없습니다."));
         }
+
+        // 날짜 검증
+        LocalDate today = LocalDate.now();
+        if (checkInDate.isBefore(today)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "체크인 날짜는 오늘보다 이전일 수 없습니다."));
+        }
+
+        if (checkOutDate.isBefore(checkInDate) || checkOutDate.isEqual(checkInDate)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "체크아웃 날짜는 체크인 날짜보다 이후여야 합니다."));
+        }
+
+        // 가격 계산
+        long numberOfNights = ChronoUnit.DAYS.between(checkInDate, checkOutDate);
+        int totalPrice = accommodation.getPrice() * (int) numberOfNights;
 
         Reservation reservation = Reservation.builder()
                 .member(member)
                 .accommodation(accommodation)
                 .checkInDate(checkInDate)
                 .checkOutDate(checkOutDate)
-                .reservationDate(LocalDate.now())
+                .reservationDate(today)
                 .specialRequests(specialRequests)
                 .name(name)
                 .phoneNumber(phoneNumber)
-                .price(price)
+                .price(totalPrice)
                 .build();
 
         reservationRepository.save(reservation);
 
-        model.addAttribute("message", "예약이 성공적으로 완료되었습니다.");
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "예약이 성공적으로 완료되었습니다.");
+        response.put("reservationId", reservation.getId());
 
-        return "redirect:/accommodation/accommodations";
+        return ResponseEntity.ok(response);
     }
 
 

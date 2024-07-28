@@ -7,8 +7,7 @@
     <meta name="description" content=""/>
     <meta name="author" content=""/>
     <title>Login - SB Admin</title>
-    <link th:href="@{/css/styles.css}" href="../css/styles.css" rel="stylesheet">
-    <script th:src="@{/js/scripts.js}"></script>
+    <link href="../css/styles.css" rel="stylesheet">
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
 </head>
 <body class="bg-primary">
@@ -33,7 +32,7 @@
                                         <label for="inputPassword">Password</label>
                                     </div>
                                     <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
-                                        <a class="small" th:href="@{/member/sendResetPasswordEmail}">Forgot Password?</a>
+                                        <a class="small" href="/member/sendResetPasswordEmail">Forgot Password?</a>
                                         <button type="button" class="btn btn-primary" id="loginButton">Login</button>
                                     </div>
                                 </form>
@@ -62,14 +61,19 @@
         </footer>
     </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
-        crossorigin="anonymous"></script>
-<script src="js/scripts.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 <script>
     document.getElementById('loginButton').addEventListener('click', function () {
         var email = document.getElementById('inputEmail').value;
         var password = document.getElementById('inputPassword').value;
         login(email, password);
+    });
+
+    document.getElementById('loginForm').addEventListener('keypress', function (event) {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // 기본 Enter 키 동작 방지
+            document.getElementById('loginButton').click(); // 로그인 버튼 클릭 이벤트 발생
+        }
     });
 
     function login(email, password) {
@@ -100,7 +104,6 @@
             });
     }
 
-    // accessToken을 헤더에 포함하여 /home 엔드포인트에 요청
     function fetchHome() {
         const accessToken = localStorage.getItem('accessToken');
         if (!accessToken) {
@@ -124,7 +127,6 @@
                 return response.json();
             })
             .then(data => {
-                // 데이터를 필요한 대로 처리
                 console.log('홈 페이지 데이터:', data);
             })
             .catch(error => {
@@ -137,7 +139,6 @@
                 }
             });
     }
-
 </script>
 </body>
 </html>

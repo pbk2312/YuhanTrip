@@ -47,6 +47,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/member/deleteAccount").authenticated()
+                        .requestMatchers("/member/withdrawalMembership").authenticated()
                         .requestMatchers("/admin/**").authenticated()
                         .anyRequest().permitAll()
                 )

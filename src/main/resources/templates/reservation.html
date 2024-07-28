@@ -1,176 +1,97 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
-    <meta name="description" content="예약하기 페이지"/>
-    <meta name="author" content="Yuhan Trip"/>
-    <title>예약하기</title>
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico"/>
-    <!-- Bootstrap icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet"/>
-    <!-- Core theme CSS (includes Bootstrap) -->
-    <link th:href="@{/css/homestyles.css}" href="../css/homestyles.css" rel="stylesheet">
-    <script th:src="@{/js/homescripts.js}"></script>
-    <!-- Custom Styles -->
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f8f9fa;
-        }
-
-        .navbar {
-            background-color: #343a40;
-        }
-
-        .navbar-brand, .nav-link {
-            color: #ffffff !important;
-        }
-
-        .navbar-brand:hover, .nav-link:hover {
-            color: #e9ecef !important;
-        }
-
-        .container {
-            max-width: 800px;
-        }
-
-        .form-label {
-            font-weight: bold;
-        }
-
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-        }
-
-        .btn-primary:hover {
-            background-color: #0056b3;
-            border-color: #004085;
-        }
-
-        .footer {
-            background-color: #343a40;
-            color: #ffffff;
-            padding: 20px 0;
-        }
-
-        .footer p {
-            margin: 0;
-            text-align: center;
-        }
-
-        .price-per-night {
-            font-size: 1.25rem;
-            font-weight: bold;
-            color: #333;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservation</title>
+    <link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
-<!-- Navigation -->
-<nav class="navbar navbar-expand-lg navbar-dark">
-    <div class="container px-4 px-lg-5">
-        <a class="navbar-brand" href="#!">YuhanTrip</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-                <li class="nav-item"><a class="nav-link" href="/home/homepage">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
-            </ul>
-            <form class="d-flex">
-                <button class="btn btn-outline-light" type="submit">
-                    <i class="bi-cart-fill me-1"></i>
-                    Cart
-                    <span class="badge bg-dark text-white ms-1 rounded-pill">0</span>
-                </button>
-            </form>
-        </div>
-    </div>
-</nav>
-
-<!-- Reservation Form Section -->
-<section class="py-5">
-    <div class="container">
-        <h2 class="text-center mb-4">예약하기</h2>
-        <div class="bg-white p-4 rounded shadow-sm">
+<div class="container">
+    <div class="card card-register mx-auto mt-5">
+        <div class="card-header">예약하기</div>
+        <div class="card-body">
             <form id="reservationForm" action="/reservation/submit" method="post">
-                <div class="mb-3">
-                    <label for="accommodationTitle" class="form-label">숙소 이름</label>
-                    <input type="text" id="accommodationTitle" name="accommodationTitle" class="form-control" th:value="${reservationDTO.accommodationTitle}" readonly>
+                <div class="form-group">
+                    <div class="form-label-group">
+                        <input type="date" id="checkInDate" name="checkInDate" class="form-control" required autofocus>
+                        <label for="checkInDate">체크인 날짜</label>
+                    </div>
                 </div>
-
-                <div class="mb-3">
-                    <label for="checkInDate" class="form-label">체크인 날짜</label>
-                    <input type="date" id="checkInDate" name="checkInDate" class="form-control" required>
+                <div class="form-group">
+                    <div class="form-label-group">
+                        <input type="date" id="checkOutDate" name="checkOutDate" class="form-control" required>
+                        <label for="checkOutDate">체크아웃 날짜</label>
+                    </div>
                 </div>
-
-                <div class="mb-3">
-                    <label for="checkOutDate" class="form-label">체크아웃 날짜</label>
-                    <input type="date" id="checkOutDate" name="checkOutDate" class="form-control" required>
+                <div class="form-group">
+                    <div class="form-label-group">
+                        <input type="text" id="specialRequests" name="specialRequests" class="form-control"
+                               placeholder="특별 요청 사항">
+                        <label for="specialRequests">특별 요청 사항</label>
+                    </div>
                 </div>
-
-                <div class="mb-3">
-                    <label for="specialRequests" class="form-label">특별 요청 사항</label>
-                    <textarea id="specialRequests" name="specialRequests" class="form-control" rows="3"></textarea>
+                <div class="form-group">
+                    <div class="form-label-group">
+                        <input type="text" id="name" name="name" class="form-control" placeholder="고객 이름" required>
+                        <label for="name">고객 이름</label>
+                    </div>
                 </div>
-
-                <div class="mb-3">
-                    <label for="name" class="form-label">고객 이름</label>
-                    <input type="text" id="name" name="name" class="form-control" required>
+                <div class="form-group">
+                    <div class="form-label-group">
+                        <input type="tel" id="phoneNumber" name="phoneNumber" class="form-control" placeholder="고객 전화번호" required>
+                        <label for="phoneNumber">고객 전화번호</label>
+                    </div>
                 </div>
-
-                <div class="mb-3">
-                    <label for="phoneNumber" class="form-label">고객 전화번호</label>
-                    <input type="tel" id="phoneNumber" name="phoneNumber" class="form-control" required>
-                </div>
-
-                <input type="hidden" name="accommodationId" id="accommodationId" th:value="${reservationDTO.id}"/>
-                <input type="hidden" id="price" th:value="${reservationDTO.price}"/>
-
-                <div class="mb-3">
-                    <label class="form-label">1박 가격</label>
-                    <div id="pricePerNight" class="price-per-night" th:text="${reservationDTO.price} + ' 원'"></div>
-                </div>
-
-                <button type="submit" class="btn btn-primary w-100">예약하기</button>
+                <input type="hidden" id="accommodationId" name="accommodationId" value="1"> <!-- 서버에서 설정 -->
+                <input type="hidden" id="price" name="price" value="100"> <!-- 서버에서 설정 -->
+                <button type="submit" class="btn btn-primary btn-block">예약하기</button>
             </form>
         </div>
     </div>
-</section>
+</div>
 
-<!-- Footer -->
-<footer class="footer">
-    <div class="container">
-        <p class="m-0">Copyright &copy; YuhanTrip 2023</p>
-    </div>
-</footer>
-
-<!-- Bootstrap core JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- Custom JavaScript for handling reservation actions -->
 <script>
-    document.addEventListener('DOMContentLoaded', (event) => {
-        const checkInDateInput = document.getElementById('checkInDate');
-        const checkOutDateInput = document.getElementById('checkOutDate');
+    document.addEventListener('DOMContentLoaded', () => {
+        const reservationForm = document.getElementById('reservationForm');
 
-        const today = '2024-07-27'; // 서버에서 전달된 오늘 날짜를 사용
-        checkInDateInput.setAttribute('min', today);
-        checkOutDateInput.setAttribute('min', today);
+        reservationForm.onsubmit = async (event) => {
+            event.preventDefault();
+            const formData = new FormData(reservationForm);
 
-        checkInDateInput.addEventListener('change', (e) => {
-            const checkInDate = new Date(e.target.value);
-            checkInDate.setDate(checkInDate.getDate() + 1);
-            const minCheckOutDate = checkInDate.toISOString().split('T')[0];
-            checkOutDateInput.setAttribute('min', minCheckOutDate);
-        });
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+
+            // localStorage에서 accessToken 가져오기
+            const accessToken = localStorage.getItem('accessToken');
+
+            try {
+                const response = await fetch(reservationForm.action, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}` // Authorization 헤더에 토큰 추가
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    const responseData = await response.json();
+                    alert('예약이 성공적으로 완료되었습니다.');
+                    window.location.href = `/payment/checkout?reservationId=${responseData.reservationId}`;
+                } else {
+                    const responseData = await response.json();
+                    alert(responseData.message || '예약에 실패했습니다. 다시 시도해 주세요.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('예약 중 오류가 발생했습니다. 다시 시도해 주세요.');
+            }
+        };
     });
 </script>
-
 </body>
 </html>
