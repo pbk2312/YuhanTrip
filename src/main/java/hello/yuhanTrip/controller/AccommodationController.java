@@ -6,8 +6,6 @@ import hello.yuhanTrip.domain.PaymentStatus;
 import hello.yuhanTrip.domain.Reservation;
 import hello.yuhanTrip.dto.ReservationDTO;
 import hello.yuhanTrip.jwt.TokenProvider;
-import hello.yuhanTrip.repository.MemberRepository;
-import hello.yuhanTrip.repository.ReservationRepository;
 import hello.yuhanTrip.service.Accomodation.AccommodationService;
 import hello.yuhanTrip.service.Accomodation.ReservationService;
 import hello.yuhanTrip.service.MemberService;
@@ -36,9 +34,8 @@ import java.util.Map;
 public class AccommodationController {
 
     private final AccommodationService accommodationService;
-    private final ReservationRepository reservationRepository;
-    private final TokenProvider tokenProvider;
     private final ReservationService reservationService;
+    private final TokenProvider tokenProvider;
     private final MemberService memberService;
 
 
@@ -117,8 +114,6 @@ public class AccommodationController {
         log.info("숙소 이름 : {} ", accommodationInfo.getTitle());
 
 
-        // 예약된 날짜를 가져옴
-        List<LocalDate> bookedDates = reservationService.getBookedDates(id);
 
         ReservationDTO reservationDTO = new ReservationDTO();
         reservationDTO.setId(accommodationInfo.getId());
@@ -127,7 +122,6 @@ public class AccommodationController {
         reservationDTO.setLocalDate(LocalDate.now());
 
         model.addAttribute("reservation", reservationDTO);
-        model.addAttribute("bookedDates", bookedDates);
         return "reservation";
     }
 
@@ -177,13 +171,13 @@ public class AccommodationController {
             }
 
             // 기존 예약 확인
-            List<Reservation> overlappingReservations = reservationRepository.findOverlappingReservations(
+            boolean dateOverlapping = reservationService.isDateOverlapping(
                     reservationDTO.getAccommodationId(),
                     reservationDTO.getCheckInDate(),
                     reservationDTO.getCheckOutDate()
             );
 
-            if (!overlappingReservations.isEmpty()) {
+            if (dateOverlapping) { // 선택한 날짜가 이미 예약이 존재하면
                 return ResponseEntity.status(HttpStatus.CONFLICT)
                         .body(Map.of("message", "선택한 날짜에 이미 예약이 있습니다."));
             }
@@ -207,7 +201,7 @@ public class AccommodationController {
                     .paymentStatus(PaymentStatus.PENDING) // 예약 생성 시 결제 대기 상태로 설정
                     .build();
 
-            reservationRepository.save(reservation);
+            reservationService.reservationRegister(reservation);
 
             log.info("예약이 성공적으로 완료되었습니다: 예약 ID = {}", reservation.getId());
 
