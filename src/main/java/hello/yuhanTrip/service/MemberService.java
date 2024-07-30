@@ -26,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -166,7 +167,7 @@ public class MemberService {
     @Transactional
     public String deleteAccount(WithdrawalMembershipDTO withdrawalMembershipDTO) {
         Member member = memberRepository.findByEmail(withdrawalMembershipDTO.getEmail()).orElseThrow(() -> new RuntimeException("존재하지 않는 회원 입니다."));
-        if (!passwordEncoder.matches(withdrawalMembershipDTO.getPassword(),member.getPassword())){
+        if (!passwordEncoder.matches(withdrawalMembershipDTO.getPassword(), member.getPassword())) {
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");
 
         }
@@ -181,6 +182,14 @@ public class MemberService {
         return "회원 정보가 정상적으로 삭제되었습니다.";
 
     }
+
+    // 회원 찾기
+    public Member findByEmail(String email) {
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid user"));
+        return member;
+    }
+
 
     // 임시 비밀번호 생성 메서드
     private String generateResetToken() {

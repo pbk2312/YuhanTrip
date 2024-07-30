@@ -224,8 +224,6 @@
 <!-- Bootstrap core JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 
-
-
 <script>
     document.getElementById('reservationButton').addEventListener('click', function() {
         const token = localStorage.getItem('accessToken'); // Get token from localStorage
@@ -238,33 +236,10 @@
             return;
         }
 
-        // Fetch the reservation page content
-        fetch(url, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`, // Include JWT token in Authorization header
-                'Content-Type': 'application/json' // Set content type to JSON
-            },
-            credentials: 'include' // Include credentials for session maintenance
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.text(); // Return the HTML content as text
-                } else {
-                    throw new Error('Failed to load the reservation page');
-                }
-            })
-            .then(html => {
-                document.body.innerHTML = html; // Inject the HTML content into the page
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                loginMessage.classList.add('alert-show'); // Show login message on error
-            });
+        // Redirect to the reservation page
+        window.location.href = url;
     });
 </script>
-
-
 
 </body>
 </html>

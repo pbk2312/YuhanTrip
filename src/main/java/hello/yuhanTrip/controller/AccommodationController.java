@@ -2,18 +2,21 @@ package hello.yuhanTrip.controller;
 
 import hello.yuhanTrip.domain.Accommodation;
 import hello.yuhanTrip.domain.Member;
+import hello.yuhanTrip.domain.PaymentStatus;
 import hello.yuhanTrip.domain.Reservation;
 import hello.yuhanTrip.dto.ReservationDTO;
+import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.repository.MemberRepository;
 import hello.yuhanTrip.repository.ReservationRepository;
 import hello.yuhanTrip.service.Accomodation.AccommodationService;
+import hello.yuhanTrip.service.Accomodation.ReservationService;
 import hello.yuhanTrip.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -32,8 +36,10 @@ import java.util.Map;
 public class AccommodationController {
 
     private final AccommodationService accommodationService;
-    private final MemberRepository memberRepository;
     private final ReservationRepository reservationRepository;
+    private final TokenProvider tokenProvider;
+    private final ReservationService reservationService;
+    private final MemberService memberService;
 
 
     @GetMapping("/accommodations")
@@ -97,88 +103,127 @@ public class AccommodationController {
     public String getReservation(
             @RequestParam("id") Long id,
             Model model,
-            @AuthenticationPrincipal UserDetails userDetails
-    ) {
+            @CookieValue(value = "accessToken", required = false) String accessToken) {
 
-
-        if (userDetails == null) {
-            // 인증되지 않은 경우 로그인 페이지로 리다이렉트
+        if (accessToken == null || !tokenProvider.validate(accessToken)) {
             return "redirect:/member/login";
         }
 
-        log.info("로그인된 사용자 : {} ", userDetails.getUsername());
+        Authentication authentication = tokenProvider.getAuthentication(accessToken);
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        log.info("예약 시도 유저 : {}", userDetails.getUsername());
+
+        Accommodation accommodationInfo = accommodationService.getAccommodationInfo(id);
+        log.info("숙소 이름 : {} ", accommodationInfo.getTitle());
 
 
-        // 예약 정보를 가져옵니다.
-        Accommodation accommodation = accommodationService.getAccommodationInfo(id);
+        // 예약된 날짜를 가져옴
+        List<LocalDate> bookedDates = reservationService.getBookedDates(id);
 
-        // 숙소 정보를 가져옵니다.
         ReservationDTO reservationDTO = new ReservationDTO();
-        reservationDTO.setId(accommodation.getId());
-        reservationDTO.setAccommodationTitle(accommodation.getTitle());
-        reservationDTO.setPrice(accommodation.getPrice());
+        reservationDTO.setId(accommodationInfo.getId());
+        reservationDTO.setAccommodationTitle(accommodationInfo.getTitle());
+        reservationDTO.setPrice(accommodationInfo.getPrice());
         reservationDTO.setLocalDate(LocalDate.now());
-        // 모델에 예약 정보를 담습니다.
-        model.addAttribute("reservationDTO", reservationDTO);
 
+        model.addAttribute("reservation", reservationDTO);
+        model.addAttribute("bookedDates", bookedDates);
         return "reservation";
     }
 
 
+
     @PostMapping("/reservation/submit")
     public ResponseEntity<Map<String, Object>> submitReservation(
-            @RequestParam("accommodationId") Long accommodationId,
-            @RequestParam("checkInDate") LocalDate checkInDate,
-            @RequestParam("checkOutDate") LocalDate checkOutDate,
-            @RequestParam("specialRequests") String specialRequests,
-            @RequestParam("name") String name,
-            @RequestParam("phoneNumber") String phoneNumber,
-            @AuthenticationPrincipal UserDetails userDetails
+            @RequestBody ReservationDTO reservationDTO,
+            @CookieValue(value = "accessToken", required = false) String accessToken
     ) {
-        log.info("숙소 예약 유저 : {}", userDetails.getUsername());
+        log.info("예약 요청을 처리합니다...");
 
-        String username = userDetails.getUsername();
-        Member member = memberRepository.findByEmail(username)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid user"));
+        log.info("Received ReservationDTO: {}", reservationDTO);
+        log.info("Accommodation ID from DTO: {}", reservationDTO.getAccommodationId());
 
-        Accommodation accommodation = accommodationService.getAccommodationInfo(accommodationId);
-        if (accommodation == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "숙소를 찾을 수 없습니다."));
+        // 인증 확인
+        if (accessToken == null || !tokenProvider.validate(accessToken)) {
+            log.info("사용자가 인증되지 않았습니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "유저를 찾을 수 없습니다."));
         }
 
-        // 날짜 검증
-        LocalDate today = LocalDate.now();
-        if (checkInDate.isBefore(today)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "체크인 날짜는 오늘보다 이전일 수 없습니다."));
+        Authentication authentication = tokenProvider.getAuthentication(accessToken);
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        log.info("예약 시도 유저: {}", userDetails.getUsername());
+
+        try {
+            // 숙소 정보 조회
+            Accommodation accommodation = accommodationService.getAccommodationInfo(reservationDTO.getAccommodationId());
+            if (accommodation == null) {
+                log.warn("숙소를 찾을 수 없습니다: ID = {}", reservationDTO.getAccommodationId());
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("message", "숙소를 찾을 수 없습니다."));
+            }
+
+            // 체크인 및 체크아웃 날짜 검증
+            LocalDate today = LocalDate.now();
+            if (reservationDTO.getCheckInDate().isBefore(today)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("message", "체크인 날짜는 오늘보다 이전일 수 없습니다."));
+            }
+
+            if (reservationDTO.getCheckOutDate().isBefore(reservationDTO.getCheckInDate()) ||
+                    reservationDTO.getCheckOutDate().isEqual(reservationDTO.getCheckInDate())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("message", "체크아웃 날짜는 체크인 날짜보다 이후여야 합니다."));
+            }
+
+            // 기존 예약 확인
+            List<Reservation> overlappingReservations = reservationRepository.findOverlappingReservations(
+                    reservationDTO.getAccommodationId(),
+                    reservationDTO.getCheckInDate(),
+                    reservationDTO.getCheckOutDate()
+            );
+
+            if (!overlappingReservations.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(Map.of("message", "선택한 날짜에 이미 예약이 있습니다."));
+            }
+
+            // 총 가격 계산
+            long numberOfNights = ChronoUnit.DAYS.between(reservationDTO.getCheckInDate(), reservationDTO.getCheckOutDate());
+            int totalPrice = accommodation.getPrice() * (int) numberOfNights;
+
+            // 사용자 정보 및 예약 저장
+            Member member = memberService.findByEmail(userDetails.getUsername());
+            Reservation reservation = Reservation.builder()
+                    .member(member)
+                    .accommodation(accommodation)
+                    .checkInDate(reservationDTO.getCheckInDate())
+                    .checkOutDate(reservationDTO.getCheckOutDate())
+                    .reservationDate(today)
+                    .specialRequests(reservationDTO.getSpecialRequests())
+                    .name(reservationDTO.getName())
+                    .phoneNumber(reservationDTO.getPhoneNumber())
+                    .price(totalPrice)
+                    .paymentStatus(PaymentStatus.PENDING) // 예약 생성 시 결제 대기 상태로 설정
+                    .build();
+
+            reservationRepository.save(reservation);
+
+            log.info("예약이 성공적으로 완료되었습니다: 예약 ID = {}", reservation.getId());
+
+            // 성공적인 응답 반환
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "예약이 성공적으로 완료되었습니다.");
+            response.put("reservationId", reservation.getId());
+            response.put("totalPrice", totalPrice);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            log.error("예약 처리 중 오류 발생: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "예약 처리 중 오류가 발생했습니다."));
         }
-
-        if (checkOutDate.isBefore(checkInDate) || checkOutDate.isEqual(checkInDate)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "체크아웃 날짜는 체크인 날짜보다 이후여야 합니다."));
-        }
-
-        // 가격 계산
-        long numberOfNights = ChronoUnit.DAYS.between(checkInDate, checkOutDate);
-        int totalPrice = accommodation.getPrice() * (int) numberOfNights;
-
-        Reservation reservation = Reservation.builder()
-                .member(member)
-                .accommodation(accommodation)
-                .checkInDate(checkInDate)
-                .checkOutDate(checkOutDate)
-                .reservationDate(today)
-                .specialRequests(specialRequests)
-                .name(name)
-                .phoneNumber(phoneNumber)
-                .price(totalPrice)
-                .build();
-
-        reservationRepository.save(reservation);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "예약이 성공적으로 완료되었습니다.");
-        response.put("reservationId", reservation.getId());
-
-        return ResponseEntity.ok(response);
     }
 
 

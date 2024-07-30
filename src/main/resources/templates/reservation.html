@@ -4,15 +4,73 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reservation</title>
+    <title>예약하기</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 600px;
+            margin-top: 50px;
+        }
+        .card-header {
+            background-color: #007bff;
+            color: white;
+        }
+        .form-label-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        .form-label-group > input,
+        .form-label-group > label {
+            height: 3.5rem;
+            padding: .75rem;
+        }
+        .form-label-group > label {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: block;
+            width: 100%;
+            margin-bottom: 0;
+            line-height: 1.5;
+            color: #495057;
+            pointer-events: none;
+            cursor: text;
+            border: 1px solid transparent;
+            border-radius: .25rem;
+            transition: all .1s ease-in-out;
+        }
+        .form-label-group input:not(:placeholder-shown) + label {
+            padding-top: calc(.75rem + .75rem * (2 / 3));
+            padding-bottom: calc(.75rem / 3);
+            font-size: 12px;
+            color: #777;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
     <div class="card card-register mx-auto mt-5">
-        <div class="card-header">예약하기</div>
+        <div class="card-header text-center">예약하기</div>
         <div class="card-body">
-            <form id="reservationForm" action="/reservation/submit" method="post">
+            <div class="mb-4">
+                <h5 class="text-center" id="accommodationTitle" th:text="${reservation.accommodationTitle}">숙소 이름</h5>
+                <p class="text-center" id="pricePerNight" th:text="'1박 가격: ' + ${reservation.price} + ' 원'">1박 가격: 0 원</p>
+            </div>
+            <form id="reservationForm" action="/accommodation/reservation/submit" method="post">
                 <div class="form-group">
                     <div class="form-label-group">
                         <input type="date" id="checkInDate" name="checkInDate" class="form-control" required autofocus>
@@ -27,8 +85,7 @@
                 </div>
                 <div class="form-group">
                     <div class="form-label-group">
-                        <input type="text" id="specialRequests" name="specialRequests" class="form-control"
-                               placeholder="특별 요청 사항">
+                        <input type="text" id="specialRequests" name="specialRequests" class="form-control" placeholder="특별 요청 사항">
                         <label for="specialRequests">특별 요청 사항</label>
                     </div>
                 </div>
@@ -44,9 +101,9 @@
                         <label for="phoneNumber">고객 전화번호</label>
                     </div>
                 </div>
-                <input type="hidden" id="accommodationId" name="accommodationId" value="1"> <!-- 서버에서 설정 -->
-                <input type="hidden" id="price" name="price" value="100"> <!-- 서버에서 설정 -->
-                <button type="submit" class="btn btn-primary btn-block">예약하기</button>
+                <input type="hidden" id="accommodationId" name="accommodationId" th:value="${reservation.id}">
+                <input type="hidden" id="price" name="price" th:value="${reservation.price}">
+                <button type="submit" class="btn btn-primary btn-block">결제하기</button>
             </form>
         </div>
     </div>
@@ -65,33 +122,35 @@
                 data[key] = value;
             });
 
-            // localStorage에서 accessToken 가져오기
-            const accessToken = localStorage.getItem('accessToken');
-
             try {
                 const response = await fetch(reservationForm.action, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${accessToken}` // Authorization 헤더에 토큰 추가
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(data)
                 });
 
                 if (response.ok) {
-                    const responseData = await response.json();
-                    alert('예약이 성공적으로 완료되었습니다.');
-                    window.location.href = `/payment/checkout?reservationId=${responseData.reservationId}`;
+                    const result = await response.json();
+                    const reservationId = result.reservationId; // 서버에서 반환된 예약 ID
+                    const totalPrice = result.totalPrice; // 서버에서 반환된 총 가격
+
+                    // 결제 페이지로 리디렉션
+                    window.location.href = `/paymentPage?reservationId=${reservationId}&totalPrice=${totalPrice}`;
                 } else {
-                    const responseData = await response.json();
-                    alert(responseData.message || '예약에 실패했습니다. 다시 시도해 주세요.');
+                    const errorResponse = await response.json();
+                    alert(`예약에 실패했습니다: ${errorResponse.message}`);
                 }
             } catch (error) {
-                console.error('Error:', error);
-                alert('예약 중 오류가 발생했습니다. 다시 시도해 주세요.');
+                console.error('예약 처리 중 오류 발생:', error);
+                alert('예약 처리 중 오류가 발생했습니다. 다시 시도해 주세요.');
             }
         };
     });
 </script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

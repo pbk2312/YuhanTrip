@@ -52,5 +52,9 @@ public class Reservation {
     @Column(name = "price", nullable = false)
     private int price; // 예약된 숙소의 총 가격
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_status", nullable = false)
+    private PaymentStatus paymentStatus; // 결제 상태
+
 
 }
