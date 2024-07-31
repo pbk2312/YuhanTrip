@@ -48,7 +48,7 @@ public class AccommodationService {
 
             // 각 숙박 정보에 대해 랜덤 가격 설정
             for (Accommodation accommodation : allAccommodations) {
-                int randomPrice = 100_000 + random.nextInt(100_001); // 100000 ~ 200000 사이의 랜덤 값 생성
+                Long randomPrice = 100_000 + random.nextLong(100_001); // 100000 ~ 200000 사이의 랜덤 값 생성
                 accommodation.setPrice(randomPrice);
             }
 

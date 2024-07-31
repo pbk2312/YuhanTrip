@@ -112,6 +112,12 @@
                         <label for="phoneNumber">고객 전화번호</label>
                     </div>
                 </div>
+                <div class="form-group">
+                    <div class="form-label-group">
+                        <input type="text" id="addr" name="addr" class="form-control" placeholder="고객 주소" required>
+                        <label for="addr">고객 주소</label>
+                    </div>
+                </div>
                 <input type="hidden" id="accommodationId" name="accommodationId" th:value="${reservation.id}">
                 <input type="hidden" id="price" name="price" th:value="${reservation.price}">
                 <button type="submit" class="btn btn-primary btn-block">결제하기</button>

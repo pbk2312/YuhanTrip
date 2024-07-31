@@ -48,6 +48,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/member/deleteAccount").authenticated()
                         .requestMatchers("/member/withdrawalMembership").authenticated()
+                        .requestMatchers("/accommodation/**").authenticated()
+                        .requestMatchers("/paymentPage").authenticated()
                         .requestMatchers("/admin/**").authenticated()
                         .anyRequest().permitAll()
                 )

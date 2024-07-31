@@ -26,7 +26,8 @@ public class ReservationDTO {
     private LocalDate localDate;
     private String name; // 고객 이름
     private String phoneNumber; // 고객 전화번호
-    private int price; //  1박 가격
+    private Long price; //  1박 가격
+    private String addr; // 예약자 주소
 
 
 }

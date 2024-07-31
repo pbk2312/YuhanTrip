@@ -2,7 +2,6 @@ package hello.yuhanTrip.controller;
 
 import hello.yuhanTrip.domain.Accommodation;
 import hello.yuhanTrip.domain.Member;
-import hello.yuhanTrip.domain.PaymentStatus;
 import hello.yuhanTrip.domain.Reservation;
 import hello.yuhanTrip.dto.ReservationDTO;
 import hello.yuhanTrip.jwt.TokenProvider;
@@ -23,8 +22,8 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 
 @Controller
@@ -114,7 +113,6 @@ public class AccommodationController {
         log.info("숙소 이름 : {} ", accommodationInfo.getTitle());
 
 
-
         ReservationDTO reservationDTO = new ReservationDTO();
         reservationDTO.setId(accommodationInfo.getId());
         reservationDTO.setAccommodationTitle(accommodationInfo.getTitle());
@@ -124,7 +122,6 @@ public class AccommodationController {
         model.addAttribute("reservation", reservationDTO);
         return "reservation";
     }
-
 
 
     @PostMapping("/reservation/submit")
@@ -184,11 +181,13 @@ public class AccommodationController {
 
             // 총 가격 계산
             long numberOfNights = ChronoUnit.DAYS.between(reservationDTO.getCheckInDate(), reservationDTO.getCheckOutDate());
-            int totalPrice = accommodation.getPrice() * (int) numberOfNights;
+            Long totalPrice = accommodation.getPrice() * (Long) numberOfNights;
 
             // 사용자 정보 및 예약 저장
             Member member = memberService.findByEmail(userDetails.getUsername());
             Reservation reservation = Reservation.builder()
+                    .addr(reservationDTO.getAddr())
+                    .reservationUid(UUID.randomUUID().toString()) // 예약번호 생성 및 설정
                     .member(member)
                     .accommodation(accommodation)
                     .checkInDate(reservationDTO.getCheckInDate())
@@ -198,7 +197,6 @@ public class AccommodationController {
                     .name(reservationDTO.getName())
                     .phoneNumber(reservationDTO.getPhoneNumber())
                     .price(totalPrice)
-                    .paymentStatus(PaymentStatus.PENDING) // 예약 생성 시 결제 대기 상태로 설정
                     .build();
 
             reservationService.reservationRegister(reservation);

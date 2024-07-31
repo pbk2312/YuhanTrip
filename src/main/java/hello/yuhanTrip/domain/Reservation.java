@@ -21,9 +21,17 @@ public class Reservation {
     @Column(name = "reservation_id")
     private Long id;
 
-    @ManyToOne
+    private String reservationUid; // 예약번호
+
+    @ManyToOne(fetch = FetchType.LAZY) // 여러개의 예약이 하나의 고객에게 연결 // 지연로딩
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
+
+    @OneToOne(fetch = FetchType.LAZY) // 1대1
+    @JoinColumn(name = "payment_id")
+    private Payment payment;
+
+
 
     @ManyToOne
     @JoinColumn(name = "accommodation_id", nullable = false)
@@ -48,13 +56,16 @@ public class Reservation {
     private String phoneNumber;
 
 
+    @Column(name = "addr", nullable = false)
+    private String addr;
+
 
     @Column(name = "price", nullable = false)
-    private int price; // 예약된 숙소의 총 가격
+    private Long price; // 예약된 숙소의 총 가격
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "payment_status", nullable = false)
-    private PaymentStatus paymentStatus; // 결제 상태
+
+
+
 
 
 }

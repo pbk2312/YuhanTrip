@@ -1,18 +1,22 @@
 package hello.yuhanTrip.controller;
 
+import com.siot.IamportRestClient.response.IamportResponse;
+import com.siot.IamportRestClient.response.Payment;
 import hello.yuhanTrip.domain.Reservation;
-import hello.yuhanTrip.dto.PaymentDTO;
+import hello.yuhanTrip.dto.payment.PaymentCallbackRequest;
+import hello.yuhanTrip.dto.payment.PaymentDTO;
 import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.repository.ReservationRepository;
+import hello.yuhanTrip.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -21,11 +25,12 @@ public class PaymentController {
 
     private final ReservationRepository reservationRepository;
     private final TokenProvider tokenProvider;
+    private final PaymentService paymentService;
 
     @GetMapping("/paymentPage")
     public String paymentPage(
             @RequestParam("reservationId") Long reservationId,
-            @RequestParam("totalPrice") Integer totalPrice,
+            @RequestParam("totalPrice") Long totalPrice,
             @CookieValue(value = "accessToken", required = false) String accessToken,
             Model model
     ) {
@@ -46,31 +51,43 @@ public class PaymentController {
             log.error("예약 정보를 찾을 수 없습니다. reservationId: {}", reservationId);
             return "redirect:/error"; // 예약 정보가 없을 경우 오류 페이지로 리다이렉트
         }
+        String reservationUid = reservationInfo.getReservationUid();
+        PaymentDTO requestDto = paymentService.findRequestDto(reservationUid);
+        requestDto.setAddr(userDetails.getUsername());
 
+
+        log.info("paymentRequest = {} ",requestDto);
         log.info("예약자 이메일 : {}", userDetails.getUsername());
         log.info("숙소 예약자 : {}", reservationInfo.getName());
         log.info("총 가격 : {}", totalPrice);
 
         // 예약 정보를 PaymentDTO에 담기
-        PaymentDTO paymentDTO = PaymentDTO.builder()
-                .reservationId(reservationInfo.getId())
-                .memberId(reservationInfo.getMember().getId())
-                .accommodationId(reservationInfo.getAccommodation().getId())
-                .accommodationTitle(reservationInfo.getAccommodation().getTitle())
-                .reservationDate(reservationInfo.getReservationDate())
-                .checkInDate(reservationInfo.getCheckInDate())
-                .checkOutDate(reservationInfo.getCheckOutDate())
-                .name(reservationInfo.getName())
-                .phoneNumber(reservationInfo.getPhoneNumber())
-                .specialRequests(reservationInfo.getSpecialRequests())
-                .totalPrice(totalPrice)
-                .build();
-
         // 모델에 PaymentDTO 추가
-        model.addAttribute("paymentInfo", paymentDTO);
+        model.addAttribute("requestDto", requestDto);
 
         // 결제 페이지로 이동
         return "paymentPage";
+    }
+
+
+    @ResponseBody
+    @PostMapping("/payment")
+    public ResponseEntity<IamportResponse<Payment>> validationPayment(@RequestBody PaymentCallbackRequest request) {
+        IamportResponse<Payment> iamportResponse = paymentService.paymentByCallback(request);
+
+        log.info("결제 응답={}", iamportResponse.getResponse().toString());
+
+        return new ResponseEntity<>(iamportResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("/success-payment")
+    public String successPaymentPage() {
+        return "success-payment";
+    }
+
+    @GetMapping("/fail-payment")
+    public String failPaymentPage() {
+        return "fail-payment";
     }
 
 
