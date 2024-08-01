@@ -81,7 +81,7 @@
                 <h5 class="text-center" id="accommodationTitle" th:text="${reservation.accommodationTitle}">숙소 이름</h5>
                 <p class="text-center" id="pricePerNight" th:text="'1박 가격: ' + ${reservation.price} + ' 원'">1박 가격: 0 원</p>
             </div>
-            <form id="reservationForm" action="/accommodation/reservation/submit" method="post">
+            <form id="reservationForm" action="/reservation/submit" method="post">
                 <div class="form-group">
                     <div class="form-label-group">
                         <input type="date" id="checkInDate" name="checkInDate" class="form-control" required autofocus>

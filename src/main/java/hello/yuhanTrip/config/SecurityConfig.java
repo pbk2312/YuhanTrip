@@ -48,9 +48,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/member/deleteAccount").authenticated()
                         .requestMatchers("/member/withdrawalMembership").authenticated()
-                        .requestMatchers("/accommodation/**").authenticated()
                         .requestMatchers("/paymentPage").authenticated()
+                        .requestMatchers("/payment/**").authenticated()
                         .requestMatchers("/admin/**").authenticated()
+                        .requestMatchers("/reservation/**").authenticated()
+                        .requestMatchers("/reservationConfirm").authenticated()
                         .anyRequest().permitAll()
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))

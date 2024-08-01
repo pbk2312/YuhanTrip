@@ -33,5 +33,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             " where o.reservationUid = :reservationUid")
     Optional<Reservation> findReservationAndPayment(@Param("reservationUid") String reservationUid);
 
+    @Query("select o from Reservation o where o.reservationUid = :reservationUid")
+    Optional<Reservation> findByReservationUid(@Param("reservationUid") String reservationUid);
 
 }

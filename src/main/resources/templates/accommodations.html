@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
@@ -11,48 +11,87 @@
     <!-- Bootstrap icons-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet"/>
     <!-- Core theme CSS (includes Bootstrap)-->
-    <link th:href="@{/css/homestyles.css}" href="../css/homestyles.css" rel="stylesheet">
-    <script th:src="@{/js/homescripts.js}"></script>
+    <link href="../css/homestyles.css" rel="stylesheet">
     <style>
-        .page-link-lg {
-            font-size: 1.25rem; /* Larger font size */
-            padding: 0.75rem 1.25rem; /* Larger padding */
+        /* CSS styles */
+        body {
+            background: url('/los-angeles-2289637_640.jpg') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            color: #333;
         }
 
-        .pagination .page-item.disabled .page-link {
-            cursor: not-allowed;
-            opacity: 0.5;
+        .navbar {
+            background: rgba(255, 255, 255, 0.8);
+            border-bottom: 1px solid #ddd;
         }
 
-        .pagination .page-item.active .page-link {
-            background-color: #007bff;
-            border-color: #007bff;
-            color: #fff;
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .navbar-nav .nav-link {
+            color: #007bff;
+            font-weight: 500;
+        }
+
+        .navbar-nav .nav-link.active {
+            color: #0056b3;
+        }
+
+
+
+
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
         }
 
         .card-img-top {
-            height: 200px; /* Set a fixed height for images */
-            object-fit: cover; /* Ensure images cover the card without distortion */
-            cursor: pointer; /* Pointer cursor for clickable image */
+            width: 100%;
+            height: 200px; /* 카드의 이미지 높이 설정 */
+            object-fit: cover; /* 이미지 비율 유지 */
         }
 
         .card-body {
-            text-align: center; /* Center text inside the card body */
+            padding: 1rem;
         }
 
-        .card-title {
-            cursor: pointer; /* Show pointer cursor to indicate it's clickable */
+
+
+        .action-button:hover {
+            color: #f0f8ff;
+            background-color: rgba(0, 0, 0, 0.8);
         }
+
+        .pagination {
+            justify-content: center;
+        }
+
+
+
     </style>
 </head>
 <body>
-<!-- Navigation -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<!-- Navigation-->
+<nav class="navbar navbar-expand-lg navbar-light">
     <div class="container px-4 px-lg-5">
         <a class="navbar-brand" href="#!">YuhanTrip</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span
-                class="navbar-toggler-icon"></span></button>
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
                 <li class="nav-item"><a class="nav-link active" aria-current="page" href="/home/homepage">Home</a></li>
@@ -70,73 +109,137 @@
                     </ul>
                 </li>
             </ul>
-            <form class="d-flex">
-                <button class="btn btn-outline-dark" type="submit">
-                    <i class="bi-cart-fill me-1"></i>
-                    Cart
-                    <span class="badge bg-dark text-white ms-1 rounded-pill">0</span>
+            <!-- Authentication buttons -->
+            <div id="authButtons" class="d-flex">
+                <button id="authButton" class="btn btn-outline-dark me-2" type="button"></button>
+                <button id="deleteAccountButton" class="btn btn-outline-danger" type="button" style="display: none;">
+                    회원탈퇴
                 </button>
-            </form>
+            </div>
         </div>
     </div>
 </nav>
-<!-- Accommodation List Section -->
-<section class="py-5">
-    <div class="container">
-        <h1 class="mt-4">숙소 리스트</h1>
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-4">
-            <!-- Example of a card -->
-            <div class="col" th:each="accommodation : ${accommodations}">
-                <a th:href="@{|/accommodation/info?id=${accommodation.id}|}" class="text-decoration-none text-dark">
-                    <div class="card">
-                        <!-- Check if image exists, otherwise use default image -->
-                        <img th:if="${accommodation.firstimage}" th:src="@{${accommodation.firstimage}}" class="card-img-top" alt="이미지">
-                        <img th:unless="${accommodation.firstimage}" src="/house-540796_1280.jpg" class="card-img-top" alt="기본 이미지">
-                        <div class="card-body">
-                            <h5 class="card-title" th:text="${accommodation.title}">숙소 이름</h5>
-                            <p class="card-text" th:text="${accommodation.addr1}">주소</p>
+
+<!-- Main Content-->
+<div id="main-content">
+    <section class="py-5">
+        <div class="container">
+            <h1 class="mt-4">숙소 리스트</h1>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-4">
+                <!-- Example of a card -->
+                <div class="col" th:each="accommodation : ${accommodations}">
+                    <a th:href="@{|/accommodation/info?id=${accommodation.id}|}" class="text-decoration-none text-dark">
+                        <div class="card">
+                            <!-- Check if image URL is non-empty, otherwise use default image -->
+                            <img th:src="${accommodation.firstimage != '' ? accommodation.firstimage : '/Noimage.png'}" class="card-img-top" alt="이미지">
+                            <div class="card-body">
+                                <h5 class="card-title" th:text="${accommodation.title}">숙소 이름</h5>
+                                <p class="card-text" th:text="${accommodation.addr1}">주소</p>
+                            </div>
                         </div>
-                    </div>
-                </a>
+                    </a>
+                </div>
+                <!-- End of card example -->
             </div>
-            <!-- End of card example -->
+
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <!-- Previous button -->
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link page-link-lg" th:href="@{|/accommodation/accommodations?page=${currentPage - 1}&size=${pageSize}|}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+
+                    <!-- Page numbers -->
+                    <li class="page-item" th:each="i : ${#numbers.sequence(startPage, endPage)}"
+                        th:classappend="${i == currentPage} ? 'active'">
+                        <a class="page-link page-link-lg" th:href="@{|/accommodation/accommodations?page=${i}&size=${pageSize}|}"
+                           th:text="${i + 1}">1</a>
+                    </li>
+
+                    <!-- Next button -->
+                    <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
+                        <a class="page-link page-link-lg" th:href="@{|/accommodation/accommodations?page=${currentPage + 1}&size=${pageSize}|}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
+    </section>
+</div>
 
-        <nav class="mt-4">
-            <ul class="pagination justify-content-center">
-                <!-- Previous button -->
-                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                    <a class="page-link page-link-lg" th:href="@{|/accommodation/accommodations?page=${currentPage - 1}&size=${pageSize}|}" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-
-                <!-- Page numbers -->
-                <li class="page-item" th:each="i : ${#numbers.sequence(startPage, endPage)}"
-                    th:classappend="${i == currentPage} ? 'active'">
-                    <a class="page-link page-link-lg" th:href="@{|/accommodation/accommodations?page=${i}&size=${pageSize}|}"
-                       th:text="${i + 1}">1</a>
-                </li>
-
-                <!-- Next button -->
-                <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
-                    <a class="page-link page-link-lg" th:href="@{|/accommodation/accommodations?page=${currentPage + 1}&size=${pageSize}|}" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-</section>
-
-<!-- Footer -->
-<footer class="py-5 bg-dark">
-    <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
-</footer>
-
-<!-- Bootstrap core JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Core theme JS -->
+<!-- jQuery, Popper.js, and Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+<!-- Core theme JS-->
 <script src="js/scripts.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const accessToken = localStorage.getItem('accessToken');
+        const authButton = document.getElementById('authButton');
+        const deleteAccountButton = document.getElementById('deleteAccountButton');
+
+        if (accessToken) {
+            if (isTokenExpired(accessToken)) {
+                logout();
+            } else {
+                authButton.textContent = 'Logout';
+                authButton.onclick = confirmLogout;
+                deleteAccountButton.style.display = 'block';
+                deleteAccountButton.onclick = () => {
+                    window.location.href = '/member/withdrawalMembership';
+                };
+            }
+        } else {
+            authButton.textContent = 'Login';
+            authButton.onclick = () => window.location.href = '/member/login';
+            if (window.location.pathname === '/member/withdrawalMembership') {
+                window.location.href = '/member/login';
+            }
+        }
+    });
+
+    function isTokenExpired(token) {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const currentTime = Math.floor(Date.now() / 1000);
+        return payload.exp < currentTime;
+    }
+
+    function confirmLogout() {
+        if (confirm("로그아웃 하시겠습니까?")) {
+            logout();
+        }
+    }
+
+    function logout() {
+        fetch('/member/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ /* 필요 시 요청 본문 추가 */})
+        })
+            .then(response => {
+                if (response.ok) {
+                    deleteAccessToken();
+                    document.getElementById('authButton').textContent = 'Login';
+                    document.getElementById('deleteAccountButton').style.display = 'none';
+                    document.getElementById('authButton').onclick = () => window.location.href = '/member/login';
+                } else {
+                    console.error('로그아웃 요청 실패');
+                }
+            })
+            .catch(error => console.error('로그아웃 요청 중 오류 발생:', error));
+    }
+
+    function deleteAccessToken() {
+        localStorage.removeItem('accessToken');
+    }
+
+</script>
+
 </body>
 </html>

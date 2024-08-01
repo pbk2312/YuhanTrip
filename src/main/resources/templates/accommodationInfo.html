@@ -1,63 +1,143 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
-    <meta name="description" content="숙소 상세 정보"/>
-    <meta name="author" content="Yuhan Trip"/>
-    <title th:text="${accommodation.title} + ' - 숙소 상세 정보'">숙소 상세 정보</title>
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico"/>
-    <!-- Bootstrap icons -->
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <title>Yuhan Trip - Start Bootstrap Template</title>
+    <!-- Favicon-->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico"/>
+    <!-- Bootstrap icons-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet"/>
-    <!-- Core theme CSS (includes Bootstrap) -->
-    <link th:href="@{/css/homestyles.css}" href="../css/homestyles.css" rel="stylesheet">
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="../css/homestyles.css" rel="stylesheet">
     <style>
+        /* CSS styles */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url('/los-angeles-2289637_640.jpg') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
             color: #333;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+
         .navbar {
-            background-color: #f8f9fa;
-            border-bottom: 1px solid #e9ecef;
+            background: rgba(255, 255, 255, 0.8);
+            border-bottom: 1px solid #ddd;
         }
+
         .navbar-brand {
+            font-size: 1.5rem;
             font-weight: bold;
         }
+
         .navbar-nav .nav-link {
-            margin-right: 20px;
-            color: #495057;
-        }
-        .navbar-nav .nav-link:hover {
             color: #007bff;
+            font-weight: 500;
+            margin-right: 20px;
         }
+
+        .navbar-nav .nav-link.active {
+            color: #0056b3;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #0056b3;
+        }
+
+        .flex-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 30px 0;
+        }
+
+        .flex-item {
+            position: relative;
+            width: 45%;
+            text-align: center;
+        }
+
+        .accommodation-img, .confirmation-img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .accommodation-img:hover, .confirmation-img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .action-button {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fff;
+            background-color: rgba(0, 0, 0, 0.6);
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            text-align: center;
+            padding: 12px 25px;
+            border-radius: 8px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .action-button:hover {
+            color: #f0f8ff;
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .pagination {
+            justify-content: center;
+        }
+
+        .message {
+            color: red;
+            font-size: 1.25rem;
+            text-align: center;
+            margin-top: 20px;
+        }
+
         .card {
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
+
         .card-img-top {
             height: 400px;
             object-fit: cover;
         }
+
         .card-body {
             text-align: center;
             padding: 20px;
             background-color: #ffffff;
         }
+
         .card-title {
             font-size: 2rem;
             font-weight: bold;
             color: #007bff;
         }
+
         .info-container {
             display: flex;
             flex-direction: column;
             gap: 20px; /* Reduced gap for closer positioning */
         }
+
         .details {
             margin-bottom: 40px;
         }
+
         .details h2 {
             font-size: 1.5rem;
             color: #343a40;
@@ -65,13 +145,16 @@
             padding-bottom: 10px;
             margin-bottom: 20px;
         }
+
         .details p {
             font-size: 1rem;
             margin-bottom: 15px;
         }
+
         .details strong {
             color: #343a40;
         }
+
         .price-section {
             text-align: center;
             background-color: #f8f9fa;
@@ -79,6 +162,7 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
+
         .price-card {
             border-radius: 8px;
             padding: 20px;
@@ -86,11 +170,13 @@
             color: #ffffff;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
+
         .price-card h3 {
             font-size: 2.5rem;
             font-weight: bold;
             margin: 0;
         }
+
         .map-button, .reservation-button {
             display: inline-flex;
             align-items: center;
@@ -104,32 +190,40 @@
             text-decoration: none;
             transition: background-color 0.3s, transform 0.3s;
         }
+
         .map-button:hover, .reservation-button:hover {
             background-color: #0056b3;
             transform: scale(1.05);
         }
+
         .map-button i, .reservation-button i {
             margin-right: 8px;
         }
+
         footer {
             background-color: #343a40;
             color: #ffffff;
             padding: 20px 0;
         }
+
         footer p {
             margin: 0;
         }
+
         .alert {
             display: none;
             margin-top: 20px;
         }
+
         .alert-show {
             display: block;
         }
     </style>
+
 </head>
 <body>
-<!-- Navigation -->
+<!-- Navigation-->
+<!-- Navigation-->
 <nav class="navbar navbar-expand-lg navbar-light">
     <div class="container px-4 px-lg-5">
         <a class="navbar-brand" href="#!">YuhanTrip</a>
@@ -139,96 +233,97 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-                <li class="nav-item"><a class="nav-link" href="/home/homepage">Home</a></li>
+                <li class="nav-item"><a class="nav-link active" aria-current="page" href="/home/homepage">Home</a></li>
                 <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
                        data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <li><a class="dropdown-item" href="#!">All Products</a></li>
-                        <li><hr class="dropdown-divider"/></li>
+                        <li>
+                            <hr class="dropdown-divider"/>
+                        </li>
                         <li><a class="dropdown-item" href="#!">Popular Items</a></li>
                         <li><a class="dropdown-item" href="#!">New Arrivals</a></li>
                     </ul>
                 </li>
             </ul>
-            <form class="d-flex">
-                <button class="btn btn-outline-dark" type="submit">
-                    <i class="bi-cart-fill me-1"></i>
-                    Cart
-                    <span class="badge bg-dark text-white ms-1 rounded-pill">0</span>
+            <!-- Authentication buttons -->
+            <div id="authButtons" class="d-flex">
+                <button id="authButton" class="btn btn-outline-dark me-2" type="button"></button>
+                <button id="deleteAccountButton" class="btn btn-outline-danger" type="button" style="display: none;">
+                    회원탈퇴
                 </button>
-            </form>
+            </div>
         </div>
     </div>
 </nav>
 
-<!-- Accommodation Detail Section -->
-<section class="py-5">
-    <div class="container">
-        <!-- 숙소의 이미지와 제목 -->
-        <div class="card mb-4">
-            <img th:src="@{${accommodation.firstimage}}" class="card-img-top" alt="숙소 이미지">
-            <div class="card-body">
-                <h1 class="card-title" th:text="${accommodation.title}">숙소 제목</h1>
-            </div>
-        </div>
 
-        <!-- 가격 섹션 (상단으로 이동) -->
-        <div class="price-section">
-            <div class="price-card">
-                <h3 th:text="${accommodation.price} + '원'">가격</h3>
+<!-- Main Content-->
+<div id="main-content">
+    <!-- Accommodation Detail Section -->
+    <section class="py-5">
+        <div class="container">
+            <!-- 숙소의 이미지와 제목 -->
+            <div class="card mb-4">
+                <img th:src="@{${accommodation.firstimage}}" class="card-img-top" alt="숙소 이미지">
+                <div class="card-body">
+                    <h1 class="card-title" th:text="${accommodation.title}">숙소 제목</h1>
+                </div>
             </div>
-        </div>
 
-        <!-- 상세 정보 섹션 -->
-        <div class="info-container">
-            <!-- 숙소의 상세 정보 -->
-            <div class="details">
-                <h2>상세 정보</h2>
-                <p><strong>주소:</strong> <span th:text="${accommodation.addr1} + ' ' + ${accommodation.addr2}">주소</span></p>
-                <p><strong>전화번호:</strong> <span th:text="${accommodation.tel}">전화번호</span></p>
-                <p><strong>카테고리:</strong> <span th:text="${accommodation.cat1} + ' > ' + ${accommodation.cat2} + ' > ' + ${accommodation.cat3}">카테고리</span></p>
-                <p><strong>구역 코드:</strong> <span th:text="${accommodation.areacode}">구역 코드</span></p>
-                <p><strong>특징:</strong> <span th:text="${accommodation.goodstay}">특징</span></p>
-                <p><strong>한옥 여부:</strong> <span th:text="${accommodation.hanok}">한옥 여부</span></p>
-                <p><strong>출처:</strong> <span th:text="${accommodation.cpyrhtDivCd}">출처</span></p>
-                <!-- 지도 링크 -->
-                <p><strong>지도 보기:</strong>
-                    <a th:href="'https://www.google.com/maps/search/?api=1&query=' + ${accommodation.mapy} + ',' + ${accommodation.mapx}" target="_blank" class="map-button">
-                        <i class="bi bi-map"></i> View on Google Maps
-                    </a>
-                </p>
-                <!-- 예약하기 버튼 -->
-                <p><strong>예약하기:</strong>
-                    <button id="reservationButton" class="reservation-button" th:data-id="${accommodation.id}">
-                        <i class="bi bi-calendar-check"></i> 예약하기
-                    </button>
-                </p>
-                <!-- 로그인 메시지 -->
-                <div id="loginMessage" class="alert alert-danger">
-                    로그인 후 예약할 수 있습니다. <a href="/member/login">로그인 페이지로 이동</a>
+            <!-- 가격 섹션 (상단으로 이동) -->
+            <div class="price-section">
+                <div class="price-card">
+                    <h3 th:text="${accommodation.price} + '원'">가격</h3>
+                </div>
+            </div>
+
+            <!-- 상세 정보 섹션 -->
+            <div class="info-container">
+                <!-- 숙소의 상세 정보 -->
+                <div class="details">
+                    <h2>상세 정보</h2>
+                    <p><strong>주소:</strong> <span th:text="${accommodation.addr1} + ' ' + ${accommodation.addr2}">주소</span></p>
+                    <p><strong>전화번호:</strong> <span th:text="${accommodation.tel}">전화번호</span></p>
+                    <p><strong>카테고리:</strong> <span th:text="${accommodation.cat1} + ' > ' + ${accommodation.cat2} + ' > ' + ${accommodation.cat3}">카테고리</span></p>
+                    <p><strong>구역 코드:</strong> <span th:text="${accommodation.areacode}">구역 코드</span></p>
+                    <p><strong>특징:</strong> <span th:text="${accommodation.goodstay}">특징</span></p>
+                    <p><strong>한옥 여부:</strong> <span th:text="${accommodation.hanok}">한옥 여부</span></p>
+                    <p><strong>출처:</strong> <span th:text="${accommodation.cpyrhtDivCd}">출처</span></p>
+                    <!-- 지도 링크 -->
+                    <p><strong>지도 보기:</strong>
+                        <a th:href="'https://www.google.com/maps/search/?api=1&query=' + ${accommodation.mapy} + ',' + ${accommodation.mapx}" target="_blank" class="map-button">
+                            <i class="bi bi-map"></i> View on Google Maps
+                        </a>
+                    </p>
+                    <!-- 예약하기 버튼 -->
+                    <p><strong>예약하기:</strong>
+                        <button id="reservationButton" class="reservation-button" th:data-id="${accommodation.id}">
+                            <i class="bi bi-calendar-check"></i> 예약하기
+                        </button>
+                    </p>
+                    <!-- 로그인 메시지 -->
+                    <div id="loginMessage" class="alert alert-danger">
+                        로그인 후 예약할 수 있습니다. <a href="/member/login">로그인 페이지로 이동</a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+</div>
 
-<!-- Footer -->
-<footer class="py-5">
-    <div class="container">
-        <p class="m-0 text-center">Copyright &copy; Your Website 2023</p>
-    </div>
-</footer>
-
-<!-- Bootstrap core JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-
+<!-- jQuery, Popper.js, and Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+<!-- Core theme JS-->
+<script src="js/scripts.js"></script>
 <script>
     document.getElementById('reservationButton').addEventListener('click', function() {
         const token = localStorage.getItem('accessToken'); // Get token from localStorage
         const accommodationId = this.getAttribute('data-id'); // Get accommodation ID from button
-        const url = `/accommodation/reservation?id=${accommodationId}`; // Construct the URL with ID
+        const url = `/reservation?id=${accommodationId}`; // Construct the URL with ID
         const loginMessage = document.getElementById('loginMessage'); // Element to show login message
 
         if (!token) {
@@ -239,6 +334,68 @@
         // Redirect to the reservation page
         window.location.href = url;
     });
+    document.addEventListener('DOMContentLoaded', () => {
+        const accessToken = localStorage.getItem('accessToken');
+        const authButton = document.getElementById('authButton');
+        const deleteAccountButton = document.getElementById('deleteAccountButton');
+
+        if (accessToken) {
+            if (isTokenExpired(accessToken)) {
+                logout();
+            } else {
+                authButton.textContent = 'Logout';
+                authButton.onclick = confirmLogout;
+                deleteAccountButton.style.display = 'block';
+                deleteAccountButton.onclick = () => {
+                    window.location.href = '/member/withdrawalMembership';
+                };
+            }
+        } else {
+            authButton.textContent = 'Login';
+            authButton.onclick = () => window.location.href = '/member/login';
+            if (window.location.pathname === '/member/withdrawalMembership') {
+                window.location.href = '/member/login';
+            }
+        }
+    });
+
+    function isTokenExpired(token) {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const currentTime = Math.floor(Date.now() / 1000);
+        return payload.exp < currentTime;
+    }
+
+    function confirmLogout() {
+        if (confirm("로그아웃 하시겠습니까?")) {
+            logout();
+        }
+    }
+
+    function logout() {
+        fetch('/member/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ /* 필요 시 요청 본문 추가 */})
+        })
+            .then(response => {
+                if (response.ok) {
+                    deleteAccessToken();
+                    document.getElementById('authButton').textContent = 'Login';
+                    document.getElementById('deleteAccountButton').style.display = 'none';
+                    document.getElementById('authButton').onclick = () => window.location.href = '/member/login';
+                } else {
+                    console.error('로그아웃 요청 실패');
+                }
+            })
+            .catch(error => console.error('로그아웃 요청 중 오류 발생:', error));
+    }
+
+    function deleteAccessToken() {
+        localStorage.removeItem('accessToken');
+    }
+
 </script>
 
 </body>

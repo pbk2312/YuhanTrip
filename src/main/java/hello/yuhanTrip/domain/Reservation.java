@@ -60,8 +60,6 @@ public class Reservation {
     private String addr;
 
 
-    @Column(name = "price", nullable = false)
-    private Long price; // 예약된 숙소의 총 가격
 
 
 

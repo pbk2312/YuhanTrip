@@ -7,6 +7,7 @@ import hello.yuhanTrip.dto.payment.PaymentCallbackRequest;
 import hello.yuhanTrip.dto.payment.PaymentDTO;
 import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.repository.ReservationRepository;
+import hello.yuhanTrip.service.MemberService;
 import hello.yuhanTrip.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+
 @Controller
 @RequiredArgsConstructor
 @Log4j2
@@ -26,7 +28,6 @@ public class PaymentController {
     private final ReservationRepository reservationRepository;
     private final TokenProvider tokenProvider;
     private final PaymentService paymentService;
-
     @GetMapping("/paymentPage")
     public String paymentPage(
             @RequestParam("reservationId") Long reservationId,
@@ -52,6 +53,7 @@ public class PaymentController {
             return "redirect:/error"; // 예약 정보가 없을 경우 오류 페이지로 리다이렉트
         }
         String reservationUid = reservationInfo.getReservationUid();
+        log.info("reservationUid: {}" ,reservationUid);
         PaymentDTO requestDto = paymentService.findRequestDto(reservationUid);
         requestDto.setAddr(userDetails.getUsername());
 
@@ -80,15 +82,7 @@ public class PaymentController {
         return new ResponseEntity<>(iamportResponse, HttpStatus.OK);
     }
 
-    @GetMapping("/success-payment")
-    public String successPaymentPage() {
-        return "success-payment";
-    }
 
-    @GetMapping("/fail-payment")
-    public String failPaymentPage() {
-        return "fail-payment";
-    }
 
 
 }

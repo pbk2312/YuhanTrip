@@ -78,7 +78,17 @@ public class MemberController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestBody LogoutDTO logoutDTO, HttpServletResponse response) {
+    public ResponseEntity<String> logout(
+            @CookieValue(value = "accessToken", required = false) String accessToken,
+            HttpServletResponse response) {
+
+        Authentication authentication = tokenProvider.getAuthentication(accessToken);
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        String username = userDetails.getUsername();
+        LogoutDTO logoutDTO = new LogoutDTO();
+        logoutDTO.setEmail(username);
+
         log.info("로그아웃 요청");
         memberService.logout(logoutDTO);
         // 쿠키에서 accessToken 삭제
@@ -88,6 +98,7 @@ public class MemberController {
         accessTokenCookie.setPath("/"); // 모든 경로에서 쿠키 전송
         accessTokenCookie.setMaxAge(0); // 쿠키 즉시 삭제
         response.addCookie(accessTokenCookie);
+        log.info("토큰 삭제");
 
         log.info("로그아웃 완료");
         return ResponseEntity.ok("로그아웃 완료");

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,4 +38,13 @@ public class ReservationService {
 
         return isOverlapping;
     }
+
+
+    public void removeReservation(String reservationUid) {
+        Reservation reservation = reservationRepository.findByReservationUid(reservationUid)
+                .orElseThrow(() -> new RuntimeException("예약 정보가 없다"));
+
+        reservationRepository.delete(reservation);
+    }
+
 }

@@ -1,10 +1,7 @@
 package hello.yuhanTrip.domain;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,8 +14,13 @@ public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long price;
+
+
+    private Long price; // 숙소 총 가격
+
+    @Enumerated(EnumType.STRING) // 열거형을 문자열로 저장
     private PaymentStatus status;
+
     private String paymentUid; // 결제 고유 번호
 
     @Builder

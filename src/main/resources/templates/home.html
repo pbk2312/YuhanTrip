@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
@@ -13,52 +13,121 @@
     <!-- Core theme CSS (includes Bootstrap)-->
     <link href="../css/homestyles.css" rel="stylesheet">
     <style>
-        .card img {
-            height: 200px;
-            object-fit: cover;
+        /* CSS styles */
+        body {
+            background: url('/los-angeles-2289637_640.jpg') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            color: #333;
         }
 
-        .card-title {
+        header {
+            background: transparent;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        header .container {
+            text-align: center;
+        }
+
+        header .text-center {
+            color: #fff;
+        }
+
+        header .display-4 {
+            font-size: 3rem; /* Increased font size for better visibility */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Added text shadow */
+        }
+
+        header .lead {
+            font-size: 1.25rem; /* Slightly larger font size */
+            color: rgba(255, 255, 255, 0.8); /* Lightened the color */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Added text shadow */
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.8);
+            border-bottom: 1px solid #ddd;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .navbar-nav .nav-link {
+            color: #007bff;
+            font-weight: 500;
+        }
+
+        .navbar-nav .nav-link.active {
+            color: #0056b3;
+        }
+
+        .flex-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 30px 0;
+        }
+
+        .flex-item {
+            position: relative;
+            width: 45%;
+            text-align: center;
+        }
+
+        .accommodation-img, .confirmation-img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .accommodation-img:hover, .confirmation-img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .action-button {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fff;
+            background-color: rgba(0, 0, 0, 0.6);
+            border: none;
             font-size: 1.25rem;
+            cursor: pointer;
+            text-align: center;
+            padding: 12px 25px;
+            border-radius: 8px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .action-button:hover {
+            color: #f0f8ff;
+            background-color: rgba(0, 0, 0, 0.8);
         }
 
         .pagination {
             justify-content: center;
         }
 
-        .centered-button {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-
-        .btn-custom {
-            background: linear-gradient(135deg, #007bff, #0056b3);
-            color: white;
-            border: none;
-            padding: 15px 30px;
+        .message {
+            color: red;
             font-size: 1.25rem;
-            border-radius: 50px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
             text-align: center;
-        }
-
-        .btn-custom:hover {
-            background: linear-gradient(135deg, #0056b3, #00408d);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-            text-decoration: none;
-        }
-
-        .btn-custom:focus, .btn-custom:active {
-            outline: none;
-            box-shadow: 0 0 0 0.25rem rgba(38, 143, 255, 0.5);
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
 <!-- Navigation-->
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-light">
     <div class="container px-4 px-lg-5">
         <a class="navbar-brand" href="#!">YuhanTrip</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
@@ -67,7 +136,7 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-                <li class="nav-item"><a class="nav-link active" aria-current="page" href="#!">Home</a></li>
+                <li class="nav-item"><a class="nav-link active" aria-current="page" href="/home/homepage">Home</a></li>
                 <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
@@ -93,21 +162,30 @@
     </div>
 </nav>
 
+
 <!-- Header-->
-<header class="bg-dark py-5">
-    <div class="container px-4 px-lg-5 my-5">
+<header>
+    <div class="container px-4 px-lg-5 my-4">
         <div class="text-center text-white">
-            <h1 class="display-4 fw-bolder">Accommodation in style</h1>
-            <p class="lead fw-normal text-white-50 mb-0">With this shop homepage template</p>
+            <h1 class="display-4 fw-bolder">세련된 숙소를 만나다</h1>
+            <p class="lead fw-normal text-white-50 mb-0">당신의 특별한 순간을 위해</p>
         </div>
     </div>
 </header>
 
 <!-- Main Content-->
 <div class="container">
-    <!-- 숙소 예약 버튼 추가 -->
-    <div class="centered-button">
-        <button class="btn btn-custom" id="accommodationButton">숙소 예약</button>
+    <div class="flex-container">
+        <!-- 예약하기 섹션 -->
+        <div class="flex-item">
+            <img src="/house-540796_1280.jpg" class="accommodation-img" alt="숙소 예약하기">
+            <button class="action-button" onclick="location.href='/accommodation/accommodations'">예약하기</button>
+        </div>
+        <!-- 예약 확인 섹션 -->
+        <div class="flex-item">
+            <img src="/reservation-5421878_1280.jpg" class="confirmation-img" alt="예약 확인">
+            <button class="action-button" onclick="checkAccessTokenAndRedirect()">예약 확인</button>
+        </div>
     </div>
 </div>
 
@@ -117,34 +195,37 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
 <!-- Core theme JS-->
 <script src="js/scripts.js"></script>
-
 <script>
-
     document.addEventListener('DOMContentLoaded', () => {
         const accessToken = localStorage.getItem('accessToken');
         const authButton = document.getElementById('authButton');
         const deleteAccountButton = document.getElementById('deleteAccountButton');
-        const accommodationButton = document.getElementById('accommodationButton');
 
         if (accessToken) {
-            authButton.textContent = 'Logout';
-            authButton.onclick = confirmLogout;
-            deleteAccountButton.style.display = 'block';
-            deleteAccountButton.onclick = () => {
-                window.location.href = '/member/withdrawalMembership'; // 페이지를 새로 로드
-            };
+            if (isTokenExpired(accessToken)) {
+                logout();
+            } else {
+                authButton.textContent = 'Logout';
+                authButton.onclick = confirmLogout;
+                deleteAccountButton.style.display = 'block';
+                deleteAccountButton.onclick = () => {
+                    window.location.href = '/member/withdrawalMembership';
+                };
+            }
         } else {
             authButton.textContent = 'Login';
             authButton.onclick = () => window.location.href = '/member/login';
             if (window.location.pathname === '/member/withdrawalMembership') {
-                window.location.href = '/member/login'; // 로그인 페이지로 리다이렉트
+                window.location.href = '/member/login';
             }
         }
-
-        accommodationButton.onclick = () => {
-            window.location.href = '/accommodation/accommodations';
-        };
     });
+
+    function isTokenExpired(token) {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const currentTime = Math.floor(Date.now() / 1000);
+        return payload.exp < currentTime;
+    }
 
     function confirmLogout() {
         if (confirm("로그아웃 하시겠습니까?")) {
@@ -153,16 +234,44 @@
     }
 
     function logout() {
-        deleteAccessToken();
-        document.getElementById('authButton').textContent = 'Login';
-        document.getElementById('deleteAccountButton').style.display = 'none';
-        document.getElementById('authButton').onclick = () => window.location.href = '/member/login';
+        fetch('/member/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ /* 필요 시 요청 본문 추가 */})
+        })
+            .then(response => {
+                if (response.ok) {
+                    deleteAccessToken();
+                    document.getElementById('authButton').textContent = 'Login';
+                    document.getElementById('deleteAccountButton').style.display = 'none';
+                    document.getElementById('authButton').onclick = () => window.location.href = '/member/login';
+                } else {
+                    console.error('로그아웃 요청 실패');
+                }
+            })
+            .catch(error => console.error('로그아웃 요청 중 오류 발생:', error));
     }
 
     function deleteAccessToken() {
         localStorage.removeItem('accessToken');
     }
 
+    function checkAccessTokenAndRedirect() {
+        const accessToken = localStorage.getItem('accessToken');
+        if (accessToken) {
+            if (!isTokenExpired(accessToken)) {
+                window.location.href = '/reservationConfirm';
+            } else {
+                alert('Your session has expired. Please log in again.');
+                window.location.href = '/member/login';
+            }
+        } else {
+            alert('Please log in to access this page.');
+            window.location.href = '/member/login';
+        }
+    }
 </script>
 
 </body>

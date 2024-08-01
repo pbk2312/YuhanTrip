@@ -1,6 +1,5 @@
 package hello.yuhanTrip.service;
 
-
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.request.CancelData;
@@ -13,6 +12,7 @@ import hello.yuhanTrip.dto.payment.PaymentDTO;
 import hello.yuhanTrip.repository.PaymentRepository;
 import hello.yuhanTrip.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,12 +22,12 @@ import java.math.BigDecimal;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class PaymentServiceImpl implements PaymentService{
+@Log4j2
+public class PaymentServiceImpl implements PaymentService {
 
     private final ReservationRepository reservationRepository;
-    private PaymentCallbackRequest paymentCallbackRequest;
-    private IamportClient iamportClient;
-    private PaymentRepository paymentRepository;
+    private final PaymentRepository paymentRepository;
+    private final IamportClient iamportClient;
 
     @Override
     public PaymentDTO findRequestDto(String reservationUid) {
@@ -40,7 +40,7 @@ public class PaymentServiceImpl implements PaymentService{
                 .specialRequests(reservation.getSpecialRequests())
                 .reservationDate(reservation.getReservationDate())
                 .checkInDate(reservation.getCheckInDate())
-                .totalPrice(reservation.getPrice())
+                .totalPrice(reservation.getPayment().getPrice())
                 .checkOutDate(reservation.getCheckOutDate())
                 .accommodationId(reservation.getId())
                 .phoneNumber(reservation.getPhoneNumber())
@@ -51,11 +51,13 @@ public class PaymentServiceImpl implements PaymentService{
     @Override
     public IamportResponse<Payment> paymentByCallback(PaymentCallbackRequest request) {
         try {
+            log.info("결제 시도..");
+
             // 결제 단건 조회(아임포트)
             IamportResponse<Payment> iamportResponse = iamportClient.paymentByImpUid(request.getPaymentUid());
             // 주문내역 조회
             Reservation reservation = reservationRepository.findReservationAndPayment(request.getReservationUid())
-                    .orElseThrow(() -> new IllegalArgumentException("주문 내역이 없습니다."));
+                    .orElseThrow(() -> new IllegalArgumentException("예약 내역이 없습니다."));
 
             // 결제 완료가 아니면
             if (!iamportResponse.getResponse().getStatus().equals("paid")) {
@@ -70,6 +72,7 @@ public class PaymentServiceImpl implements PaymentService{
             Long price = reservation.getPayment().getPrice();
             // 실 결제 금액
             int iamportPrice = iamportResponse.getResponse().getAmount().intValue();
+
 
             // 결제 금액 검증
             if (iamportPrice != price) {
@@ -94,4 +97,4 @@ public class PaymentServiceImpl implements PaymentService{
             throw new RuntimeException(e);
         }
     }
-    }
+}
