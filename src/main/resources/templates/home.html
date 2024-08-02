@@ -203,8 +203,10 @@
 
         if (accessToken) {
             if (isTokenExpired(accessToken)) {
+                // 토큰이 만료된 경우 로그아웃
                 logout();
             } else {
+                // 유효한 토큰이 있는 경우 로그아웃 버튼 표시
                 authButton.textContent = 'Logout';
                 authButton.onclick = confirmLogout;
                 deleteAccountButton.style.display = 'block';
@@ -213,6 +215,7 @@
                 };
             }
         } else {
+            // 토큰이 없는 경우 로그인 버튼 표시
             authButton.textContent = 'Login';
             authButton.onclick = () => window.location.href = '/member/login';
             if (window.location.pathname === '/member/withdrawalMembership') {
@@ -222,9 +225,14 @@
     });
 
     function isTokenExpired(token) {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        const currentTime = Math.floor(Date.now() / 1000);
-        return payload.exp < currentTime;
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const currentTime = Math.floor(Date.now() / 1000);
+            return payload.exp < currentTime;
+        } catch (e) {
+            console.error('토큰 파싱 중 오류 발생:', e);
+            return true;
+        }
     }
 
     function confirmLogout() {
@@ -239,7 +247,7 @@
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ /* 필요 시 요청 본문 추가 */})
+            body: JSON.stringify({ /* 필요 시 요청 본문 추가 */ })
         })
             .then(response => {
                 if (response.ok) {
@@ -264,11 +272,11 @@
             if (!isTokenExpired(accessToken)) {
                 window.location.href = '/reservationConfirm';
             } else {
-                alert('Your session has expired. Please log in again.');
+                alert('세션이 만료되었습니다. 다시 로그인 해주세요.');
                 window.location.href = '/member/login';
             }
         } else {
-            alert('Please log in to access this page.');
+            alert('이 페이지에 접근하려면 로그인 해주세요.');
             window.location.href = '/member/login';
         }
     }

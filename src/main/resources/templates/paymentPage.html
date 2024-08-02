@@ -14,9 +14,9 @@
             font-family: 'Arial', sans-serif;
         }
         .container {
-            max-width: 800px; /* 너비를 넓혀서 노트북 화면에 맞게 조정 */
+            max-width: 800px;
             margin-top: 50px;
-            padding: 30px; /* 여백을 넓게 설정 */
+            padding: 30px;
             background-color: white;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
@@ -29,12 +29,15 @@
             margin-bottom: 20px;
         }
         .info p {
-            font-size: 20px; /* 폰트 크기를 넓은 화면에 맞게 조정 */
-            margin: 10px 0; /* 여백을 넓게 설정 */
+            font-size: 20px;
+            margin: 10px 0;
         }
         .info p strong {
             display: inline-block;
-            width: 160px; /* 더 넓은 화면에 맞게 조정 */
+            width: 160px;
+        }
+        .highlight {
+            color: #007bff;
         }
         .btn-primary {
             width: 100%;
@@ -105,8 +108,8 @@
             const homeLink = document.querySelector('.navbar-nav .nav-link[href="/home/homepage"]');
             if (homeLink) {
                 homeLink.addEventListener('click', (event) => {
-                    event.preventDefault(); // 기본 링크 클릭 동작 방지
-                    const reservationId = '[[${requestDto.reservationUid}]]'; // 서버에서 제공된 예약 ID
+                    event.preventDefault();
+                    const reservationId = '[[${requestDto.reservationUid}]]';
                     window.location.href = `/reservation/fail?reservationId=${reservationId}`;
                 });
             }
@@ -154,11 +157,12 @@
     </div>
     <div class="info">
         <p><strong>숙소 이름:</strong> <span th:text="${requestDto.accommodationTitle}">숙소 이름</span></p>
-        <p><strong>결제해야 할 가격:</strong> <span th:text="${requestDto.totalPrice}">0</span> 원</p>
+        <p><strong class="highlight">결제해야 할 가격:</strong> <span class="highlight" th:text="${requestDto.totalPrice}">0</span> 원</p>
         <p><strong>예약자 성함:</strong> <span th:text="${requestDto.buyerName}">예약자 성함</span></p>
         <p><strong>전화번호:</strong> <span th:text="${requestDto.phoneNumber}">전화번호</span></p>
-        <p><strong>체크인 날짜:</strong> <span th:text="${requestDto.checkInDate}">체크인 날짜</span></p>
-        <p><strong>체크아웃 날짜:</strong> <span th:text="${requestDto.checkOutDate}">체크아웃 날짜</span></p>
+        <p><strong class="highlight">체크인 날짜:</strong> <span class="highlight" th:text="${requestDto.checkInDate}">체크인 날짜</span></p>
+        <p><strong class="highlight">체크아웃 날짜:</strong> <span class="highlight" th:text="${requestDto.checkOutDate}">체크아웃 날짜</span></p>
+        <p><strong>숙박 인원수:</strong> <span th:text="${requestDto.numberOfGuests}">1</span> 명</p>
     </div>
     <button class="btn btn-primary" onclick="requestPay()">
         결제하기

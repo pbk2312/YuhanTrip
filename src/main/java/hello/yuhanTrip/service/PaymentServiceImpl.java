@@ -45,6 +45,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .accommodationId(reservation.getId())
                 .phoneNumber(reservation.getPhoneNumber())
                 .reservationUid(reservationUid)
+                .numberOfGuests(reservation.getNumberOfGuests())
                 .build();
     }
 

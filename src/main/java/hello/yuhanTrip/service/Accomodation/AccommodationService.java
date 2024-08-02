@@ -3,7 +3,10 @@ package hello.yuhanTrip.service.Accomodation;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hello.yuhanTrip.domain.Accommodation;
+import hello.yuhanTrip.domain.Room;
 import hello.yuhanTrip.repository.AccommodationRepository;
+import hello.yuhanTrip.repository.RoomReposiotry;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -16,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -31,38 +35,74 @@ public class AccommodationService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
     private final AccommodationRepository accommodationRepository;
+    private final RoomReposiotry roomReposiotry;
 
-    public AccommodationService(RestTemplate restTemplate, ObjectMapper objectMapper, AccommodationRepository accommodationRepository) {
+    private static final String[] IMAGE_URLS = {
+            "http://localhost:8080/villa-1737168_1280.jpg",
+            "http://localhost:8080/ai-generated-8856798_1280.jpg"
+    };
+
+
+    public AccommodationService(RestTemplate restTemplate, ObjectMapper objectMapper, AccommodationRepository accommodationRepository,RoomReposiotry roomReposiotry) {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
         this.accommodationRepository = accommodationRepository;
+        this.roomReposiotry = roomReposiotry;
     }
-
 
     @Transactional
     public void saveDataToDatabase() {
         List<Accommodation> allAccommodations = fetchAllDataFromAPI();
         if (!allAccommodations.isEmpty()) {
-            // Random 객체 생성
             Random random = new Random();
 
-            // 각 숙박 정보에 대해 랜덤 가격 설정
+            // 객실 데이터 생성 및 저장
             for (Accommodation accommodation : allAccommodations) {
-                Long randomPrice = 100_000 + random.nextLong(100_001); // 100000 ~ 200000 사이의 랜덤 값 생성
-                accommodation.setPrice(randomPrice);
+                // 객실 2~3개 랜덤 생성
+                int roomCount = 2 + random.nextInt(2); // 2개 또는 3개
+
+                List<Room> rooms = new ArrayList<>();
+                for (int i = 0; i < roomCount; i++) {
+                    Room room = new Room();
+                    room.setRoomNo("R" + (1000 + i)); // 객실 번호 예: R1000, R1001, ...
+                    room.setRoomNm("객실 " + (i + 1)); // 객실명 예: 객실 1, 객실 2, ...
+                    room.setRoomType("Standard"); // 기본 타입, 필요에 따라 설정 가능
+                    room.setMaxOccupancy(2 + random.nextInt(9)); // 최대 수용 인원: 2~10명
+                    room.setRoomArea(20.0 + random.nextDouble() * 30.0); // 객실 면적: 20~50 제곱미터
+                    room.setPrice(BigDecimal.valueOf(100_000 + random.nextLong(100_001))); // 가격: 100,000 ~ 200,000
+                    room.setAmenities("TV, Wi-Fi"); // 기본 편의시설
+                    room.setRoomIntr("편안한 객실입니다."); // 객실 소개
+                    room.setRoomImgUrl(IMAGE_URLS[random.nextInt(IMAGE_URLS.length)]); // 기본 이미지 URL 랜덤 선택
+                    room.setSmokingYn(random.nextBoolean()); // 흡연 가능 여부 랜덤
+                    room.setBreakfastInclYn(random.nextBoolean()); // 조식 포함 여부 랜덤
+                    room.setCheckInTime("10:00"); // 체크인 시간
+                    room.setCheckOutTime("12:00"); // 체크아웃 시간
+                    room.setAccommodation(accommodation); // 객실과 숙소 연관 설정
+
+                    rooms.add(room);
+                }
+
+                // 저장하기
+                try {
+                    roomReposiotry.saveAll(rooms);
+                    accommodation.setRooms(rooms); // 숙소에 객실 리스트 설정
+                } catch (Exception e) {
+                    log.error("객실 정보를 저장하는 중 오류가 발생했습니다.", e);
+                    throw new RuntimeException("객실 저장 중 오류 발생", e); // 예외 던져 트랜잭션 롤백 유도
+                }
             }
 
             try {
                 accommodationRepository.saveAll(allAccommodations);
-                log.info("데이터베이스에 숙소 정보를 저장했습니다.");
+                log.info("데이터베이스에 숙소 및 객실 정보를 저장했습니다.");
             } catch (Exception e) {
-                log.info("데이터베이스에 숙소 정보를 저장하는 중 오류가 발생했습니다: " + e.getMessage());
+                log.error("숙소 정보를 저장하는 중 오류가 발생했습니다.", e);
+                throw new RuntimeException("숙소 저장 중 오류 발생", e); // 예외 던져 트랜잭션 롤백 유도
             }
         } else {
             log.info("저장할 숙소 정보가 없습니다.");
         }
     }
-
     public Page<Accommodation> getAccommodations(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return accommodationRepository.findAll(pageable);

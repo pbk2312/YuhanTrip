@@ -131,7 +131,7 @@
         .info-container {
             display: flex;
             flex-direction: column;
-            gap: 20px; /* Reduced gap for closer positioning */
+            gap: 20px;
         }
 
         .details {
@@ -166,7 +166,7 @@
         .price-card {
             border-radius: 8px;
             padding: 20px;
-            background-color: #e83e8c; /* Change color here */
+            background-color: #e83e8c;
             color: #ffffff;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
@@ -219,10 +219,8 @@
             display: block;
         }
     </style>
-
 </head>
 <body>
-<!-- Navigation-->
 <!-- Navigation-->
 <nav class="navbar navbar-expand-lg navbar-light">
     <div class="container px-4 px-lg-5">
@@ -258,7 +256,6 @@
         </div>
     </div>
 </nav>
-
 
 <!-- Main Content-->
 <div id="main-content">
@@ -311,6 +308,7 @@
                 </div>
             </div>
         </div>
+    </section>
 </div>
 
 <!-- jQuery, Popper.js, and Bootstrap JS -->
@@ -321,19 +319,19 @@
 <script src="js/scripts.js"></script>
 <script>
     document.getElementById('reservationButton').addEventListener('click', function() {
-        const token = localStorage.getItem('accessToken'); // Get token from localStorage
-        const accommodationId = this.getAttribute('data-id'); // Get accommodation ID from button
-        const url = `/reservation?id=${accommodationId}`; // Construct the URL with ID
-        const loginMessage = document.getElementById('loginMessage'); // Element to show login message
+        const token = localStorage.getItem('accessToken');
+        const accommodationId = this.getAttribute('data-id');
+        const url = `/reservation?id=${accommodationId}`;
+        const loginMessage = document.getElementById('loginMessage');
 
         if (!token) {
-            loginMessage.classList.add('alert-show'); // Show login message if no token
+            loginMessage.classList.add('alert-show');
             return;
         }
 
-        // Redirect to the reservation page
         window.location.href = url;
     });
+
     document.addEventListener('DOMContentLoaded', () => {
         const accessToken = localStorage.getItem('accessToken');
         const authButton = document.getElementById('authButton');
@@ -377,7 +375,7 @@
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ /* 필요 시 요청 본문 추가 */})
+            body: JSON.stringify({})
         })
             .then(response => {
                 if (response.ok) {
@@ -395,7 +393,6 @@
     function deleteAccessToken() {
         localStorage.removeItem('accessToken');
     }
-
 </script>
 
 </body>

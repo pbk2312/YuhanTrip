@@ -165,6 +165,7 @@ public class ReservationController {
                     .name(reservationDTO.getName())
                     .phoneNumber(reservationDTO.getPhoneNumber())
                     .payment(savedPayment) // 저장된 Payment 객체 설정
+                    .numberOfGuests(reservationDTO.getNumberOfGuests())
                     .build();
 
             reservationService.reservationRegister(reservation);

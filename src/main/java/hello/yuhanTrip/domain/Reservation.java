@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Getter
@@ -13,7 +14,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Reservation {
-
 
 
     @Id
@@ -30,7 +30,6 @@ public class Reservation {
     @OneToOne(fetch = FetchType.LAZY) // 1대1
     @JoinColumn(name = "payment_id")
     private Payment payment;
-
 
 
     @ManyToOne
@@ -59,9 +58,8 @@ public class Reservation {
     @Column(name = "addr", nullable = false)
     private String addr;
 
-
-
-
+    @Column(name = "number_of_guests", nullable = false)
+    private int numberOfGuests;
 
 
 
