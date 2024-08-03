@@ -18,6 +18,9 @@ public class ReservationDTO {
     private Long id; // 예약 ID
     private Long memberId; // 회원 ID
     private Long accommodationId; // 숙소 ID
+    private Long roomId; // 객실 ID
+    private String roomNm; // 객실 번호
+    private String roomType;// 객실 타입
     private LocalDate checkInDate; // 체크인 날짜
     private LocalDate checkOutDate; // 체크아웃 날짜
     private LocalDate reservationDate; // 예약 날짜

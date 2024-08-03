@@ -39,8 +39,8 @@ public class ReservationController {
 
     @GetMapping("/reservation")
     public String getReservation(
-            @RequestParam("id") Long id,
             Model model,
+            @RequestParam("id") Long roomId,
             @CookieValue(value = "accessToken", required = false) String accessToken) {
 
         if (accessToken == null || !tokenProvider.validate(accessToken)) {
@@ -51,14 +51,19 @@ public class ReservationController {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         log.info("예약 시도 유저 : {}", userDetails.getUsername());
 
-        Accommodation accommodationInfo = accommodationService.getAccommodationInfo(id);
-        log.info("숙소 이름 : {} ", accommodationInfo.getTitle());
+
+        Room room = accommodationService.getRoomInfo(roomId);
+        log.info("객실 이름 : {} ", room.getRoomType());
+        log.info("숙소 이름 :{}" ,room.getAccommodation().getTitle());
 
 
         ReservationDTO reservationDTO = new ReservationDTO();
-        reservationDTO.setId(accommodationInfo.getId());
-        reservationDTO.setAccommodationTitle(accommodationInfo.getTitle());
-        reservationDTO.setPrice(accommodationInfo.getPrice());
+        reservationDTO.setAccommodationId(room.getAccommodation().getId());
+        reservationDTO.setAccommodationTitle(room.getAccommodation().getTitle());
+        reservationDTO.setRoomId(roomId);
+        reservationDTO.setRoomNm(room.getRoomNm());
+        reservationDTO.setRoomType(room.getRoomType());
+        reservationDTO.setPrice(room.getPriceAsLong());
         reservationDTO.setLocalDate(LocalDate.now());
 
         model.addAttribute("reservation", reservationDTO);
@@ -95,8 +100,9 @@ public class ReservationController {
     ) {
         log.info("예약 요청을 처리합니다...");
 
+
         log.info("Received ReservationDTO: {}", reservationDTO);
-        log.info("Accommodation ID from DTO: {}", reservationDTO.getAccommodationId());
+        log.info("Room ID from DTO: {}", reservationDTO.getRoomId());
 
         // 인증 확인
         if (accessToken == null || !tokenProvider.validate(accessToken)) {
@@ -110,10 +116,10 @@ public class ReservationController {
         log.info("예약 시도 유저: {}", userDetails.getUsername());
 
         try {
-            // 숙소 정보 조회
-            Accommodation accommodation = accommodationService.getAccommodationInfo(reservationDTO.getAccommodationId());
-            if (accommodation == null) {
-                log.warn("숙소를 찾을 수 없습니다: ID = {}", reservationDTO.getAccommodationId());
+            // 객실 정보 조회
+            Room room = accommodationService.getRoomInfo(reservationDTO.getRoomId());
+            if (room == null) {
+                log.warn("객실을 찾을 수 없습니다: ID = {}", reservationDTO.getRoomId());
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(Map.of("message", "숙소를 찾을 수 없습니다."));
             }
@@ -133,7 +139,7 @@ public class ReservationController {
 
             // 기존 예약 확인
             boolean dateOverlapping = reservationService.isDateOverlapping(
-                    reservationDTO.getAccommodationId(),
+                    reservationDTO.getRoomId(),
                     reservationDTO.getCheckInDate(),
                     reservationDTO.getCheckOutDate()
             );
@@ -145,7 +151,7 @@ public class ReservationController {
 
             // 총 가격 계산
             long numberOfNights = ChronoUnit.DAYS.between(reservationDTO.getCheckInDate(), reservationDTO.getCheckOutDate());
-            Long totalPrice = accommodation.getPrice() * numberOfNights;
+            Long totalPrice = reservationDTO.getPrice() * numberOfNights;
 
             // 결제 정보 저장
             Payment payment = new Payment(totalPrice, PaymentStatus.PENDING);
@@ -157,7 +163,7 @@ public class ReservationController {
                     .addr(reservationDTO.getAddr())
                     .reservationUid(UUID.randomUUID().toString()) // 예약번호 생성 및 설정
                     .member(member)
-                    .accommodation(accommodation)
+                    .room(room)
                     .checkInDate(reservationDTO.getCheckInDate())
                     .checkOutDate(reservationDTO.getCheckOutDate())
                     .reservationDate(today)
@@ -166,6 +172,7 @@ public class ReservationController {
                     .phoneNumber(reservationDTO.getPhoneNumber())
                     .payment(savedPayment) // 저장된 Payment 객체 설정
                     .numberOfGuests(reservationDTO.getNumberOfGuests())
+                    .accommodationId(room.getAccommodation().getId())
                     .build();
 
             reservationService.reservationRegister(reservation);

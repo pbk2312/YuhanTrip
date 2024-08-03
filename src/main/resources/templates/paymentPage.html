@@ -63,7 +63,7 @@
 
         function requestPay() {
             var reservationUid = '[[${requestDto.reservationUid}]]';
-            var accommodationTitle = '[[${requestDto.accommodationTitle}]]';
+            var roomId = '[[${requestDto.roomId}]]';
             var totalPrice = [[${requestDto.totalPrice}]];
             var buyerName = '[[${requestDto.buyerName}]]';
             var phoneNumber = '[[${requestDto.phoneNumber}]]';
@@ -74,7 +74,7 @@
                 pg: 'html5_inicis.INIpayTest',
                 pay_method: 'card',
                 merchant_uid: reservationUid, // 주문 번호
-                name: accommodationTitle, // 상품 이름
+                name: roomId, // 상품 이름
                 amount: totalPrice, // 상품 가격
                 buyer_email: email, // 구매자 이메일
                 buyer_name: buyerName, // 구매자 이름
@@ -95,7 +95,7 @@
                     }).done(function (response) {
                         console.log(response);
                         alert('예약이 확정 되었습니다.');
-                        window.location.href = `/reservation/fail?reservationId=${rsp.merchant_uid}`;
+                        window.location.href = `/reservationConfirm`;
                     });
                 } else {
                     alert('결제 실패!');
@@ -157,6 +157,7 @@
     </div>
     <div class="info">
         <p><strong>숙소 이름:</strong> <span th:text="${requestDto.accommodationTitle}">숙소 이름</span></p>
+        <p><strong>숙소 이름:</strong> <span th:text="${requestDto.roomNm}">객실 이름</span></p>
         <p><strong class="highlight">결제해야 할 가격:</strong> <span class="highlight" th:text="${requestDto.totalPrice}">0</span> 원</p>
         <p><strong>예약자 성함:</strong> <span th:text="${requestDto.buyerName}">예약자 성함</span></p>
         <p><strong>전화번호:</strong> <span th:text="${requestDto.phoneNumber}">전화번호</span></p>

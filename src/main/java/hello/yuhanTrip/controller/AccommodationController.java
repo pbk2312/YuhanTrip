@@ -1,11 +1,7 @@
 package hello.yuhanTrip.controller;
 
 import hello.yuhanTrip.domain.*;
-import hello.yuhanTrip.jwt.TokenProvider;
-import hello.yuhanTrip.repository.PaymentRepository;
 import hello.yuhanTrip.service.Accomodation.AccommodationService;
-import hello.yuhanTrip.service.Accomodation.ReservationService;
-import hello.yuhanTrip.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -13,6 +9,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @Controller
@@ -58,6 +56,7 @@ public class AccommodationController {
     }
 
 
+
     @GetMapping("/info")
     public String getAccommodationInfo(@RequestParam("id") Long id, Model model) {
 
@@ -71,7 +70,6 @@ public class AccommodationController {
         if (accommodation == null) {
             return "error/404"; // 또는 "redirect:/error/404"
         }
-
         // 모델에 숙소 정보를 추가하여 뷰로 전달합니다.
         model.addAttribute("accommodation", accommodation);
 

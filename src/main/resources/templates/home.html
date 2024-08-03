@@ -204,6 +204,7 @@
         if (accessToken) {
             if (isTokenExpired(accessToken)) {
                 // 토큰이 만료된 경우 로그아웃
+                deleteAccessToken();
                 logout();
             } else {
                 // 유효한 토큰이 있는 경우 로그아웃 버튼 표시

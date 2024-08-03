@@ -33,5 +33,15 @@ public class Room {
     @JoinColumn(name = "accommodation_id")
     private Accommodation accommodation; // Accommodation과의 연관관계
 
+    @OneToOne(mappedBy = "room")
+    private Reservation reservation; // Reservation과의 연관관계
+
+    public Long getPriceAsLong() {
+        if (price != null) {
+            return price.longValue(); // BigDecimal을 Long으로 변환
+        }
+        return null; // 가격이 없을 경우 null 반환
+    }
+
 
 }

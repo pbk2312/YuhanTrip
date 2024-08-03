@@ -24,19 +24,22 @@
         }
 
         .navbar {
-            background: rgba(255, 255, 255, 0.8);
-            border-bottom: 1px solid #ddd;
+            background: rgba(255, 255, 255, 0.9);
+            border-bottom: 1px solid #ccc;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .navbar-brand {
-            font-size: 1.5rem;
+            font-size: 1.75rem;
             font-weight: bold;
+            color: #333;
         }
 
         .navbar-nav .nav-link {
-            color: #007bff;
+            color: #333;
             font-weight: 500;
             margin-right: 20px;
+            transition: color 0.3s;
         }
 
         .navbar-nav .nav-link.active {
@@ -44,82 +47,27 @@
         }
 
         .navbar-nav .nav-link:hover {
-            color: #0056b3;
+            color: #007bff;
         }
 
-        .flex-container {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            margin: 30px 0;
-        }
 
-        .flex-item {
-            position: relative;
-            width: 45%;
-            text-align: center;
-        }
-
-        .accommodation-img, .confirmation-img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 15px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-
-        .accommodation-img:hover, .confirmation-img:hover {
-            transform: scale(1.05);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
-        }
-
-        .action-button {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #fff;
-            background-color: rgba(0, 0, 0, 0.6);
-            border: none;
-            font-size: 1.25rem;
-            cursor: pointer;
-            text-align: center;
-            padding: 12px 25px;
-            border-radius: 8px;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        .action-button:hover {
-            color: #f0f8ff;
-            background-color: rgba(0, 0, 0, 0.8);
-        }
-
-        .pagination {
-            justify-content: center;
-        }
-
-        .message {
-            color: red;
-            font-size: 1.25rem;
-            text-align: center;
-            margin-top: 20px;
-        }
 
         .card {
-            border-radius: 8px;
+            border-radius: 5px;
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
         }
 
         .card-img-top {
-            height: 400px;
+            height: 300px;
             object-fit: cover;
         }
 
         .card-body {
             text-align: center;
             padding: 20px;
-            background-color: #ffffff;
+            background-color: #fff;
         }
 
         .card-title {
@@ -139,7 +87,7 @@
         }
 
         .details h2 {
-            font-size: 1.5rem;
+            font-size: 1.75rem;
             color: #343a40;
             border-bottom: 2px solid #007bff;
             padding-bottom: 10px;
@@ -147,7 +95,7 @@
         }
 
         .details p {
-            font-size: 1rem;
+            font-size: 1.125rem;
             margin-bottom: 15px;
         }
 
@@ -155,21 +103,8 @@
             color: #343a40;
         }
 
-        .price-section {
-            text-align: center;
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
 
-        .price-card {
-            border-radius: 8px;
-            padding: 20px;
-            background-color: #e83e8c;
-            color: #ffffff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
+
 
         .price-card h3 {
             font-size: 2.5rem;
@@ -202,7 +137,7 @@
 
         footer {
             background-color: #343a40;
-            color: #ffffff;
+            color: #fff;
             padding: 20px 0;
         }
 
@@ -210,14 +145,64 @@
             margin: 0;
         }
 
-        .alert {
-            display: none;
-            margin-top: 20px;
+        .info-container {
+             display: flex;
+             flex-direction: column;
+             gap: 20px;
+             background-color: #fff; /* Add background color */
+             padding: 20px; /* Add padding for content spacing */
+             border-radius: 8px; /* Optional: add rounded corners */
+             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: add shadow for depth */
+         }
+
+        .details {
+            background-color: #fff; /* Add background color */
+            padding: 20px; /* Add padding for content spacing */
+            border-radius: 8px; /* Optional: add rounded corners */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: add shadow for depth */
+            margin-bottom: 40px; /* Existing margin */
+        }
+        .room-card {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
         }
 
-        .alert-show {
-            display: block;
+        .room-img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 16px;
         }
+
+        .room-details {
+            flex: 1;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .room-details p {
+            flex: 1 1 45%;
+            margin: 4px 0;
+            font-size: 1rem;
+            color: #555;
+        }
+
+        .room-details h3 {
+            flex: 1 1 100%;
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            color: #007bff;
+        }
+
     </style>
 </head>
 <body>
@@ -270,42 +255,57 @@
                 </div>
             </div>
 
-            <!-- 가격 섹션 (상단으로 이동) -->
-            <div class="price-section">
-                <div class="price-card">
-                    <h3 th:text="${accommodation.price} + '원'">가격</h3>
-                </div>
-            </div>
-
             <!-- 상세 정보 섹션 -->
             <div class="info-container">
+
+                <!-- 객실 정보 섹션 -->
+                <div class="details">
+                    <h2>객실 정보</h2>
+                    <div th:each="room : ${accommodation.rooms}">
+                        <div class="room-card">
+                            <img th:src="@{${room.roomImgUrl}}" class="room-img" alt="객실 이미지">
+                            <div class="room-details">
+                                <h3 th:text="${room.roomNm}">객실 이름</h3>
+                                <p><strong>타입:</strong> <span th:text="${room.roomType}">객실 타입</span></p>
+                                <p><strong>최대 수용 인원:</strong> <span th:text="${room.maxOccupancy}">최대 수용 인원</span></p>
+                                <p><strong>면적:</strong> <span th:text="${room.roomArea}">객실 면적</span>㎡</p>
+                                <p><strong>가격:</strong>
+                                    <span th:text="${room.getPriceAsLong()}">가격</span>원
+                                </p>
+                                <p><strong>편의시설:</strong> <span th:text="${room.amenities}">편의시설</span></p>
+                                <p><strong>흡연 가능 여부:</strong> <span
+                                        th:text="${room.smokingYn ? '예' : '아니오'}">흡연 가능 여부</span></p>
+                                <p><strong>조식 포함 여부:</strong> <span th:text="${room.breakfastInclYn ? '예' : '아니오'}">조식 포함 여부</span></p>
+                                <p><strong>체크인 시간:</strong> <span th:text="${room.checkInTime}">체크인 시간</span></p>
+                                <p><strong>체크아웃 시간:</strong> <span th:text="${room.checkOutTime}">체크아웃 시간</span></p>
+                                <p><strong>객실 소개:</strong> <span th:text="${room.roomIntr}">객실 소개</span></p>
+                                <!-- 예약하기 버튼 -->
+                                <p><strong>예약하기:</strong>
+                                    <button id="reservationButton" class="reservation-button" th:data-id="${room.id}">
+                                        <i class="bi bi-calendar-check"></i> 예약하기
+                                    </button>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
                 <!-- 숙소의 상세 정보 -->
                 <div class="details">
                     <h2>상세 정보</h2>
-                    <p><strong>주소:</strong> <span th:text="${accommodation.addr1} + ' ' + ${accommodation.addr2}">주소</span></p>
+                    <p><strong>주소:</strong> <span
+                            th:text="${accommodation.addr1} + ' ' + ${accommodation.addr2}">주소</span></p>
                     <p><strong>전화번호:</strong> <span th:text="${accommodation.tel}">전화번호</span></p>
-                    <p><strong>카테고리:</strong> <span th:text="${accommodation.cat1} + ' > ' + ${accommodation.cat2} + ' > ' + ${accommodation.cat3}">카테고리</span></p>
-                    <p><strong>구역 코드:</strong> <span th:text="${accommodation.areacode}">구역 코드</span></p>
-                    <p><strong>특징:</strong> <span th:text="${accommodation.goodstay}">특징</span></p>
-                    <p><strong>한옥 여부:</strong> <span th:text="${accommodation.hanok}">한옥 여부</span></p>
-                    <p><strong>출처:</strong> <span th:text="${accommodation.cpyrhtDivCd}">출처</span></p>
                     <!-- 지도 링크 -->
                     <p><strong>지도 보기:</strong>
-                        <a th:href="'https://www.google.com/maps/search/?api=1&query=' + ${accommodation.mapy} + ',' + ${accommodation.mapx}" target="_blank" class="map-button">
+                        <a th:href="'https://www.google.com/maps/search/?api=1&query=' + ${accommodation.mapy} + ',' + ${accommodation.mapx}"
+                           target="_blank" class="map-button">
                             <i class="bi bi-map"></i> View on Google Maps
                         </a>
                     </p>
-                    <!-- 예약하기 버튼 -->
-                    <p><strong>예약하기:</strong>
-                        <button id="reservationButton" class="reservation-button" th:data-id="${accommodation.id}">
-                            <i class="bi bi-calendar-check"></i> 예약하기
-                        </button>
-                    </p>
-                    <!-- 로그인 메시지 -->
-                    <div id="loginMessage" class="alert alert-danger">
-                        로그인 후 예약할 수 있습니다. <a href="/member/login">로그인 페이지로 이동</a>
-                    </div>
                 </div>
+
             </div>
         </div>
     </section>
@@ -318,20 +318,6 @@
 <!-- Core theme JS-->
 <script src="js/scripts.js"></script>
 <script>
-    document.getElementById('reservationButton').addEventListener('click', function() {
-        const token = localStorage.getItem('accessToken');
-        const accommodationId = this.getAttribute('data-id');
-        const url = `/reservation?id=${accommodationId}`;
-        const loginMessage = document.getElementById('loginMessage');
-
-        if (!token) {
-            loginMessage.classList.add('alert-show');
-            return;
-        }
-
-        window.location.href = url;
-    });
-
     document.addEventListener('DOMContentLoaded', () => {
         const accessToken = localStorage.getItem('accessToken');
         const authButton = document.getElementById('authButton');
@@ -393,6 +379,23 @@
     function deleteAccessToken() {
         localStorage.removeItem('accessToken');
     }
+
+    // 예약 버튼 클릭 이벤트 처리
+    document.querySelectorAll('.reservation-button').forEach(button => {
+        button.addEventListener('click', function () {
+            const token = localStorage.getItem('accessToken');
+            const roomId = this.getAttribute('data-id');
+            const url = `/reservation?id=${roomId}`
+            const loginMessage = document.getElementById('loginMessage');
+
+            if (!token) {
+                loginMessage.classList.add('alert-show');
+                return;
+            }
+
+            window.location.href = url;
+        });
+    });
 </script>
 
 </body>

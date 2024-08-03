@@ -36,7 +36,9 @@ public class PaymentServiceImpl implements PaymentService {
 
         return PaymentDTO.builder()
                 .buyerName(reservation.getName())
-                .accommodationTitle(reservation.getAccommodation().getTitle())
+                .roomId(reservation.getRoom().getId())
+                .roomNm(reservation.getRoom().getRoomNm())
+                .accommodationTitle(reservation.getRoom().getAccommodation().getTitle())
                 .specialRequests(reservation.getSpecialRequests())
                 .reservationDate(reservation.getReservationDate())
                 .checkInDate(reservation.getCheckInDate())
@@ -90,6 +92,8 @@ public class PaymentServiceImpl implements PaymentService {
             // 결제 상태 변경
             reservation.getPayment().changePaymentBySuccess(PaymentStatus.COMPLETED, iamportResponse.getResponse().getImpUid());
 
+
+            log.info("결제 완료...");
             return iamportResponse;
 
         } catch (IamportResponseException e) {

@@ -103,13 +103,15 @@
     </style>
 </head>
 <body>
-
 <div class="container">
     <div class="card card-register mx-auto mt-5">
         <div class="card-header text-center">예약하기</div>
         <div class="card-body">
             <div class="mb-4">
-                <h5 class="text-center" id="accommodationTitle" th:text="${reservation.accommodationTitle}">숙소 이름</h5>
+                <h5 class="text-center" id="accommodationTitle">
+                    <span th:text="${reservation.accommodationTitle}">숙소 이름</span>
+                    - <span th:text="${reservation.roomNm}">객실 이름</span>
+                </h5>
                 <p class="text-center" id="pricePerNight" th:text="'1박 가격: ' + ${reservation.price} + ' 원'">1박 가격: 0 원</p>
             </div>
             <form id="reservationForm" action="/reservation/submit" method="post">
@@ -158,6 +160,7 @@
                     </div>
                 </div>
                 <input type="hidden" id="accommodationId" name="accommodationId" th:value="${reservation.id}">
+                <input type="hidden" id="roomId" name="roomId" th:value="${reservation.roomId}">
                 <input type="hidden" id="price" name="price" th:value="${reservation.price}">
                 <button type="submit" class="btn btn-primary btn-block">예약하기</button>
             </form>

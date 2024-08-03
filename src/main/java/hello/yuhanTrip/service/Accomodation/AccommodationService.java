@@ -3,10 +3,10 @@ package hello.yuhanTrip.service.Accomodation;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hello.yuhanTrip.domain.Accommodation;
+import hello.yuhanTrip.domain.RegionCode;
 import hello.yuhanTrip.domain.Room;
 import hello.yuhanTrip.repository.AccommodationRepository;
 import hello.yuhanTrip.repository.RoomReposiotry;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -43,11 +43,23 @@ public class AccommodationService {
     };
 
 
-    public AccommodationService(RestTemplate restTemplate, ObjectMapper objectMapper, AccommodationRepository accommodationRepository,RoomReposiotry roomReposiotry) {
+    public AccommodationService(RestTemplate restTemplate, ObjectMapper objectMapper, AccommodationRepository accommodationRepository, RoomReposiotry roomReposiotry) {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
         this.accommodationRepository = accommodationRepository;
         this.roomReposiotry = roomReposiotry;
+    }
+
+
+    public Page<Accommodation> getAccommodationsByRegion(String region, int page, int size) {
+        Integer areacode = RegionCode.getCodeByRegion(region);
+        if (areacode != null) {
+            Pageable pageable = PageRequest.of(page, size);
+            return accommodationRepository.findByAreacode(areacode.toString(), pageable);
+        } else {
+            // 지역명이 유효하지 않은 경우 빈 페이지 반환
+            return Page.empty();
+        }
     }
 
     @Transactional
@@ -103,6 +115,7 @@ public class AccommodationService {
             log.info("저장할 숙소 정보가 없습니다.");
         }
     }
+
     public Page<Accommodation> getAccommodations(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return accommodationRepository.findAll(pageable);
@@ -246,6 +259,12 @@ public class AccommodationService {
         return accommodation;
 
 
+    }
+
+    public Room getRoomInfo(Long id) {
+        Room room = roomReposiotry.findById(id)
+                .orElseThrow(() -> new RuntimeException("객실 정보 없음"));
+        return room;
     }
 
 }

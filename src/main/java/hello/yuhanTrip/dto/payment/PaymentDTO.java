@@ -19,6 +19,8 @@ public class PaymentDTO {
 
     private String reservationUid; // 예약 고유 번호
     private Long memberId; // 회원 ID
+    private Long roomId; // 객실 ID
+    private String roomNm;          // 객실명
     private Long accommodationId; // 숙소 ID
     private String accommodationTitle; // 숙소 제목
     private LocalDate reservationDate; // 예약 날짜

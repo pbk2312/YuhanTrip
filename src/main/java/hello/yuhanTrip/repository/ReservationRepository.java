@@ -13,14 +13,13 @@ import java.util.Optional;
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
 
-    @Query("SELECT r FROM Reservation r WHERE r.accommodation.id = :accommodationId AND " +
-            "((r.checkInDate <= :checkOutDate AND r.checkOutDate >= :checkInDate))")
+    @Query("SELECT r FROM Reservation r WHERE r.room.id = :roomId AND " +
+            "(r.checkInDate <= :checkOutDate AND r.checkOutDate >= :checkInDate)")
     List<Reservation> findOverlappingReservations(
-            @Param("accommodationId") Long accommodationId,
+            @Param("roomId") Long roomId,
             @Param("checkInDate") LocalDate checkInDate,
             @Param("checkOutDate") LocalDate checkOutDate
     );
-
 
     @Query("select o from Reservation o" +
             " left join fetch o.payment p" +

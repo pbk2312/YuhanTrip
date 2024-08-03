@@ -31,10 +31,13 @@ public class Reservation {
     @JoinColumn(name = "payment_id")
     private Payment payment;
 
+    @OneToOne
+    @JoinColumn(name = "room_id", nullable = false)
+    private Room room; // Room과의 1:1 연관관계
 
-    @ManyToOne
-    @JoinColumn(name = "accommodation_id", nullable = false)
-    private Accommodation accommodation;
+    @Column(name = "accommodation_id", nullable = false)
+    private Long accommodationId; // 숙소 ID
+
 
     @Column(name = "check_in_date", nullable = false)
     private LocalDate checkInDate;
