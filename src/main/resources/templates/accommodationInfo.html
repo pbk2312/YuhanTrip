@@ -22,70 +22,56 @@
             color: #333;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
         .navbar {
             background: rgba(255, 255, 255, 0.9);
             border-bottom: 1px solid #ccc;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-
         .navbar-brand {
             font-size: 1.75rem;
             font-weight: bold;
             color: #333;
         }
-
         .navbar-nav .nav-link {
             color: #333;
             font-weight: 500;
             margin-right: 20px;
             transition: color 0.3s;
         }
-
         .navbar-nav .nav-link.active {
             color: #0056b3;
         }
-
         .navbar-nav .nav-link:hover {
             color: #007bff;
         }
-
-
-
         .card {
             border-radius: 5px;
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             margin-bottom: 15px;
         }
-
         .card-img-top {
             height: 300px;
             object-fit: cover;
         }
-
         .card-body {
             text-align: center;
             padding: 20px;
             background-color: #fff;
         }
-
         .card-title {
             font-size: 2rem;
             font-weight: bold;
             color: #007bff;
         }
-
         .info-container {
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
-
         .details {
             margin-bottom: 40px;
         }
-
         .details h2 {
             font-size: 1.75rem;
             color: #343a40;
@@ -93,25 +79,18 @@
             padding-bottom: 10px;
             margin-bottom: 20px;
         }
-
         .details p {
             font-size: 1.125rem;
             margin-bottom: 15px;
         }
-
         .details strong {
             color: #343a40;
         }
-
-
-
-
         .price-card h3 {
             font-size: 2.5rem;
             font-weight: bold;
             margin: 0;
         }
-
         .map-button, .reservation-button {
             display: inline-flex;
             align-items: center;
@@ -125,36 +104,30 @@
             text-decoration: none;
             transition: background-color 0.3s, transform 0.3s;
         }
-
         .map-button:hover, .reservation-button:hover {
             background-color: #0056b3;
             transform: scale(1.05);
         }
-
         .map-button i, .reservation-button i {
             margin-right: 8px;
         }
-
         footer {
             background-color: #343a40;
             color: #fff;
             padding: 20px 0;
         }
-
         footer p {
             margin: 0;
         }
-
         .info-container {
-             display: flex;
-             flex-direction: column;
-             gap: 20px;
-             background-color: #fff; /* Add background color */
-             padding: 20px; /* Add padding for content spacing */
-             border-radius: 8px; /* Optional: add rounded corners */
-             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: add shadow for depth */
-         }
-
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background-color: #fff; /* Add background color */
+            padding: 20px; /* Add padding for content spacing */
+            border-radius: 8px; /* Optional: add rounded corners */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: add shadow for depth */
+        }
         .details {
             background-color: #fff; /* Add background color */
             padding: 20px; /* Add padding for content spacing */
@@ -173,7 +146,6 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             background-color: #fff;
         }
-
         .room-img {
             width: 150px;
             height: 150px;
@@ -181,28 +153,37 @@
             border-radius: 8px;
             margin-right: 16px;
         }
-
         .room-details {
             flex: 1;
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
         }
-
         .room-details p {
             flex: 1 1 45%;
             margin: 4px 0;
             font-size: 1rem;
             color: #555;
         }
-
         .room-details h3 {
             flex: 1 1 100%;
             font-size: 1.5rem;
             margin-bottom: 8px;
             color: #007bff;
         }
-
+        .login-message {
+            display: none;
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            font-size: 0.875rem;
+        }
+        .login-message.show {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -257,11 +238,11 @@
 
             <!-- 상세 정보 섹션 -->
             <div class="info-container">
-
                 <!-- 객실 정보 섹션 -->
                 <div class="details">
                     <h2>객실 정보</h2>
                     <div th:each="room : ${accommodation.rooms}">
+                        <!-- 객실 카드 -->
                         <div class="room-card">
                             <img th:src="@{${room.roomImgUrl}}" class="room-img" alt="객실 이미지">
                             <div class="room-details">
@@ -269,22 +250,21 @@
                                 <p><strong>타입:</strong> <span th:text="${room.roomType}">객실 타입</span></p>
                                 <p><strong>최대 수용 인원:</strong> <span th:text="${room.maxOccupancy}">최대 수용 인원</span></p>
                                 <p><strong>면적:</strong> <span th:text="${room.roomArea}">객실 면적</span>㎡</p>
-                                <p><strong>가격:</strong>
-                                    <span th:text="${room.getPriceAsLong()}">가격</span>원
-                                </p>
+                                <p><strong>가격:</strong> <span th:text="${room.getPriceAsLong()}">가격</span>원</p>
                                 <p><strong>편의시설:</strong> <span th:text="${room.amenities}">편의시설</span></p>
-                                <p><strong>흡연 가능 여부:</strong> <span
-                                        th:text="${room.smokingYn ? '예' : '아니오'}">흡연 가능 여부</span></p>
+                                <p><strong>흡연 가능 여부:</strong> <span th:text="${room.smokingYn ? '예' : '아니오'}">흡연 가능 여부</span></p>
                                 <p><strong>조식 포함 여부:</strong> <span th:text="${room.breakfastInclYn ? '예' : '아니오'}">조식 포함 여부</span></p>
                                 <p><strong>체크인 시간:</strong> <span th:text="${room.checkInTime}">체크인 시간</span></p>
                                 <p><strong>체크아웃 시간:</strong> <span th:text="${room.checkOutTime}">체크아웃 시간</span></p>
                                 <p><strong>객실 소개:</strong> <span th:text="${room.roomIntr}">객실 소개</span></p>
                                 <!-- 예약하기 버튼 -->
                                 <p><strong>예약하기:</strong>
-                                    <button id="reservationButton" class="reservation-button" th:data-id="${room.id}">
+                                    <button class="reservation-button" th:data-id="${room.id}">
                                         <i class="bi bi-calendar-check"></i> 예약하기
                                     </button>
                                 </p>
+                                <!-- 로그인 메시지 -->
+                                <div class="login-message">로그인 후 이용할 수 있습니다.</div>
                             </div>
                         </div>
                     </div>
@@ -305,7 +285,6 @@
                         </a>
                     </p>
                 </div>
-
             </div>
         </div>
     </section>
@@ -341,6 +320,26 @@
                 window.location.href = '/member/login';
             }
         }
+
+        // 예약 버튼 클릭 이벤트 처리
+        document.querySelectorAll('.reservation-button').forEach(button => {
+            button.addEventListener('click', function (event) {
+                const token = localStorage.getItem('accessToken');
+                const roomCard = this.closest('.room-card'); // 클릭한 버튼의 가장 가까운 room-card 요소 찾기
+                const loginMessage = roomCard.querySelector('.login-message'); // 해당 room-card 내의 로그인 메시지 찾기
+
+                if (!token) {
+                    loginMessage.classList.add('show');
+                    event.preventDefault(); // 클릭 이벤트 중단
+                    return;
+                }
+
+                // 예약하기 버튼 클릭 시, 예약 페이지로 이동
+                const roomId = this.getAttribute('data-id');
+                const url = `/reservation?id=${roomId}`;
+                window.location.href = url;
+            });
+        });
     });
 
     function isTokenExpired(token) {
@@ -380,22 +379,7 @@
         localStorage.removeItem('accessToken');
     }
 
-    // 예약 버튼 클릭 이벤트 처리
-    document.querySelectorAll('.reservation-button').forEach(button => {
-        button.addEventListener('click', function () {
-            const token = localStorage.getItem('accessToken');
-            const roomId = this.getAttribute('data-id');
-            const url = `/reservation?id=${roomId}`
-            const loginMessage = document.getElementById('loginMessage');
 
-            if (!token) {
-                loginMessage.classList.add('alert-show');
-                return;
-            }
-
-            window.location.href = url;
-        });
-    });
 </script>
 
 </body>

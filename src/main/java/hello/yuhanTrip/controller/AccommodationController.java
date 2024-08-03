@@ -1,3 +1,4 @@
+
 package hello.yuhanTrip.controller;
 
 import hello.yuhanTrip.domain.*;
@@ -68,7 +69,7 @@ public class AccommodationController {
 
         // 숙소 정보가 존재하지 않는 경우 에러 페이지로 리다이렉트 또는 404 오류 페이지로 이동
         if (accommodation == null) {
-            return "error/404"; // 또는 "redirect:/error/404"
+            return "accommodations"; // 또는 "redirect:/error/404"
         }
         // 모델에 숙소 정보를 추가하여 뷰로 전달합니다.
         model.addAttribute("accommodation", accommodation);

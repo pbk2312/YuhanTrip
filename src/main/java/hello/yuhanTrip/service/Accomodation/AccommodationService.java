@@ -51,16 +51,7 @@ public class AccommodationService {
     }
 
 
-    public Page<Accommodation> getAccommodationsByRegion(String region, int page, int size) {
-        Integer areacode = RegionCode.getCodeByRegion(region);
-        if (areacode != null) {
-            Pageable pageable = PageRequest.of(page, size);
-            return accommodationRepository.findByAreacode(areacode.toString(), pageable);
-        } else {
-            // 지역명이 유효하지 않은 경우 빈 페이지 반환
-            return Page.empty();
-        }
-    }
+
 
     @Transactional
     public void saveDataToDatabase() {
@@ -120,6 +111,7 @@ public class AccommodationService {
         Pageable pageable = PageRequest.of(page, size);
         return accommodationRepository.findAll(pageable);
     }
+
 
     public boolean isDatabaseEmpty() {
         return accommodationRepository.count() == 0;
