@@ -185,12 +185,12 @@
                     <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
                         <a class="page-link page-link-lg"
                            th:href="@{${'/accommodation/byregion' +
-                   (region != null && region != '' ? '?region=' + region : '') +
-                   (checkin != null && checkin != '' ? (region != null ? '&' : '?') + 'checkin=' + checkin : '') +
-                   (checkout != null && checkout != '' ? (region != null || checkin != null ? '&' : '?') + 'checkout=' + checkout : '') +
-                   (numGuests != null && numGuests != '' ? (region != null || checkin != null || checkout != null ? '&' : '?') + 'numGuests=' + numGuests : '') +
-                   (currentPage > 0 ? (region != null || checkin != null || checkout != null || numGuests != null ? '&' : '?') + 'page=' + (currentPage - 1) : (region == null && checkin == null && checkout == null && numGuests == null ? '?page=0' : '&page=0')) +
-                   '&size=' + pageSize}}">
+               (region != null && region != '' ? '?region=' + region : '') +
+               (checkin != null && checkin != '' ? (region != null ? '&' : '?') + 'checkin=' + checkin : '') +
+               (checkout != null && checkout != '' ? (region != null || checkin != null ? '&' : '?') + 'checkout=' + checkout : '') +
+               (numGuests != null && numGuests != '' ? (region != null || checkin != null || checkout != null ? '&' : '?') + 'numGuests=' + numGuests : '') +
+               (currentPage > 0 ? (region != null || checkin != null || checkout != null || numGuests != null ? '&' : '?') + 'page=' + (currentPage - 1) : (region == null && checkin == null && checkout == null && numGuests == null ? '?page=0' : '&page=0')) +
+               '&size=' + pageSize}}">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
@@ -200,12 +200,12 @@
                         th:classappend="${i == currentPage} ? 'active'">
                         <a class="page-link page-link-lg"
                            th:href="@{${'/accommodation/byregion' +
-                   (region != null && region != '' ? '?region=' + region : '') +
-                   (checkin != null && checkin != '' ? (region != null ? '&' : '?') + 'checkin=' + checkin : '') +
-                   (checkout != null && checkout != '' ? (region != null || checkin != null ? '&' : '?') + 'checkout=' + checkout : '') +
-                   (numGuests != null && numGuests != '' ? (region != null || checkin != null || checkout != null ? '&' : '?') + 'numGuests=' + numGuests : '') +
-                   (i != 0 ? (region != null || checkin != null || checkout != null || numGuests != null ? '&' : '?') + 'page=' + i : (region == null && checkin == null && checkout == null && numGuests == null ? '?page=' + i : '&page=' + i)) +
-                   '&size=' + pageSize}}">
+               (region != null && region != '' ? '?region=' + region : '') +
+               (checkin != null && checkin != '' ? (region != null ? '&' : '?') + 'checkin=' + checkin : '') +
+               (checkout != null && checkout != '' ? (region != null || checkin != null ? '&' : '?') + 'checkout=' + checkout : '') +
+               (numGuests != null && numGuests != '' ? (region != null || checkin != null || checkout != null ? '&' : '?') + 'numGuests=' + numGuests : '') +
+               (i != 0 ? (region != null || checkin != null || checkout != null || numGuests != null ? '&' : '?') + 'page=' + i : (region == null && checkin == null && checkout == null && numGuests == null ? '?page=' + i : '&page=' + i)) +
+               '&size=' + pageSize}}">
                             <span th:text="${i + 1}">1</span>
                         </a>
                     </li>
@@ -214,12 +214,12 @@
                     <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
                         <a class="page-link page-link-lg"
                            th:href="@{${'/accommodation/byregion' +
-                   (region != null && region != '' ? '?region=' + region : '') +
-                   (checkin != null && checkin != '' ? (region != null ? '&' : '?') + 'checkin=' + checkin : '') +
-                   (checkout != null && checkout != '' ? (region != null || checkin != null ? '&' : '?') + 'checkout=' + checkout : '') +
-                   (numGuests != null && numGuests != '' ? (region != null || checkin != null || checkout != null ? '&' : '?') + 'numGuests=' + numGuests : '') +
-                   (currentPage + 1 < totalPages ? (region != null || checkin != null || checkout != null || numGuests != null ? '&' : '?') + 'page=' + (currentPage + 1) : (region == null && checkin == null && checkout == null && numGuests == null ? '?page=' + (currentPage + 1) : '&page=' + (currentPage + 1))) +
-                   '&size=' + pageSize}}">
+               (region != null && region != '' ? '?region=' + region : '') +
+               (checkin != null && checkin != '' ? (region != null ? '&' : '?') + 'checkin=' + checkin : '') +
+               (checkout != null && checkout != '' ? (region != null || checkin != null ? '&' : '?') + 'checkout=' + checkout : '') +
+               (numGuests != null && numGuests != '' ? (region != null || checkin != null || checkout != null ? '&' : '?') + 'numGuests=' + numGuests : '') +
+               (currentPage + 1 < totalPages ? (region != null || checkin != null || checkout != null || numGuests != null ? '&' : '?') + 'page=' + (currentPage + 1) : (region == null && checkin == null && checkout == null && numGuests == null ? '?page=' + (currentPage + 1) : '&page=' + (currentPage + 1))) +
+               '&size=' + pageSize}}">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>

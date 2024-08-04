@@ -22,6 +22,7 @@ import org.springframework.web.client.RestTemplate;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -116,6 +117,10 @@ public class AccommodationService {
     public Page<Accommodation> getAccommodationsByAreaCode(String areaCode, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return accommodationRepository.findByAreacode(areaCode, pageable);
+    }
+
+    public Page<Accommodation> getAvailableAccommodations(String areaCode, LocalDate checkInDate, LocalDate checkOutDate, int numGuests, int page, int size) {
+        return accommodationRepository.findAvailableAccommodations(areaCode, checkInDate, checkOutDate, numGuests, PageRequest.of(page, size));
     }
 
 
