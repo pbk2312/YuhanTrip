@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Getter
@@ -33,9 +34,9 @@ public class Room {
     @JoinColumn(name = "accommodation_id")
     private Accommodation accommodation; // Accommodation과의 연관관계
 
-    @OneToOne(mappedBy = "room")
-    private Reservation reservation; // Reservation과의 연관관계
 
+    @OneToMany(mappedBy = "room")
+    private List<Reservation> reservations; // Reservation과의 연관관계
     public Long getPriceAsLong() {
         if (price != null) {
             return price.longValue(); // BigDecimal을 Long으로 변환

@@ -31,9 +31,10 @@ public class Reservation {
     @JoinColumn(name = "payment_id")
     private Payment payment;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id", nullable = false)
-    private Room room; // Room과의 1:1 연관관계
+    private Room room; // Room과의 연관관계
+
 
     @Column(name = "accommodation_id", nullable = false)
     private Long accommodationId; // 숙소 ID
