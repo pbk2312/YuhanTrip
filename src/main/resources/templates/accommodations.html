@@ -149,7 +149,8 @@
                 </div>
                 <div class="form-group">
                     <label for="numGuests">숙박 인원수</label>
-                    <input type="number" id="numGuests" name="numGuests" class="form-control" min="1" max="10" th:value="${numGuests}">
+                    <input type="number" id="numGuests" name="numGuests" class="form-control" min="1" max="10"
+                           th:value="${numGuests}">
                 </div>
                 <button type="submit" class="btn btn-primary mt-2">검색</button>
             </form>
@@ -160,9 +161,14 @@
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-4">
                 <!-- Accommodations cards -->
                 <div class="col" th:each="accommodation : ${accommodations}">
-                    <a th:href="@{|/accommodation/info?id=${accommodation.id}|}" class="text-decoration-none text-dark">
+                    <a th:href="@{${'/accommodation/info?id=' + accommodation.id +
+            (checkInDate != null ? '&checkInDate=' + checkInDate : '') +
+            (checkOutDate != null ? '&checkOutDate=' + checkOutDate : '') +
+            (numberOfGuests != null ? '&numberOfGuests=' + numberOfGuests : '')}}"
+                       class="text-decoration-none text-dark">
                         <div class="card">
-                            <img th:src="${accommodation.firstimage != '' ? accommodation.firstimage : '/Noimage.png'}" class="card-img-top" alt="이미지">
+                            <img th:src="${accommodation.firstimage != '' ? accommodation.firstimage : '/Noimage.png'}"
+                                 class="card-img-top" alt="이미지">
                             <div class="card-body">
                                 <h5 class="card-title" th:text="${accommodation.title}">숙소 이름</h5>
                                 <p class="card-text" th:text="${accommodation.addr1}">주소</p>
@@ -172,18 +178,19 @@
                 </div>
             </div>
 
+
             <nav class="mt-4">
                 <ul class="pagination justify-content-center">
                     <!-- Previous button -->
                     <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
                         <a class="page-link page-link-lg"
                            th:href="@{${'/accommodation/byregion' +
-       (region != null && region != '' ? '?region=' + region : '') +
-       (checkin != null && checkin != '' ? (region != null ? '&' : '?') + 'checkin=' + checkin : '') +
-       (checkout != null && checkout != '' ? (region != null || checkin != null ? '&' : '?') + 'checkout=' + checkout : '') +
-       (numGuests != null && numGuests != '' ? (region != null || checkin != null || checkout != null ? '&' : '?') + 'numGuests=' + numGuests : '') +
-       (currentPage > 0 ? (region != null || checkin != null || checkout != null || numGuests != null ? '&' : '?') + 'page=' + (currentPage - 1) : '') +
-       '&size=' + pageSize}}">
+                   (region != null && region != '' ? '?region=' + region : '') +
+                   (checkin != null && checkin != '' ? (region != null ? '&' : '?') + 'checkin=' + checkin : '') +
+                   (checkout != null && checkout != '' ? (region != null || checkin != null ? '&' : '?') + 'checkout=' + checkout : '') +
+                   (numGuests != null && numGuests != '' ? (region != null || checkin != null || checkout != null ? '&' : '?') + 'numGuests=' + numGuests : '') +
+                   (currentPage > 0 ? (region != null || checkin != null || checkout != null || numGuests != null ? '&' : '?') + 'page=' + (currentPage - 1) : (region == null && checkin == null && checkout == null && numGuests == null ? '?page=0' : '&page=0')) +
+                   '&size=' + pageSize}}">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
@@ -193,12 +200,12 @@
                         th:classappend="${i == currentPage} ? 'active'">
                         <a class="page-link page-link-lg"
                            th:href="@{${'/accommodation/byregion' +
-       (region != null && region != '' ? '?region=' + region : '') +
-       (checkin != null && checkin != '' ? (region != null ? '&' : '?') + 'checkin=' + checkin : '') +
-       (checkout != null && checkout != '' ? (region != null || checkin != null ? '&' : '?') + 'checkout=' + checkout : '') +
-       (numGuests != null && numGuests != '' ? (region != null || checkin != null || checkout != null ? '&' : '?') + 'numGuests=' + numGuests : '') +
-       (i != 0 ? (region != null || checkin != null || checkout != null || numGuests != null ? '&' : '?') + 'page=' + i : '') +
-       '&size=' + pageSize}}">
+                   (region != null && region != '' ? '?region=' + region : '') +
+                   (checkin != null && checkin != '' ? (region != null ? '&' : '?') + 'checkin=' + checkin : '') +
+                   (checkout != null && checkout != '' ? (region != null || checkin != null ? '&' : '?') + 'checkout=' + checkout : '') +
+                   (numGuests != null && numGuests != '' ? (region != null || checkin != null || checkout != null ? '&' : '?') + 'numGuests=' + numGuests : '') +
+                   (i != 0 ? (region != null || checkin != null || checkout != null || numGuests != null ? '&' : '?') + 'page=' + i : (region == null && checkin == null && checkout == null && numGuests == null ? '?page=' + i : '&page=' + i)) +
+                   '&size=' + pageSize}}">
                             <span th:text="${i + 1}">1</span>
                         </a>
                     </li>
@@ -207,17 +214,19 @@
                     <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
                         <a class="page-link page-link-lg"
                            th:href="@{${'/accommodation/byregion' +
-       (region != null && region != '' ? '?region=' + region : '') +
-       (checkin != null && checkin != '' ? (region != null ? '&' : '?') + 'checkin=' + checkin : '') +
-       (checkout != null && checkout != '' ? (region != null || checkin != null ? '&' : '?') + 'checkout=' + checkout : '') +
-       (numGuests != null && numGuests != '' ? (region != null || checkin != null || checkout != null ? '&' : '?') + 'numGuests=' + numGuests : '') +
-       (currentPage + 1 < totalPages ? (region != null || checkin != null || checkout != null || numGuests != null ? '&' : '?') + 'page=' + (currentPage + 1) : '') +
-       '&size=' + pageSize}}">
+                   (region != null && region != '' ? '?region=' + region : '') +
+                   (checkin != null && checkin != '' ? (region != null ? '&' : '?') + 'checkin=' + checkin : '') +
+                   (checkout != null && checkout != '' ? (region != null || checkin != null ? '&' : '?') + 'checkout=' + checkout : '') +
+                   (numGuests != null && numGuests != '' ? (region != null || checkin != null || checkout != null ? '&' : '?') + 'numGuests=' + numGuests : '') +
+                   (currentPage + 1 < totalPages ? (region != null || checkin != null || checkout != null || numGuests != null ? '&' : '?') + 'page=' + (currentPage + 1) : (region == null && checkin == null && checkout == null && numGuests == null ? '?page=' + (currentPage + 1) : '&page=' + (currentPage + 1))) +
+                   '&size=' + pageSize}}">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
                 </ul>
             </nav>
+
+
 
         </div>
     </section>

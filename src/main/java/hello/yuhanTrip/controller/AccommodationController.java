@@ -74,13 +74,13 @@ public class AccommodationController {
     @GetMapping("/byregion")
     public String listAccommodationsByRegion(Model model,
                                              @RequestParam(value = "region", required = false) String region,
-                                             @RequestParam(value = "checkin",required = false)  LocalDate checkin,
-                                             @RequestParam(value = "checkout",required = false) LocalDate checkout,
-                                             @RequestParam(value = "numGuests",required = false) Integer numGuests,
+                                             @RequestParam(value = "checkin", required = false) LocalDate checkin,
+                                             @RequestParam(value = "checkout", required = false) LocalDate checkout,
+                                             @RequestParam(value = "numGuests", required = false) Integer numGuests,
                                              @RequestParam(defaultValue = "0") int page,
                                              @RequestParam(defaultValue = "12") int size) {
 
-        log.info("지역 코드로 숙소 리스트를 조회합니다. 지역: {}, 페이지: {}, 사이즈: {} , 체크인 날짜 :{} ,체크아웃 날짜 :{},숙박 인원 수 :{}", region, page, size,checkin,checkout,numGuests);
+        log.info("지역 코드로 숙소 리스트를 조회합니다. 지역: {}, 페이지: {}, 사이즈: {} , 체크인 날짜 :{} ,체크아웃 날짜 :{},숙박 인원 수 :{}", region, page, size, checkin, checkout, numGuests);
 
         // 페이지 번호와 사이즈 검증
         page = Math.max(page, 0);
@@ -125,9 +125,12 @@ public class AccommodationController {
     }
 
 
-
     @GetMapping("/info")
-    public String getAccommodationInfo(@RequestParam("id") Long id, Model model) {
+    public String getAccommodationInfo(@RequestParam("id") Long id, Model model,
+                                       @RequestParam(value = "checkInDate", required = false) LocalDate checkInDate,
+                                       @RequestParam(value = "checkOutDate", required = false) LocalDate checkOutDate,
+                                       @RequestParam(value = "numberOfGuests", required = false) Integer numberOfGuests
+    ) {
 
 
         log.info("숙소 정보를 가져옵니다... = {}", id);
@@ -141,6 +144,11 @@ public class AccommodationController {
         }
         // 모델에 숙소 정보를 추가하여 뷰로 전달합니다.
         model.addAttribute("accommodation", accommodation);
+        // 쿼리 파라미터 정보도 모델에 추가합니다.
+        model.addAttribute("checkInDate", checkInDate);
+        model.addAttribute("checkOutDate", checkOutDate);
+        model.addAttribute("numberOfGuests", numberOfGuests);
+
 
         // 상세 페이지로 이동합니다.
         return "accommodationInfo"; // 상세 페이지의 뷰 이름
