@@ -112,6 +112,12 @@ public class AccommodationService {
         return accommodationRepository.findAll(pageable);
     }
 
+    // 지역 코드를 기반으로 숙소를 페이지네이션하여 조회
+    public Page<Accommodation> getAccommodationsByAreaCode(String areaCode, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return accommodationRepository.findByAreacode(areaCode, pageable);
+    }
+
 
     public boolean isDatabaseEmpty() {
         return accommodationRepository.count() == 0;

@@ -41,10 +41,6 @@
             color: #0056b3;
         }
 
-
-
-
-
         .card {
             border: none;
             border-radius: 15px;
@@ -68,8 +64,6 @@
             padding: 1rem;
         }
 
-
-
         .action-button:hover {
             color: #f0f8ff;
             background-color: rgba(0, 0, 0, 0.8);
@@ -78,9 +72,6 @@
         .pagination {
             justify-content: center;
         }
-
-
-
     </style>
 </head>
 <body>
@@ -124,13 +115,42 @@
 <div id="main-content">
     <section class="py-5">
         <div class="container">
-            <h1 class="mt-4">숙소 리스트</h1>
+            <!-- 검색 폼 추가 -->
+            <form action="/accommodation/byregion" method="get" class="mb-4">
+                <div class="form-group">
+                    <label for="region">지역 선택</label>
+                    <select id="region" name="region" class="form-control">
+                        <option value="">모든 지역</option>
+                        <option value="Seoul" th:selected="${region == 'Seoul'}">서울</option>
+                        <option value="Incheon" th:selected="${region == 'Incheon'}">인천</option>
+                        <option value="Daejeon" th:selected="${region == 'Daejeon'}">대전</option>
+                        <option value="Daegu" th:selected="${region == 'Daegu'}">대구</option>
+                        <option value="Gwangju" th:selected="${region == 'Gwangju'}">광주</option>
+                        <option value="Busan" th:selected="${region == 'Busan'}">부산</option>
+                        <option value="Ulsan" th:selected="${region == 'Ulsan'}">울산</option>
+                        <option value="Sejong" th:selected="${region == 'Sejong'}">세종</option>
+                        <option value="Gyeonggi" th:selected="${region == 'Gyeonggi'}">경기</option>
+                        <option value="Gangwon" th:selected="${region == 'Gangwon'}">강원</option>
+                        <option value="Chungbuk" th:selected="${region == 'Chungbuk'}">충북</option>
+                        <option value="Chungnam" th:selected="${region == 'Chungnam'}">충남</option>
+                        <option value="Gyeongbuk" th:selected="${region == 'Gyeongbuk'}">경북</option>
+                        <option value="Gyeongnam" th:selected="${region == 'Gyeongnam'}">경남</option>
+                        <option value="Jeonbuk" th:selected="${region == 'Jeonbuk'}">전북</option>
+                        <option value="Jeonnam" th:selected="${region == 'Jeonnam'}">전남</option>
+                        <option value="Jeju" th:selected="${region == 'Jeju'}">제주</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary mt-2">검색</button>
+            </form>
+
+            <!-- Display header based on the presence of the region parameter -->
+            <h1 class="mt-4" th:text="${region != null ? '지역: ' + region + '의 숙소 리스트' : '전체 숙소 리스트'}"></h1>
+
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-4">
-                <!-- Example of a card -->
+                <!-- Accommodation cards -->
                 <div class="col" th:each="accommodation : ${accommodations}">
                     <a th:href="@{|/accommodation/info?id=${accommodation.id}|}" class="text-decoration-none text-dark">
                         <div class="card">
-                            <!-- Check if image URL is non-empty, otherwise use default image -->
                             <img th:src="${accommodation.firstimage != '' ? accommodation.firstimage : '/Noimage.png'}" class="card-img-top" alt="이미지">
                             <div class="card-body">
                                 <h5 class="card-title" th:text="${accommodation.title}">숙소 이름</h5>
@@ -139,14 +159,15 @@
                         </div>
                     </a>
                 </div>
-                <!-- End of card example -->
             </div>
 
             <nav class="mt-4">
                 <ul class="pagination justify-content-center">
                     <!-- Previous button -->
                     <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                        <a class="page-link page-link-lg" th:href="@{|/accommodation/accommodations?page=${currentPage - 1}&size=${pageSize}|}" aria-label="Previous">
+                        <a class="page-link page-link-lg"
+                           th:href="@{|/accommodation/byregion${region != null ? '?region=' + region + '&' : '?'}page=${currentPage - 1}&size=${pageSize}|}"
+                           aria-label="Previous">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
@@ -154,18 +175,24 @@
                     <!-- Page numbers -->
                     <li class="page-item" th:each="i : ${#numbers.sequence(startPage, endPage)}"
                         th:classappend="${i == currentPage} ? 'active'">
-                        <a class="page-link page-link-lg" th:href="@{|/accommodation/accommodations?page=${i}&size=${pageSize}|}"
+                        <a class="page-link page-link-lg"
+                           th:href="@{|/accommodation/byregion${region != null ? '?region=' + region + '&' : '?'}page=${i}&size=${pageSize}|}"
                            th:text="${i + 1}">1</a>
                     </li>
 
                     <!-- Next button -->
                     <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
-                        <a class="page-link page-link-lg" th:href="@{|/accommodation/accommodations?page=${currentPage + 1}&size=${pageSize}|}" aria-label="Next">
+                        <a class="page-link page-link-lg"
+                           th:href="@{|/accommodation/byregion${region != null ? '?region=' + region + '&' : '?'}page=${currentPage + 1}&size=${pageSize}|}"
+                           aria-label="Next">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
                 </ul>
             </nav>
+
+
+
         </div>
     </section>
 </div>
@@ -238,7 +265,6 @@
     function deleteAccessToken() {
         localStorage.removeItem('accessToken');
     }
-
 </script>
 
 </body>

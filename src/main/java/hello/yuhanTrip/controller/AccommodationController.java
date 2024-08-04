@@ -11,7 +11,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 
 @Controller
@@ -25,9 +24,9 @@ public class AccommodationController {
 
     @GetMapping("/accommodations")
     public String listAccommodations(Model model,
+                                     @RequestParam(required = false) String region,
                                      @RequestParam(defaultValue = "0") int page,
-                                     @RequestParam(defaultValue = "12") int size
-    ) {
+                                     @RequestParam(defaultValue = "12") int size) {
 
         log.info("숙소 리스트를 조회합니다.... 페이지: {}, 사이즈: {}", page, size);
 
@@ -35,7 +34,20 @@ public class AccommodationController {
         page = Math.max(page, 0);
         size = Math.max(size, 1);
 
-        Page<Accommodation> accommodationsPage = accommodationService.getAccommodations(page, size);
+        Page<Accommodation> accommodationsPage;
+        if (region != null && !region.isEmpty()) {
+            // 지역 코드로 숙소 리스트 조회
+            Integer areaCode = RegionCode.getCodeByRegion(region);
+            if (areaCode == null) {
+                log.error("잘못된 지역 이름: {}", region);
+                return "error"; // 잘못된 지역 이름 처리
+            }
+            accommodationsPage = accommodationService.getAccommodationsByAreaCode(String.valueOf(areaCode), page, size);
+            model.addAttribute("region", region);
+        } else {
+            // 전체 숙소 리스트 조회
+            accommodationsPage = accommodationService.getAccommodations(page, size);
+        }
 
         int totalPages = accommodationsPage.getTotalPages();
         int currentPage = page;
@@ -54,6 +66,52 @@ public class AccommodationController {
         log.info("현재 페이지: {}, 전체 페이지: {}, 시작 페이지: {}, 끝 페이지: {}", currentPage, totalPages, startPage, endPage);
 
         return "accommodations";
+    }
+
+
+    @GetMapping("/byregion")
+    public String listAccommodationsByRegion(Model model,
+                                             @RequestParam(value = "region", required = false) String region,
+                                             @RequestParam(defaultValue = "0") int page,
+                                             @RequestParam(defaultValue = "12") int size) {
+
+        log.info("지역 코드로 숙소 리스트를 조회합니다. 지역: {}, 페이지: {}, 사이즈: {}", region, page, size);
+
+        // 페이지 번호와 사이즈 검증
+        page = Math.max(page, 0);
+        size = Math.max(size, 1);
+
+        // 지역 코드가 있을 경우에만 지역 코드로 필터링
+        Page<Accommodation> accommodationsPage;
+        if (region != null && !region.isEmpty()) {
+            Integer areaCode = RegionCode.getCodeByRegion(region);
+            if (areaCode == null) {
+                log.error("잘못된 지역 이름: {}", region);
+                return "error"; // 잘못된 지역 이름 처리
+            }
+            accommodationsPage = accommodationService.getAccommodationsByAreaCode(String.valueOf(areaCode), page, size);
+        } else {
+            accommodationsPage = accommodationService.getAccommodations(page, size);
+        }
+
+        int totalPages = accommodationsPage.getTotalPages();
+        int currentPage = page;
+
+        // 페이지 번호 범위 계산
+        int startPage = Math.max(0, currentPage - 5);
+        int endPage = Math.min(totalPages - 1, currentPage + 5);
+
+        model.addAttribute("accommodations", accommodationsPage.getContent());
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+        model.addAttribute("pageSize", size);
+        model.addAttribute("region", region);
+
+        log.info("현재 페이지: {}, 전체 페이지: {}, 시작 페이지: {}, 끝 페이지: {}", currentPage, totalPages, startPage, endPage);
+
+        return "accommodations"; // 사용할 뷰 이름
     }
 
 
