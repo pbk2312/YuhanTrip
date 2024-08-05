@@ -3,6 +3,7 @@ package hello.yuhanTrip.controller;
 
 import hello.yuhanTrip.domain.*;
 import hello.yuhanTrip.dto.ReservationDTO;
+import hello.yuhanTrip.dto.ReservationUpdateDTO;
 import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.repository.PaymentRepository;
 import hello.yuhanTrip.service.Accomodation.AccommodationService;
@@ -11,6 +12,7 @@ import hello.yuhanTrip.service.MemberService;
 import hello.yuhanTrip.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -219,6 +221,101 @@ public class ReservationController {
 
         return "reservationConfirms";
     }
+
+
+    @GetMapping("/reservationUpdate")
+    public String reservationUpdate(
+            @CookieValue(value = "accessToken", required = false) String accessToken,
+            @RequestParam("reservationId") Long id,
+            Model model
+    ) {
+        // 인증 확인
+        if (accessToken == null || !tokenProvider.validate(accessToken)) {
+            return "redirect:/member/login"; // 로그인 페이지로 리다이렉트
+        }
+
+        Authentication authentication = tokenProvider.getAuthentication(accessToken);
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        log.info("예약 수정 유저 : {}", userDetails.getUsername());
+        log.info("예약 수정 번호 : {}", id);
+
+        // 예약 정보 조회
+        Reservation reservation = reservationService.findReservation(id);
+
+        // 예약의 소유자와 로그인한 유저 비교
+        if (!reservation.getMember().getEmail().equals(userDetails.getUsername())) {
+            // 유저가 예약의 소유자가 아니면 접근 거부 처리
+            return "redirect:/accessDenied"; // 접근 거부 페이지로 리다이렉트
+        }
+
+        // 예약 정보 모델에 추가
+        model.addAttribute("reservationInfo", reservation);
+
+        return "reservationUpdate";
+    }
+
+
+    @PostMapping("/updateReservation")
+    public ResponseEntity<Map<String, Object>> updateReservation(
+            @RequestBody ReservationUpdateDTO reservationUpdateDTO,
+            @CookieValue(value = "accessToken", required = false) String accessToken
+    ) {
+        log.info("예약 수정 : {}", reservationUpdateDTO);
+        Reservation reservation = reservationService.findReservation(reservationUpdateDTO.getId());
+        // 인증 확인
+        if (accessToken == null || !tokenProvider.validate(accessToken)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "로그인이 필요합니다."));
+        }
+
+        Authentication authentication = tokenProvider.getAuthentication(accessToken);
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        try {
+            // 체크인 및 체크아웃 날짜 검증
+            LocalDate today = LocalDate.now();
+            if (reservationUpdateDTO.getCheckInDate().isBefore(today)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("message", "체크인 날짜는 오늘보다 이전일 수 없습니다."));
+            }
+
+            if (reservationUpdateDTO.getCheckOutDate().isBefore(reservationUpdateDTO.getCheckInDate()) ||
+                    reservationUpdateDTO.getCheckOutDate().isEqual(reservationUpdateDTO.getCheckInDate())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("message", "체크아웃 날짜는 체크인 날짜보다 이후여야 합니다."));
+            }
+
+            // 기존 예약 확인
+            boolean dateOverlapping = reservationService.isDateOverlapping(
+                    reservation.getRoom().getId(),
+                    reservationUpdateDTO.getCheckInDate(),
+                    reservationUpdateDTO.getCheckOutDate()
+            );
+
+            if (dateOverlapping) { // 선택한 날짜가 이미 예약이 존재하면
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(Map.of("message", "선택한 날짜에 이미 예약이 있습니다."));
+            }
+
+            log.info("예약 수정 시도...");
+            reservationService.updateReservation(reservationUpdateDTO, userDetails.getUsername());
+
+            // 성공 응답
+            return ResponseEntity.ok(Map.of("message", "예약이 성공적으로 수정되었습니다."));
+
+        } catch (RuntimeException e) {
+            log.error("예약 수정 중 오류 발생: {}", e.getMessage());
+
+            // 오류 응답
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "예약 수정 중 오류가 발생했습니다."));
+        }
+    }
+
+
+
+
+
 
     @GetMapping("/fail-payment")
     public String failPaymentPage() {

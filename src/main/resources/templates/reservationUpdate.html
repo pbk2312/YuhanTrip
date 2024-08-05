@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>예약 수정</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 600px;
+            margin-top: 50px;
+        }
+        .card-header {
+            background-color: #007bff;
+            color: white;
+        }
+        .form-label-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        .form-label-group > input {
+            height: 3.5rem;
+            padding: .75rem;
+            border-radius: .25rem;
+        }
+        .form-label-group > label {
+            position: absolute;
+            top: .75rem;
+            left: .75rem;
+            display: block;
+            width: calc(100% - 1.5rem);
+            margin: 0;
+            line-height: 1.5;
+            color: #495057;
+            pointer-events: none;
+            background: white;
+            transition: all .2s ease-in-out;
+            font-size: 1rem;
+            padding: 0 .25rem;
+            border: 1px solid transparent;
+            border-radius: .25rem;
+        }
+        .form-label-group input:focus ~ label,
+        .form-label-group input:not(:placeholder-shown) ~ label {
+            top: -0.5rem;
+            left: .75rem;
+            font-size: .75rem;
+            color: #007bff;
+            background: white;
+            padding: 0 .25rem;
+        }
+        .form-control {
+            border-radius: .25rem;
+            box-shadow: none;
+            border: 1px solid #ced4da;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            padding: 1rem 2rem; /* Increase padding for larger button */
+            font-size: 1.25rem; /* Increase font size */
+            border-radius: .5rem; /* Increase border radius */
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+        .number-input {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 1rem;
+        }
+        .number-input button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            cursor: pointer;
+            font-size: 1.5rem;
+            border-radius: 0.25rem;
+        }
+        .number-input button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .number-input input {
+            text-align: center;
+            width: 4rem; /* Width adjusted to be more noticeable */
+            border: 1px solid #ced4da;
+            height: 3rem; /* Height adjusted to match button size */
+            margin: 0 1rem;
+            font-size: 1.5rem;
+            border-radius: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card card-register mx-auto mt-5">
+        <div class="card-header text-center">예약 수정</div>
+        <div class="card-body">
+            <div class="mb-4">
+                <h5 class="text-center" id="accommodationTitle">
+                    <span th:text="${reservationInfo.room.getAccommodation().getTitle()}">숙소 이름</span>
+                    - <span th:text="${reservationInfo.room.roomNm}">객실 이름</span>
+                </h5>
+            </div>
+            <form id="reservationForm">
+                <div class="form-group">
+                    <div class="form-label-group">
+                        <input type="date" id="checkInDate" name="checkInDate" class="form-control" th:value="${reservationInfo.checkInDate}" required>
+                        <label for="checkInDate">체크인 날짜</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="form-label-group">
+                        <input type="date" id="checkOutDate" name="checkOutDate" class="form-control" th:value="${reservationInfo.checkOutDate}" required>
+                        <label for="checkOutDate">체크아웃 날짜</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="form-label-group">
+                        <input type="text" id="specialRequests" name="specialRequests" class="form-control" placeholder="특별 요청 사항" th:value="${reservationInfo.specialRequests}">
+                        <label for="specialRequests">특별 요청 사항</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="form-label-group">
+                        <input type="text" id="name" name="name" class="form-control" placeholder="고객 이름" th:value="${reservationInfo.name}" required>
+                        <label for="name">고객 이름</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="form-label-group">
+                        <input type="tel" id="phoneNumber" name="phoneNumber" class="form-control" placeholder="고객 전화번호" th:value="${reservationInfo.phoneNumber}" required>
+                        <label for="phoneNumber">고객 전화번호</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="form-label-group">
+                        <input type="text" id="addr" name="addr" class="form-control" placeholder="고객 주소" th:value="${reservationInfo.addr}" required>
+                        <label for="addr">고객 주소</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="numberOfGuests">숙박 인원수</label>
+                    <div class="number-input">
+                        <button type="button" id="decreaseGuests" onclick="changeGuestCount(-1)">-</button>
+                        <input type="number" id="numberOfGuests" name="numberOfGuests" th:value="${reservationInfo.numberOfGuests}" min="1" readonly>
+                        <button type="button" id="increaseGuests" onclick="changeGuestCount(1)">+</button>
+                    </div>
+                </div>
+                <input type="hidden" id="id" name="id" th:value="${reservationInfo.id}">
+                <button type="submit" class="btn btn-primary btn-block">수정 완료</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function changeGuestCount(amount) {
+        const guestInput = document.getElementById('numberOfGuests');
+        let currentCount = parseInt(guestInput.value);
+        currentCount += amount;
+        if (currentCount < 1) currentCount = 1;
+        guestInput.value = currentCount;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const reservationForm = document.getElementById('reservationForm');
+
+        reservationForm.onsubmit = async (event) => {
+            event.preventDefault();
+            const formData = new FormData(reservationForm);
+
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+
+            try {
+                const response = await fetch('/updateReservation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert(result.message || '예약이 성공적으로 수정되었습니다!');
+                    window.location.href = '/reservationConfirm'; // 수정된 후 페이지 리다이렉트
+                } else {
+                    alert(`예약 수정에 실패했습니다: ${result.message}`);
+                }
+            } catch (error) {
+                console.error('예약 수정 처리 중 오류 발생:', error);
+                alert('예약 수정 처리 중 오류가 발생했습니다. 다시 시도해 주세요.');
+            }
+        };
+    });
+
+</script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -5,70 +5,104 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
     <meta name="description" content=""/>
     <meta name="author" content=""/>
-    <title>예약 확인</title>
+    <title>Yuhan Trip - 예약 확인</title>
     <!-- Favicon-->
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico"/>
     <!-- Bootstrap icons-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet"/>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="../css/homestyles.css" rel="stylesheet">
     <style>
+        /* CSS styles */
         body {
-            background-color: #f0f2f5;
+            background: url('/los-angeles-2289637_640.jpg') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            color: #333;
             font-family: 'Noto Sans KR', sans-serif;
         }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.8);
+            border-bottom: 1px solid #ddd;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .navbar-nav .nav-link {
+            color: #007bff;
+            font-weight: 500;
+        }
+
+        .navbar-nav .nav-link.active {
+            color: #0056b3;
+        }
+
         .container {
-            max-width: 900px; /* 넓은 화면을 고려하여 넓게 설정 */
-            margin-top: 50px;
-            padding: 30px; /* 여백을 더 넓게 설정 */
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 30px;
             background-color: #ffffff;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
         }
+
         .header {
             text-align: center;
             margin-bottom: 40px;
             background-color: #007bff;
             color: #ffffff;
-            padding: 30px; /* 여백을 넓게 설정 */
+            padding: 30px;
             border-radius: 10px 10px 0 0;
         }
+
         .header h1 {
-            font-size: 36px; /* 큰 화면에 맞게 폰트 크기 조정 */
+            font-size: 36px;
             margin: 0;
         }
+
         .info p {
-            font-size: 20px; /* 큰 화면에 맞게 폰트 크기 조정 */
-            margin: 15px 0; /* 여백을 넓게 설정 */
+            font-size: 20px;
+            margin: 15px 0;
         }
+
         .info p strong {
             display: inline-block;
-            width: 200px; /* 더 넓은 화면에 맞게 조정 */
+            width: 200px;
         }
+
         .info hr {
             border-top: 2px solid #007bff;
         }
+
         .footer {
             text-align: center;
             margin-top: 30px;
             background-color: #f8f9fa;
-            padding: 15px; /* 여백을 넓게 설정 */
+            padding: 15px;
             border-radius: 0 0 10px 10px;
         }
+
         .footer a {
             color: #007bff;
             text-decoration: none;
             font-weight: bold;
         }
+
         .footer a:hover {
             text-decoration: underline;
         }
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<!-- Navigation-->
+<nav class="navbar navbar-expand-lg navbar-light">
     <div class="container px-4 px-lg-5">
-        <a class="navbar-brand" href="/home/homepage">YuhanTrip</a>
+        <a class="navbar-brand" href="#!">YuhanTrip</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -90,88 +124,116 @@
                     </ul>
                 </li>
             </ul>
-            <form class="d-flex">
-                <button id="logoutButton" class="btn btn-outline-danger" style="display: none;">Logout</button>
-            </form>
+            <!-- Authentication buttons -->
+            <div id="authButtons" class="d-flex">
+                <button id="authButton" class="btn btn-outline-dark me-2" type="button"></button>
+                <button id="deleteAccountButton" class="btn btn-outline-danger" type="button" style="display: none;">
+                    회원탈퇴
+                </button>
+            </div>
         </div>
     </div>
 </nav>
-<div class="container">
-    <div class="header">
-        <h1>예약 확인</h1>
-    </div>
-    <div class="info">
-        <div th:each="reservation : ${reservations}">
-            <p><strong>예약 번호:</strong> <span th:text="${reservation.reservationUid}">예약 번호</span></p>
-            <p><strong>숙소 이름:</strong> <span th:text="${reservation.room.getAccommodation().getTitle()}">숙소 이름</span></p>
-            <p><strong>객실 이름:</strong> <span th:text="${reservation.room.getRoomNm()}">객실 이름</span></p>
-            <p><strong>체크인 날짜:</strong> <span th:text="${reservation.checkInDate}">체크인 날짜</span></p>
-            <p><strong>체크아웃 날짜:</strong> <span th:text="${reservation.checkOutDate}">체크아웃 날짜</span></p>
-            <p><strong>총 가격:</strong> <span th:text="${reservation.getPayment().price}">총 가격</span> 원</p>
-            <p><strong>투숙 인원:</strong> <span th:text="${reservation.getNumberOfGuests()}">투숙 인원</span> 명</p>
-            <hr/>
+
+<!-- Main Content-->
+<div id="main-content">
+    <div class="container">
+        <div class="header">
+            <h1>예약 확인</h1>
         </div>
-    </div>
-    <div class="footer">
-        <a href="#">도움말</a>
+        <div class="info">
+            <div th:each="reservation : ${reservations}">
+                <p><strong>예약 번호:</strong> <span th:text="${reservation.reservationUid}">예약 번호</span></p>
+                <p><strong>숙소 이름:</strong> <span th:text="${reservation.room.getAccommodation().getTitle()}">숙소 이름</span></p>
+                <p><strong>객실 이름:</strong> <span th:text="${reservation.room.getRoomNm()}">객실 이름</span></p>
+                <p><strong>예약자명:</strong> <span th:text="${reservation.getName()}">예약자명</span></p>
+                <p><strong>체크인 날짜:</strong> <span th:text="${reservation.checkInDate}">체크인 날짜</span></p>
+                <p><strong>체크아웃 날짜:</strong> <span th:text="${reservation.checkOutDate}">체크아웃 날짜</span></p>
+                <p><strong>총 가격:</strong> <span th:text="${reservation.getPayment().price}">총 가격</span> 원</p>
+                <p><strong>투숙 인원:</strong> <span th:text="${reservation.getNumberOfGuests()}">투숙 인원</span> 명</p>
+                <a th:href="'/reservationUpdate?reservationId=' + ${reservation.id}" class="btn btn-primary update-button">예약 수정</a>
+                <hr/>
+            </div>
+        </div>
+        <div class="footer">
+            <a href="/home/homepage">홈으로</a>
+        </div>
     </div>
 </div>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+<!-- jQuery, Popper.js, and Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+<!-- Core theme JS-->
+<script src="js/scripts.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const accessToken = localStorage.getItem('accessToken');
-        const logoutButton = document.getElementById('logoutButton');
+        const authButton = document.getElementById('authButton');
+        const deleteAccountButton = document.getElementById('deleteAccountButton');
 
         if (accessToken) {
             if (isTokenExpired(accessToken)) {
-                deleteAccessToken();
-            } else {
-                logoutButton.style.display = 'block';
-                logoutButton.onclick = confirmLogout;
-            }
-        }
-
-        function isTokenExpired(token) {
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            const currentTime = Math.floor(Date.now() / 1000);
-            return payload.exp < currentTime;
-        }
-
-        function confirmLogout() {
-            if (confirm("로그아웃 하시겠습니까?")) {
                 logout();
+            } else {
+                authButton.textContent = 'Logout';
+                authButton.onclick = confirmLogout;
+                deleteAccountButton.style.display = 'block';
+                deleteAccountButton.onclick = () => {
+                    window.location.href = '/member/withdrawalMembership';
+                };
             }
-        }
-
-        function logout() {
-            fetch('/member/logout', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({})
-            })
-                .then(response => {
-                    if (response.ok) {
-                        deleteAccessToken();
-                        window.location.href = '/home/homepage';
-                    } else {
-                        alert('로그아웃에 실패했습니다.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('로그아웃에 실패했습니다.');
-                });
-        }
-
-        function deleteAccessToken() {
-            localStorage.removeItem('accessToken');
+        } else {
+            authButton.textContent = 'Login';
+            authButton.onclick = () => window.location.href = '/member/login';
+            if (window.location.pathname === '/member/withdrawalMembership') {
+                window.location.href = '/member/login';
+            }
         }
     });
+
+    function isTokenExpired(token) {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const currentTime = Math.floor(Date.now() / 1000);
+        return payload.exp < currentTime;
+    }
+
+    function confirmLogout() {
+        if (confirm("로그아웃 하시겠습니까?")) {
+            logout();
+        }
+    }
+
+
+    function logout() {
+        fetch('/member/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ /* 필요 시 요청 본문 추가 */ })
+        })
+            .then(response => {
+                if (response.ok) {
+                    deleteAccessToken();
+                    document.getElementById('authButton').textContent = 'Login';
+                    document.getElementById('deleteAccountButton').style.display = 'none';
+                    document.getElementById('authButton').onclick = () => window.location.href = '/member/login';
+                    window.location.href = '/home/homepage'; // 로그아웃 후 /home/homepage로 리다이렉트
+                } else {
+                    console.error('로그아웃 요청 실패');
+                }
+            })
+            .catch(error => console.error('로그아웃 요청 중 오류 발생:', error));
+
+
+    }
+
+    function deleteAccessToken() {
+        localStorage.removeItem('accessToken');
+    }
+
 </script>
 </body>
 </html>

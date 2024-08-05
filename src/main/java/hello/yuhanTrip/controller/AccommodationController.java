@@ -162,8 +162,8 @@ public class AccommodationController {
         model.addAttribute("endPage", endPage);
         model.addAttribute("pageSize", size);
         model.addAttribute("region", region);
-        model.addAttribute("checkin", checkInDate);
-        model.addAttribute("checkout", checkOutDate);
+        model.addAttribute("checkin", checkInDateStr);
+        model.addAttribute("checkout", checkOutDateStr);
         model.addAttribute("numGuests", numGuests);
 
         log.info("현재 페이지: {}, 전체 페이지: {}, 시작 페이지: {}, 끝 페이지: {}", currentPage, totalPages, startPage, endPage);

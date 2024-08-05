@@ -13,7 +13,6 @@
     <!-- Core theme CSS (includes Bootstrap)-->
     <link href="../css/homestyles.css" rel="stylesheet">
     <style>
-        /* CSS styles */
         body {
             background: url('/los-angeles-2289637_640.jpg') no-repeat center center fixed;
             background-size: cover;
@@ -72,8 +71,121 @@
         .pagination {
             justify-content: center;
         }
+
+        /* Flexbox for horizontal form layout */
+        .form-horizontal {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px; /* 요소 간 간격 */
+            align-items: center; /* 세로 중앙 정렬 */
+            background: rgba(255, 255, 255, 0.8); /* 배경색 */
+            padding: 20px; /* 패딩 추가 */
+            border-radius: 15px; /* 둥근 모서리 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 박스 그림자 */
+            margin: 20px; /* 외부 간격 */
+        }
+
+        .form-horizontal .form-group {
+            flex: 1; /* 모든 폼 그룹을 동일한 공간으로 설정 */
+            min-width: 150px; /* 각 항목의 최소 너비 */
+        }
+
+        .form-horizontal button {
+            flex: 0 0 auto; /* 버튼의 크기를 고정 */
+            margin-left: auto; /* 버튼을 오른쪽으로 정렬 */
+            background-color: #007bff; /* 버튼 배경색 */
+            color: white; /* 버튼 텍스트 색상 */
+            padding: 10px 20px; /* 버튼 패딩 */
+            border: none; /* 버튼 테두리 제거 */
+            border-radius: 5px; /* 버튼 모서리 둥글게 */
+            cursor: pointer; /* 마우스 포인터 변경 */
+        }
+
+        .form-horizontal button:hover {
+            background-color: #0056b3; /* 버튼 호버 배경색 */
+        }
+
+
     </style>
 </head>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.querySelector('form');
+        const region = document.getElementById('region');
+        const checkin = document.getElementById('checkin');
+        const checkout = document.getElementById('checkout');
+        const numGuests = document.getElementById('numGuests');
+
+        form.addEventListener('submit', (event) => {
+            // 모든 필드의 기존 오류 메시지 제거
+            removeErrorMessages();
+
+            if (region.value === '') {
+                return; // 지역만 선택한 경우 폼을 제출합니다.
+            }
+
+            let isValid = true;
+
+            if (!checkin.value) {
+                showError(checkin, '체크인 날짜를 입력해주세요.');
+                isValid = false;
+            }
+
+            if (!checkout.value) {
+                showError(checkout, '체크아웃 날짜를 입력해주세요.');
+                isValid = false;
+            }
+
+            if (!numGuests.value) {
+                showError(numGuests, '숙박 인원수를 입력해주세요.');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                event.preventDefault(); // 폼 제출을 막습니다.
+            }
+        });
+
+        function showError(input, message) {
+            const error = document.createElement('div');
+            error.className = 'error-message';
+            error.textContent = message;
+            input.parentNode.appendChild(error);
+            input.classList.add('input-error');
+        }
+
+        function removeErrorMessages() {
+            const errors = document.querySelectorAll('.error-message');
+            errors.forEach(error => error.remove());
+            const inputs = document.querySelectorAll('.input-error');
+            inputs.forEach(input => input.classList.remove('input-error'));
+        }
+    });
+</script>
+<style>
+    .error-message {
+        position: absolute;
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+        border-radius: 0.25rem;
+        padding: 0.5rem;
+        margin-top: 0.5rem;
+        font-size: 0.875em;
+        z-index: 1000;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+
+
+    .form-group {
+        position: relative;
+    }
+</style>
+
+
+
 <body>
 <!-- Navigation-->
 <nav class="navbar navbar-expand-lg navbar-light">
@@ -115,7 +227,9 @@
     <section class="py-5">
         <div class="container">
             <!-- 검색 폼 추가 -->
-            <form action="/accommodation/byregion" method="get" class="mb-4">
+
+
+            <form action="/accommodation/byregion" method="get" class="mb-4 form-horizontal">
                 <div class="form-group">
                     <label for="region">지역 선택</label>
                     <select id="region" name="region" class="form-control" th:value="${region}">
@@ -139,24 +253,26 @@
                         <option value="Jeju" th:selected="${region == 'Jeju'}">제주</option>
                     </select>
                 </div>
+
                 <div class="form-group">
                     <label for="checkin">체크인 날짜</label>
                     <input type="date" id="checkin" name="checkin" class="form-control" th:value="${checkin}">
                 </div>
+
                 <div class="form-group">
                     <label for="checkout">체크아웃 날짜</label>
                     <input type="date" id="checkout" name="checkout" class="form-control" th:value="${checkout}">
                 </div>
+
                 <div class="form-group">
                     <label for="numGuests">숙박 인원수</label>
-                    <input type="number" id="numGuests" name="numGuests" class="form-control" min="1" max="10"
-                           th:value="${numGuests}">
+                    <input type="number" id="numGuests" name="numGuests" class="form-control" min="1" max="10" th:value="${numGuests != null ? numGuests : 1}">
                 </div>
+
+
                 <button type="submit" class="btn btn-primary mt-2">검색</button>
             </form>
 
-            <!-- Display header based on the presence of the region parameter -->
-            <h1 class="mt-4" th:text="${region != null ? '지역: ' + region + '의 숙소 리스트' : '전체 숙소 리스트'}"></h1>
 
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-4">
                 <!-- Accommodations cards -->
@@ -225,9 +341,6 @@
                     </li>
                 </ul>
             </nav>
-
-
-
         </div>
     </section>
 </div>
