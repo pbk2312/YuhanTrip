@@ -16,7 +16,7 @@ import hello.yuhanTrip.repository.MemberRepository;
 import hello.yuhanTrip.repository.RefreshTokenRepository;
 import hello.yuhanTrip.dto.register.MemberChangePasswordDTO;
 import hello.yuhanTrip.dto.register.MemberRequestDTO;
-import hello.yuhanTrip.repository.ResetTokenReposiotry;
+import hello.yuhanTrip.repository.ResetTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,7 +26,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -40,7 +39,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final ResetTokenReposiotry resetTokenReposiotry;
+    private final ResetTokenRepository resetTokenReposiotry;
     private final EmailProvider emailProvider;
 
     public String register(MemberRequestDTO memberRequestDTO) {

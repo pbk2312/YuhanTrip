@@ -3,10 +3,9 @@ package hello.yuhanTrip.service.Accomodation;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hello.yuhanTrip.domain.Accommodation;
-import hello.yuhanTrip.domain.RegionCode;
 import hello.yuhanTrip.domain.Room;
 import hello.yuhanTrip.repository.AccommodationRepository;
-import hello.yuhanTrip.repository.RoomReposiotry;
+import hello.yuhanTrip.repository.RoomRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -36,7 +35,7 @@ public class AccommodationService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
     private final AccommodationRepository accommodationRepository;
-    private final RoomReposiotry roomReposiotry;
+    private final RoomRepository roomReposiotry;
 
     private static final String[] IMAGE_URLS = {
             "http://localhost:8080/villa-1737168_1280.jpg",
@@ -44,7 +43,7 @@ public class AccommodationService {
     };
 
 
-    public AccommodationService(RestTemplate restTemplate, ObjectMapper objectMapper, AccommodationRepository accommodationRepository, RoomReposiotry roomReposiotry) {
+    public AccommodationService(RestTemplate restTemplate, ObjectMapper objectMapper, AccommodationRepository accommodationRepository, RoomRepository roomReposiotry) {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
         this.accommodationRepository = accommodationRepository;
@@ -119,6 +118,8 @@ public class AccommodationService {
         return accommodationRepository.findByAreacode(areaCode, pageable);
     }
 
+
+    // 해당 날짜에 예약이 가능한 숙소들 보여주기
     public Page<Accommodation> getAvailableAccommodations(String areaCode, LocalDate checkInDate, LocalDate checkOutDate, int numGuests, int page, int size) {
         return accommodationRepository.findAvailableAccommodations(areaCode, checkInDate, checkOutDate, numGuests, PageRequest.of(page, size));
     }

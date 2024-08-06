@@ -49,6 +49,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-mail'
 
 
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+
     // 아임포트 관련 //
     // https://mvnrepository.com/artifact/com.github.iamport/iamport-rest-client-java
     implementation group: 'com.github.iamport', name: 'iamport-rest-client-java', version: '0.2.22'

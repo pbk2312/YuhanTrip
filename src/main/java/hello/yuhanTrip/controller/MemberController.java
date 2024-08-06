@@ -8,7 +8,7 @@ import hello.yuhanTrip.dto.email.EmailRequestDTO;
 import hello.yuhanTrip.dto.register.MemberChangePasswordDTO;
 import hello.yuhanTrip.dto.token.TokenDTO;
 import hello.yuhanTrip.jwt.TokenProvider;
-import hello.yuhanTrip.repository.ResetTokenReposiotry;
+import hello.yuhanTrip.repository.ResetTokenRepository;
 import hello.yuhanTrip.service.MemberService;
 import hello.yuhanTrip.dto.register.MemberRequestDTO;
 import jakarta.servlet.http.Cookie;
@@ -18,7 +18,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,7 +34,7 @@ import java.time.LocalDateTime;
 public class MemberController {
 
     private final MemberService memberService;
-    private final ResetTokenReposiotry resetTokenReposiotry;
+    private final ResetTokenRepository resetTokenReposiotry;
     private final TokenProvider tokenProvider;
 
     @GetMapping("/register")
