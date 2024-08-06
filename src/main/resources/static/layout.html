@@ -41,63 +41,8 @@
       color: #0056b3;
     }
 
-    .flex-container {
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      margin: 30px 0;
-    }
 
-    .flex-item {
-      position: relative;
-      width: 45%;
-      text-align: center;
-    }
 
-    .accommodation-img, .confirmation-img {
-      max-width: 100%;
-      height: auto;
-      border-radius: 15px;
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-
-    .accommodation-img:hover, .confirmation-img:hover {
-      transform: scale(1.05);
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
-    }
-
-    .action-button {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      color: #fff;
-      background-color: rgba(0, 0, 0, 0.6);
-      border: none;
-      font-size: 1.25rem;
-      cursor: pointer;
-      text-align: center;
-      padding: 12px 25px;
-      border-radius: 8px;
-      transition: background-color 0.3s, color 0.3s;
-    }
-
-    .action-button:hover {
-      color: #f0f8ff;
-      background-color: rgba(0, 0, 0, 0.8);
-    }
-
-    .pagination {
-      justify-content: center;
-    }
-
-    .message {
-      color: red;
-      font-size: 1.25rem;
-      text-align: center;
-      margin-top: 20px;
-    }
   </style>
 </head>
 <body>
@@ -127,13 +72,6 @@
           </ul>
         </li>
       </ul>
-      <!-- Authentication buttons -->
-      <div id="authButtons" class="d-flex">
-        <button id="authButton" class="btn btn-outline-dark me-2" type="button"></button>
-        <button id="deleteAccountButton" class="btn btn-outline-danger" type="button" style="display: none;">
-          회원탈퇴
-        </button>
-      </div>
     </div>
   </div>
 </nav>
@@ -151,82 +89,6 @@
 <!-- Core theme JS-->
 <script src="js/scripts.js"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const accessToken = localStorage.getItem('accessToken');
-    const authButton = document.getElementById('authButton');
-    const deleteAccountButton = document.getElementById('deleteAccountButton');
-
-    if (accessToken) {
-      if (isTokenExpired(accessToken)) {
-        logout();
-      } else {
-        authButton.textContent = 'Logout';
-        authButton.onclick = confirmLogout;
-        deleteAccountButton.style.display = 'block';
-        deleteAccountButton.onclick = () => {
-          window.location.href = '/member/withdrawalMembership';
-        };
-      }
-    } else {
-      authButton.textContent = 'Login';
-      authButton.onclick = () => window.location.href = '/member/login';
-      if (window.location.pathname === '/member/withdrawalMembership') {
-        window.location.href = '/member/login';
-      }
-    }
-  });
-
-  function isTokenExpired(token) {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    const currentTime = Math.floor(Date.now() / 1000);
-    return payload.exp < currentTime;
-  }
-
-  function confirmLogout() {
-    if (confirm("로그아웃 하시겠습니까?")) {
-      logout();
-    }
-  }
-
-  function logout() {
-    fetch('/member/logout', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ /* 필요 시 요청 본문 추가 */})
-    })
-            .then(response => {
-              if (response.ok) {
-                deleteAccessToken();
-                document.getElementById('authButton').textContent = 'Login';
-                document.getElementById('deleteAccountButton').style.display = 'none';
-                document.getElementById('authButton').onclick = () => window.location.href = '/member/login';
-              } else {
-                console.error('로그아웃 요청 실패');
-              }
-            })
-            .catch(error => console.error('로그아웃 요청 중 오류 발생:', error));
-  }
-
-  function deleteAccessToken() {
-    localStorage.removeItem('accessToken');
-  }
-
-  function checkAccessTokenAndRedirect() {
-    const accessToken = localStorage.getItem('accessToken');
-    if (accessToken) {
-      if (!isTokenExpired(accessToken)) {
-        window.location.href = '/reservationConfirm';
-      } else {
-        alert('Your session has expired. Please log in again.');
-        window.location.href = '/member/login';
-      }
-    } else {
-      alert('Please log in to access this page.');
-      window.location.href = '/member/login';
-    }
-  }
 </script>
 
 </body>

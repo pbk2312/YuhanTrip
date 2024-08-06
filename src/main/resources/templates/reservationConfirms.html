@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
     <meta name="description" content=""/>
     <meta name="author" content=""/>
-    <title>Yuhan Trip - 예약 확인</title>
+    <title>Yuhan Trip - Start Bootstrap Template</title>
     <!-- Favicon-->
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico"/>
     <!-- Bootstrap icons-->
@@ -20,7 +20,31 @@
             margin: 0;
             padding: 0;
             color: #333;
-            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        header {
+            background: transparent;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        header .container {
+            text-align: center;
+        }
+
+        header .text-center {
+            color: #fff;
+        }
+
+        header .display-4 {
+            font-size: 3rem; /* Increased font size for better visibility */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Added text shadow */
+        }
+
+        header .lead {
+            font-size: 1.25rem; /* Slightly larger font size */
+            color: rgba(255, 255, 255, 0.8); /* Lightened the color */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Added text shadow */
         }
 
         .navbar {
@@ -42,49 +66,28 @@
             color: #0056b3;
         }
 
-        .container {
-            max-width: 900px;
-            margin: 50px auto;
-            padding: 30px;
-            background-color: #ffffff;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-        }
 
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            background-color: #007bff;
-            color: #ffffff;
-            padding: 30px;
-            border-radius: 10px 10px 0 0;
-        }
 
-        .header h1 {
-            font-size: 36px;
-            margin: 0;
+
+        .info {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            margin: 20px;
         }
 
         .info p {
-            font-size: 20px;
-            margin: 15px 0;
+            margin: 10px 0;
         }
 
-        .info p strong {
-            display: inline-block;
-            width: 200px;
-        }
-
-        .info hr {
-            border-top: 2px solid #007bff;
+        .info .btn {
+            margin-top: 10px;
         }
 
         .footer {
             text-align: center;
-            margin-top: 30px;
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 0 0 10px 10px;
+            margin: 20px;
         }
 
         .footer a {
@@ -95,6 +98,49 @@
 
         .footer a:hover {
             text-decoration: underline;
+        }
+
+        /* Add these styles to your existing CSS */
+        .reservation-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px; /* Adjust spacing between items */
+        }
+
+        .reservation-item {
+            flex: 1 1 calc(50% - 20px); /* 50% width with a gap adjustment */
+            box-sizing: border-box; /* Ensure padding and border are included in the width */
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .footer {
+            text-align: center;
+            margin: 20px;
+            background-color: #fff; /* White background for footer */
+            padding: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .footer a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .reservation-actions {
+            text-align: right; /* Align buttons to the right */
+        }
+
+        .update-button {
+            display: inline-block;
         }
     </style>
 </head>
@@ -136,30 +182,31 @@
 </nav>
 
 <!-- Main Content-->
-<div id="main-content">
-    <div class="container">
-        <div class="header">
-            <h1>예약 확인</h1>
-        </div>
-        <div class="info">
-            <div th:each="reservation : ${reservations}">
+<div class="container">
+    <div class="info">
+        <div class="reservation-container">
+            <div th:each="reservation : ${reservations}" class="reservation-item">
                 <p><strong>예약 번호:</strong> <span th:text="${reservation.reservationUid}">예약 번호</span></p>
                 <p><strong>숙소 이름:</strong> <span th:text="${reservation.room.getAccommodation().getTitle()}">숙소 이름</span></p>
                 <p><strong>객실 이름:</strong> <span th:text="${reservation.room.getRoomNm()}">객실 이름</span></p>
                 <p><strong>예약자명:</strong> <span th:text="${reservation.getName()}">예약자명</span></p>
                 <p><strong>체크인 날짜:</strong> <span th:text="${reservation.checkInDate}">체크인 날짜</span></p>
                 <p><strong>체크아웃 날짜:</strong> <span th:text="${reservation.checkOutDate}">체크아웃 날짜</span></p>
-                <p><strong>총 가격:</strong> <span th:text="${reservation.getPayment().price}">총 가격</span> 원</p>
+                <p><strong>결제 금액:</strong> <span th:text="${reservation.getPayment().price}">결제 금액</span> 원</p>
                 <p><strong>투숙 인원:</strong> <span th:text="${reservation.getNumberOfGuests()}">투숙 인원</span> 명</p>
-                <a th:href="'/reservationUpdate?reservationId=' + ${reservation.id}" class="btn btn-primary update-button">예약 수정</a>
+                <div class="reservation-actions">
+                    <a th:href="'/reservationUpdate?reservationId=' + ${reservation.id}" class="btn btn-primary update-button">예약 수정</a>
+                </div>
                 <hr/>
             </div>
         </div>
-        <div class="footer">
-            <a href="/home/homepage">홈으로</a>
-        </div>
+    </div>
+
+    <div class="footer">
+        <a href="/home/homepage">홈으로</a>
     </div>
 </div>
+
 
 <!-- jQuery, Popper.js, and Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -205,7 +252,6 @@
         }
     }
 
-
     function logout() {
         fetch('/member/logout', {
             method: 'POST',
@@ -226,8 +272,6 @@
                 }
             })
             .catch(error => console.error('로그아웃 요청 중 오류 발생:', error));
-
-
     }
 
     function deleteAccessToken() {

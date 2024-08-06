@@ -125,6 +125,11 @@ public class AccommodationService {
     }
 
 
+    public List<Room> getAvailableRoomsByAccommodation(Long accommodationId, LocalDate checkInDate, LocalDate checkOutDate) {
+        return roomReposiotry.findAvailableRoomsByAccommodation(accommodationId, checkInDate, checkOutDate);
+    }
+
+
     public boolean isDatabaseEmpty() {
         return accommodationRepository.count() == 0;
     }

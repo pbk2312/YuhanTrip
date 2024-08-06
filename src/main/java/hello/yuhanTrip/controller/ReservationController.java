@@ -43,6 +43,8 @@ public class ReservationController {
     public String getReservation(
             Model model,
             @RequestParam("id") Long roomId,
+            @RequestParam(value = "checkin", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkin,
+            @RequestParam(value = "checkout", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkout,
             @CookieValue(value = "accessToken", required = false) String accessToken) {
 
         if (accessToken == null || !tokenProvider.validate(accessToken)) {
@@ -56,7 +58,7 @@ public class ReservationController {
 
         Room room = accommodationService.getRoomInfo(roomId);
         log.info("객실 이름 : {} ", room.getRoomType());
-        log.info("숙소 이름 :{}" ,room.getAccommodation().getTitle());
+        log.info("숙소 이름 :{}", room.getAccommodation().getTitle());
 
 
         ReservationDTO reservationDTO = new ReservationDTO();
@@ -67,6 +69,9 @@ public class ReservationController {
         reservationDTO.setRoomType(room.getRoomType());
         reservationDTO.setPrice(room.getPriceAsLong());
         reservationDTO.setLocalDate(LocalDate.now());
+        reservationDTO.setCheckInDate(checkin);
+        reservationDTO.setCheckOutDate(checkout);
+
 
         model.addAttribute("reservation", reservationDTO);
         return "reservation";
@@ -92,7 +97,6 @@ public class ReservationController {
 
         return "redirect:/home/homepage";
     }
-
 
 
     @PostMapping("/reservation/submit")
@@ -138,6 +142,12 @@ public class ReservationController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(Map.of("message", "체크아웃 날짜는 체크인 날짜보다 이후여야 합니다."));
             }
+
+            if (reservationDTO.getNumberOfGuests() > room.getMaxOccupancy()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("message", "숙박 인원 수가 방 최대 수용 인원수 보다 많습니다"));
+            }
+
 
             // 기존 예약 확인
             boolean dateOverlapping = reservationService.isDateOverlapping(
@@ -311,10 +321,6 @@ public class ReservationController {
                     .body(Map.of("message", "예약 수정 중 오류가 발생했습니다."));
         }
     }
-
-
-
-
 
 
     @GetMapping("/fail-payment")

@@ -4,55 +4,100 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
     <title>결제 페이지</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet"/>
     <style>
         body {
-            background-color: #f8f9fa;
-            font-family: 'Arial', sans-serif;
+            background: url('/los-angeles-2289637_640.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #333;
+            font-family: 'Roboto', sans-serif;
         }
-        .container {
-            max-width: 800px;
-            margin-top: 50px;
-            padding: 30px;
-            background-color: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
+        .navbar {
+            background: rgba(255, 255, 255, 0.8);
+            border-bottom: 1px solid #ddd;
+        }
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .navbar-nav .nav-link {
+            color: #007bff;
+            font-weight: 500;
+        }
+        .navbar-nav .nav-link.active {
+            color: #0056b3;
+        }
+        .content-wrapper {
+            max-width: 900px;
+            margin: 80px auto;
+            padding: 40px;
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
         }
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #343a40;
         }
         .info {
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
         }
         .info p {
-            font-size: 20px;
+            font-size: 1.1rem;
             margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         .info p strong {
-            display: inline-block;
-            width: 160px;
+            flex-basis: 40%;
         }
         .highlight {
             color: #007bff;
+            font-weight: 500;
+        }
+        .price {
+            display: flex;
+            align-items: baseline;
+        }
+        .price .amount {
+            font-size: 1.2rem;
+            font-weight: bold;
         }
         .btn-primary {
             width: 100%;
             padding: 15px;
-            font-size: 18px;
+            font-size: 1.2rem;
             background-color: #007bff;
             border: none;
             border-radius: 8px;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.3s ease;
         }
         .btn-primary:hover {
             background-color: #0056b3;
+            transform: translateY(-2px);
         }
         .alert {
             display: none;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9rem;
         }
     </style>
     <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
@@ -103,22 +148,11 @@
                 }
             });
         }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const homeLink = document.querySelector('.navbar-nav .nav-link[href="/home/homepage"]');
-            if (homeLink) {
-                homeLink.addEventListener('click', (event) => {
-                    event.preventDefault();
-                    const reservationId = '[[${requestDto.reservationUid}]]';
-                    window.location.href = `/reservation/fail?reservationId=${reservationId}`;
-                });
-            }
-        });
     </script>
 </head>
 <body>
 <!-- Navigation -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-light">
     <div class="container px-4 px-lg-5">
         <a class="navbar-brand" href="/home/homepage">YuhanTrip</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
@@ -151,23 +185,28 @@
     결제 실패. 다시 시도해 주세요.
 </div>
 
-<div class="container">
+<!-- Main Content -->
+<div class="content-wrapper">
     <div class="header">
         <h1>결제 페이지</h1>
     </div>
     <div class="info">
         <p><strong>숙소 이름:</strong> <span th:text="${requestDto.accommodationTitle}">숙소 이름</span></p>
-        <p><strong>숙소 이름:</strong> <span th:text="${requestDto.roomNm}">객실 이름</span></p>
-        <p><strong class="highlight">결제해야 할 가격:</strong> <span class="highlight" th:text="${requestDto.totalPrice}">0</span> 원</p>
+        <p><strong>객실 이름:</strong> <span th:text="${requestDto.roomNm}">객실 이름</span></p>
+        <p><strong class="highlight">결제해야 할 가격:</strong> <span class="price"><span class="amount" th:text="${requestDto.totalPrice}">0</span>원</span></p>
         <p><strong>예약자 성함:</strong> <span th:text="${requestDto.buyerName}">예약자 성함</span></p>
         <p><strong>전화번호:</strong> <span th:text="${requestDto.phoneNumber}">전화번호</span></p>
         <p><strong class="highlight">체크인 날짜:</strong> <span class="highlight" th:text="${requestDto.checkInDate}">체크인 날짜</span></p>
         <p><strong class="highlight">체크아웃 날짜:</strong> <span class="highlight" th:text="${requestDto.checkOutDate}">체크아웃 날짜</span></p>
-        <p><strong>숙박 인원수:</strong> <span th:text="${requestDto.numberOfGuests}">1</span> 명</p>
+        <p><strong>숙박 인원수:</strong> <span class="price"><span class="amount" th:text="${requestDto.numberOfGuests}">1</span>명</span></p>
     </div>
     <button class="btn btn-primary" onclick="requestPay()">
         결제하기
     </button>
+</div>
+
+<div class="footer">
+    <p>YuhanTrip에 오신 것을 환영합니다. 안전한 결제를 보장합니다.</p>
 </div>
 
 <!-- Bootstrap JS -->

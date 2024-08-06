@@ -184,6 +184,39 @@
         .login-message.show {
             display: block;
         }
+
+        /* Flexbox for horizontal form layout */
+        .form-horizontal {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px; /* 요소 간 간격 */
+            align-items: center; /* 세로 중앙 정렬 */
+            background: rgba(255, 255, 255, 0.8); /* 배경색 */
+            padding: 20px; /* 패딩 추가 */
+            border-radius: 15px; /* 둥근 모서리 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 박스 그림자 */
+            margin: 20px; /* 외부 간격 */
+        }
+
+        .form-horizontal .form-group {
+            flex: 1; /* 모든 폼 그룹을 동일한 공간으로 설정 */
+            min-width: 150px; /* 각 항목의 최소 너비 */
+        }
+
+        .form-horizontal button {
+            flex: 0 0 auto; /* 버튼의 크기를 고정 */
+            margin-left: auto; /* 버튼을 오른쪽으로 정렬 */
+            background-color: #007bff; /* 버튼 배경색 */
+            color: white; /* 버튼 텍스트 색상 */
+            padding: 10px 20px; /* 버튼 패딩 */
+            border: none; /* 버튼 테두리 제거 */
+            border-radius: 5px; /* 버튼 모서리 둥글게 */
+            cursor: pointer; /* 마우스 포인터 변경 */
+        }
+
+        .form-horizontal button:hover {
+            background-color: #0056b3; /* 버튼 호버 배경색 */
+        }
     </style>
 </head>
 <body>
@@ -236,39 +269,70 @@
                 </div>
             </div>
 
+            <form action="/accommodation/info" method="get" class="mb-4 form-horizontal">
+                <input type="hidden" id="id" name="id" th:value="${accommodation.getId()}">
+                <!-- 체크인 날짜 필드 -->
+                <div class="form-group">
+                    <label for="checkin">체크인 날짜</label>
+                    <input type="date" id="checkin" name="checkin" class="form-control" th:value="${checkin}">
+                </div>
+
+                <div class="form-group">
+                    <label for="checkout">체크아웃 날짜</label>
+                    <input type="date" id="checkout" name="checkout" class="form-control" th:value="${checkout}">
+                </div>
+
+                <div class="form-group">
+                    <label for="numGuests">숙박 인원수</label>
+                    <input type="number" id="numGuests" name="numGuests" class="form-control" min="1" max="10" th:value="${numGuests != null ? numGuests : 1}">
+                </div>
+                <!-- 검색 버튼 -->
+                <button type="submit" class="btn btn-primary mt-2">검색</button>
+            </form>
+
+
+
             <!-- 상세 정보 섹션 -->
             <div class="info-container">
                 <!-- 객실 정보 섹션 -->
                 <div class="details">
                     <h2>객실 정보</h2>
-                    <div th:each="room : ${accommodation.rooms}">
-                        <!-- 객실 카드 -->
-                        <div class="room-card">
-                            <img th:src="@{${room.roomImgUrl}}" class="room-img" alt="객실 이미지">
-                            <div class="room-details">
-                                <h3 th:text="${room.roomNm}">객실 이름</h3>
-                                <p><strong>타입:</strong> <span th:text="${room.roomType}">객실 타입</span></p>
-                                <p><strong>최대 수용 인원:</strong> <span th:text="${room.maxOccupancy}">최대 수용 인원</span></p>
-                                <p><strong>면적:</strong> <span th:text="${room.roomArea}">객실 면적</span>㎡</p>
-                                <p><strong>가격:</strong> <span th:text="${room.getPriceAsLong()}">가격</span>원</p>
-                                <p><strong>편의시설:</strong> <span th:text="${room.amenities}">편의시설</span></p>
-                                <p><strong>흡연 가능 여부:</strong> <span th:text="${room.smokingYn ? '예' : '아니오'}">흡연 가능 여부</span></p>
-                                <p><strong>조식 포함 여부:</strong> <span th:text="${room.breakfastInclYn ? '예' : '아니오'}">조식 포함 여부</span></p>
-                                <p><strong>체크인 시간:</strong> <span th:text="${room.checkInTime}">체크인 시간</span></p>
-                                <p><strong>체크아웃 시간:</strong> <span th:text="${room.checkOutTime}">체크아웃 시간</span></p>
-                                <p><strong>객실 소개:</strong> <span th:text="${room.roomIntr}">객실 소개</span></p>
-                                <!-- 예약하기 버튼 -->
-                                <p><strong>예약하기:</strong>
-                                    <button class="reservation-button" th:data-id="${room.id}">
-                                        <i class="bi bi-calendar-check"></i> 예약하기
-                                    </button>
-                                </p>
-                                <!-- 로그인 메시지 -->
-                                <div class="login-message">로그인 후 이용할 수 있습니다.</div>
+                    <!-- 객실이 있는 경우 -->
+                    <div th:if="${availableRooms != null and #lists.size(availableRooms) > 0}">
+                        <div th:each="room : ${availableRooms}">
+                            <!-- 객실 카드 -->
+                            <div class="room-card">
+                                <img th:src="@{${room.roomImgUrl}}" class="room-img" alt="객실 이미지">
+                                <div class="room-details">
+                                    <h3 th:text="${room.roomNm}">객실 이름</h3>
+                                    <p><strong>타입:</strong> <span th:text="${room.roomType}">객실 타입</span></p>
+                                    <p><strong>최대 수용 인원:</strong> <span th:text="${room.maxOccupancy}">최대 수용 인원</span></p>
+                                    <p><strong>면적:</strong> <span th:text="${room.roomArea}">객실 면적</span>㎡</p>
+                                    <p><strong>가격:</strong> <span th:text="${room.getPriceAsLong()}">가격</span>원</p>
+                                    <p><strong>편의시설:</strong> <span th:text="${room.amenities}">편의시설</span></p>
+                                    <p><strong>흡연 가능 여부:</strong> <span th:text="${room.smokingYn ? '예' : '아니오'}">흡연 가능 여부</span></p>
+                                    <p><strong>조식 포함 여부:</strong> <span th:text="${room.breakfastInclYn ? '예' : '아니오'}">조식 포함 여부</span></p>
+                                    <p><strong>체크인 시간:</strong> <span th:text="${room.checkInTime}">체크인 시간</span></p>
+                                    <p><strong>체크아웃 시간:</strong> <span th:text="${room.checkOutTime}">체크아웃 시간</span></p>
+                                    <p><strong>객실 소개:</strong> <span th:text="${room.roomIntr}">객실 소개</span></p>
+                                    <!-- 예약하기 버튼 -->
+                                    <p><strong>예약하기:</strong>
+                                        <button class="reservation-button" th:data-id="${room.id}">
+                                            <i class="bi bi-calendar-check"></i> 예약하기
+                                        </button>
+                                    </p>
+                                    <!-- 로그인 메시지 -->
+                                    <div class="login-message">로그인 후 이용할 수 있습니다.</div>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <!-- 객실이 없는 경우 -->
+                    <div th:unless="${availableRooms != null and #lists.size(availableRooms) > 0}">
+                        <p>선택하신 날짜에 예약 가능한 객실이 없습니다.</p>
+                    </div>
                 </div>
+
 
 
                 <!-- 숙소의 상세 정보 -->
@@ -321,6 +385,7 @@
             }
         }
 
+
         // 예약 버튼 클릭 이벤트 처리
         document.querySelectorAll('.reservation-button').forEach(button => {
             button.addEventListener('click', function (event) {
@@ -334,9 +399,15 @@
                     return;
                 }
 
+                // 체크인 및 체크아웃 날짜 가져오기
+                const checkin = document.getElementById('checkin').value;
+                const checkout = document.getElementById('checkout').value;
+
                 // 예약하기 버튼 클릭 시, 예약 페이지로 이동
                 const roomId = this.getAttribute('data-id');
-                const url = `/reservation?id=${roomId}`;
+
+                // 체크인과 체크아웃 날짜를 URL에 추가
+                const url = `/reservation?id=${roomId}&checkin=${checkin}&checkout=${checkout}`;
                 window.location.href = url;
             });
         });
@@ -379,6 +450,55 @@
         localStorage.removeItem('accessToken');
     }
 
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.querySelector('form');
+        const checkin = document.getElementById('checkin');
+        const checkout = document.getElementById('checkout');
+        const numGuests = document.getElementById('numGuests');
+
+        form.addEventListener('submit', (event) => {
+            // 모든 필드의 기존 오류 메시지 제거
+            removeErrorMessages();
+
+
+            let isValid = true;
+
+            if (!checkin.value) {
+                showError(checkin, '체크인 날짜를 입력해주세요.');
+                isValid = false;
+            }
+
+            if (!checkout.value) {
+                showError(checkout, '체크아웃 날짜를 입력해주세요.');
+                isValid = false;
+            }
+
+            if (!numGuests.value) {
+                showError(numGuests, '숙박 인원수를 입력해주세요.');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                event.preventDefault(); // 폼 제출을 막습니다.
+            }
+        });
+
+        function showError(input, message) {
+            const error = document.createElement('div');
+            error.className = 'error-message';
+            error.textContent = message;
+            input.parentNode.appendChild(error);
+            input.classList.add('input-error');
+        }
+
+        function removeErrorMessages() {
+            const errors = document.querySelectorAll('.error-message');
+            errors.forEach(error => error.remove());
+            const inputs = document.querySelectorAll('.input-error');
+            inputs.forEach(input => input.classList.remove('input-error'));
+        }
+    });
 
 </script>
 

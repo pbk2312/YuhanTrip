@@ -2,6 +2,7 @@ package hello.yuhanTrip.controller;
 
 import hello.yuhanTrip.domain.Accommodation;
 import hello.yuhanTrip.domain.RegionCode;
+import hello.yuhanTrip.domain.Room;
 import hello.yuhanTrip.service.Accomodation.AccommodationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -25,10 +27,11 @@ public class AccommodationController {
     private final AccommodationService accommodationService;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
     @GetMapping("/accommodations")
     public String listAccommodations(Model model,
                                      @RequestParam(required = false) String region,
-                                     @RequestParam(value = "checkin", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkin ,
+                                     @RequestParam(value = "checkin", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkin,
                                      @RequestParam(value = "checkout", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkout,
                                      @RequestParam(value = "numGuests", required = false) Integer numGuests,
                                      @RequestParam(defaultValue = "0") int page,
@@ -94,13 +97,11 @@ public class AccommodationController {
     }
 
 
-
-
     @GetMapping("/byregion")
     public String listAccommodationsByRegion(Model model,
                                              @RequestParam(value = "region", required = false) String region,
-                                             @RequestParam(value = "checkin", required = false)@DateTimeFormat(pattern = "yyyy-MM-dd")  LocalDate checkin,
-                                             @RequestParam(value = "checkout", required = false)@DateTimeFormat(pattern = "yyyy-MM-dd")  LocalDate checkout,
+                                             @RequestParam(value = "checkin", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkin,
+                                             @RequestParam(value = "checkout", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkout,
                                              @RequestParam(value = "numGuests", required = false) Integer numGuests,
                                              @RequestParam(defaultValue = "0") int page,
                                              @RequestParam(defaultValue = "12") int size) {
@@ -172,31 +173,35 @@ public class AccommodationController {
     }
 
 
-
-
     @GetMapping("/info")
     public String getAccommodationInfo(@RequestParam("id") Long id, Model model,
-                                       @RequestParam(value = "checkin", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd")  LocalDate checkInDate,
-                                       @RequestParam(value = "checkout", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd")  LocalDate checkOutDate,
+                                       @RequestParam(value = "checkin", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkInDate,
+                                       @RequestParam(value = "checkout", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkOutDate,
                                        @RequestParam(value = "numGuests", required = false) Integer numberOfGuests) {
 
         log.info("숙소 정보를 가져옵니다... ID: {}", id);
         log.info("선택 사항 - 체크인 날짜: {}, 체크아웃 날짜: {}, 숙박 인원 수: {}", checkInDate, checkOutDate, numberOfGuests);
 
+
+
         // 숙소 정보를 가져옵니다.
         Accommodation accommodation = accommodationService.getAccommodationInfo(id);
 
-        // 숙소 정보가 존재하지 않는 경우
-        if (accommodation == null) {
-            log.error("숙소 정보를 찾을 수 없습니다. ID: {}", id);
-            return "error"; // 또는 "redirect:/error/404"
+        // 체크인 및 체크아웃 날짜가 제공되지 않는 경우 모든 객실을 가져옵니다.
+        List<Room> availableRooms;
+        if (checkInDate == null || checkOutDate == null) {
+            availableRooms = accommodation.getRooms(); // 모든 객실을 가져옵니다.
+        } else {
+            // 예약된 객실을 제외한 사용 가능한 객실 리스트 가져오기
+            availableRooms = accommodationService.getAvailableRoomsByAccommodation(id, checkInDate, checkOutDate);
         }
-
-        // 모델에 숙소 정보 추가
+        // 모델에 숙소 정보와 사용 가능한 객실 리스트 추가
+        model.addAttribute("availableRooms", availableRooms);
+        model.addAttribute("checkin", checkInDate);
+        model.addAttribute("checkout", checkOutDate);
+        model.addAttribute("numGuests", numberOfGuests);
         model.addAttribute("accommodation", accommodation);
-        model.addAttribute("checkInDate", checkInDate);
-        model.addAttribute("checkOutDate", checkOutDate);
-        model.addAttribute("numberOfGuests", numberOfGuests);
+
 
         return "accommodationInfo"; // 상세 페이지의 뷰 이름
     }
