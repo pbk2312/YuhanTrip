@@ -49,6 +49,7 @@ public class SecurityConfig {
                         .requestMatchers("/member/deleteAccount").authenticated()
                         .requestMatchers("/member/withdrawalMembership").authenticated()
                         .requestMatchers("/paymentPage").authenticated()
+                        .requestMatchers("/payment/cancel").permitAll()
                         .requestMatchers("/payment/**").authenticated()
                         .requestMatchers("/admin/**").authenticated()
                         .requestMatchers("/reservation/**").authenticated()

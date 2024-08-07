@@ -148,6 +148,34 @@
                 }
             });
         }
+
+        // 뒤로 가기 버튼 감지
+        window.addEventListener('popstate', function (event) {
+            cancelReservation();
+        });
+
+        // 예약 취소 요청
+        function cancelReservation() {
+            var reservationUid = '[[${requestDto.reservationUid}]]';
+            fetch('/reservation/fail?reservationId=' + reservationUid, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => {
+                if (response.ok) {
+                    console.log('Reservation canceled successfully.');
+                } else {
+                    console.error('Failed to cancel the reservation.');
+                }
+            }).catch(error => {
+                console.error('Error canceling the reservation:', error);
+            });
+        }
+
+        // 페이지 로드 시 브라우저 히스토리 관리
+        window.history.pushState({page: "paymentPage"}, "", window.location.href);
+
     </script>
 </head>
 <body>

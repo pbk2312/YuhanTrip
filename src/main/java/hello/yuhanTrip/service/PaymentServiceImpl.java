@@ -8,6 +8,7 @@ import com.siot.IamportRestClient.response.Payment;
 import hello.yuhanTrip.domain.PaymentStatus;
 import hello.yuhanTrip.domain.Reservation;
 import hello.yuhanTrip.dto.payment.PaymentCallbackRequest;
+import hello.yuhanTrip.dto.payment.PaymentCancelDTO;
 import hello.yuhanTrip.dto.payment.PaymentDTO;
 import hello.yuhanTrip.repository.PaymentRepository;
 import hello.yuhanTrip.repository.ReservationRepository;
@@ -101,5 +102,11 @@ public class PaymentServiceImpl implements PaymentService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public hello.yuhanTrip.domain.Payment findPayment(String paymentUid) {
+        hello.yuhanTrip.domain.Payment byPaymentUid = paymentRepository.findByPaymentUid(paymentUid);
+        return byPaymentUid;
     }
 }

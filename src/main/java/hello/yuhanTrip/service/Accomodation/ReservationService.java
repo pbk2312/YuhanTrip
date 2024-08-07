@@ -1,17 +1,18 @@
 package hello.yuhanTrip.service.Accomodation;
 
 import hello.yuhanTrip.domain.Reservation;
-import hello.yuhanTrip.dto.ReservationDTO;
 import hello.yuhanTrip.dto.ReservationUpdateDTO;
+import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +20,8 @@ import java.util.Optional;
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
+
+    private final TokenProvider tokenProvider;
 
 
     @Transactional
@@ -82,6 +85,7 @@ public class ReservationService {
         // 변경된 예약 저장
         return reservationRepository.save(reservation);
     }
+
 
 }
 
