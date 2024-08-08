@@ -5,13 +5,11 @@ import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.request.CancelData;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
-import hello.yuhanTrip.domain.PaymentAccessToken;
 import hello.yuhanTrip.domain.PaymentStatus;
 import hello.yuhanTrip.domain.Reservation;
 import hello.yuhanTrip.dto.payment.PaymentCallbackRequest;
 import hello.yuhanTrip.dto.payment.PaymentCancelDTO;
 import hello.yuhanTrip.dto.payment.PaymentDTO;
-import hello.yuhanTrip.repository.PaymentAccessTokenRepository;
 import hello.yuhanTrip.repository.PaymentRepository;
 import hello.yuhanTrip.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -30,7 +27,6 @@ import java.util.Optional;
 public class PaymentServiceImpl implements PaymentService {
 
 
-    private final PaymentAccessTokenRepository paymentAccessTokenRepository;
     private final ReservationRepository reservationRepository;
     private final PaymentRepository paymentRepository;
     private final IamportClient iamportClient;

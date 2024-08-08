@@ -9,17 +9,32 @@
 <body>
 
 <h1>결제 취소</h1>
-<form id="cancelForm">
-  <label for="paymentUid">주문 번호 (paymentUid):</label><br>
-  <input type="text" id="paymentUid" name="paymentUid" th:value="${paymentCancelDTO.paymentUid}" readonly><br>
-  <label for="cancelRequestAmount">환불 금액:</label><br>
-  <input type="number" id="cancelRequestAmount" name="cancelRequestAmount" th:value="${paymentCancelDTO.cancelRequestAmount}" readonly><br>
-  <input type="hidden" id="reservationId" name="reservationId" th:value="${paymentCancelDTO.reservationId}"><br>
-  <label for="reason">환불 사유:</label><br>
-  <input type="text" id="reason" name="reason"><br>
-  <button type="button" onclick="cancelPay()">환불하기</button>
-</form>
 
+<!-- 예약 내역을 보여주는 부분 -->
+<div>
+  <h2>예약 내역</h2>
+  <p>객실 이름: <span th:text="${reservationDTO.roomNm}"></span></p>
+  <p>객실 타입: <span th:text="${reservationDTO.roomType}"></span></p>
+  <p>체크인 날짜: <span th:text="${reservationDTO.checkInDate}"></span></p>
+  <p>체크아웃 날짜: <span th:text="${reservationDTO.checkOutDate}"></span></p>
+  <p>예약 날짜: <span th:text="${reservationDTO.reservationDate}"></span></p>
+  <p>숙소 이름: <span th:text="${reservationDTO.accommodationTitle}"></span></p>
+  <p>예약자 이름: <span th:text="${reservationDTO.name}"></span></p>
+  <p>고객 전화번호: <span th:text="${reservationDTO.phoneNumber}"></span></p>
+  <p>예약 금액: <span th:text="${reservationDTO.price}"></span></p>
+  <p>숙박 인원수: <span th:text="${reservationDTO.numberOfGuests}"></span></p>
+</div>
+
+<!-- 결제 취소 폼 -->
+<form id="cancelForm">
+  <input type="hidden" id="paymentUid" name="paymentUid" th:value="${paymentCancelDTO.paymentUid}">
+  <input type="hidden" id="cancelRequestAmount" name="cancelRequestAmount" th:value="${paymentCancelDTO.cancelRequestAmount}">
+  <input type="hidden" id="reservationId" name="reservationId" th:value="${paymentCancelDTO.reservationId}">
+
+  <label for="reason">취소 사유:</label><br>
+  <input type="text" id="reason" name="reason"><br>
+  <button type="button" onclick="cancelPay()">환불 및 예약 취소</button>
+</form>
 
 <script>
   function cancelPay() {

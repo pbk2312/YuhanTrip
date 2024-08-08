@@ -1,15 +1,14 @@
 package hello.yuhanTrip.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
-import hello.yuhanTrip.domain.PaymentAccessToken;
+import hello.yuhanTrip.domain.CancelReservation;
 import hello.yuhanTrip.domain.Reservation;
+import hello.yuhanTrip.dto.ReservationDTO;
 import hello.yuhanTrip.dto.payment.PaymentCallbackRequest;
 import hello.yuhanTrip.dto.payment.PaymentCancelDTO;
 import hello.yuhanTrip.dto.payment.PaymentDTO;
 import hello.yuhanTrip.jwt.TokenProvider;
-import hello.yuhanTrip.repository.PaymentAccessTokenRepository;
 import hello.yuhanTrip.repository.ReservationRepository;
 import hello.yuhanTrip.service.Accomodation.ReservationService;
 import hello.yuhanTrip.service.PaymentService;
@@ -27,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 
-import java.util.HashMap;
 import java.util.Map;
 
 
@@ -39,7 +37,6 @@ public class PaymentController {
     private final ReservationRepository reservationRepository;
     private final TokenProvider tokenProvider;
     private final PaymentService paymentService;
-    private final PaymentAccessTokenRepository paymentAccessTokenRepository;
     private final ReservationService reservationService;
 
     @Value("${imp_key}")
@@ -109,7 +106,30 @@ public class PaymentController {
 
         log.info("환불 받을 예약 번호: {}", reservationId);
 
+
         Reservation reservation = reservationService.findReservation(reservationId);
+
+        // ReservationDTO를 생성하고 필드를 설정함
+        ReservationDTO reservationDTO = ReservationDTO.builder()
+                .id(reservation.getId())
+                .memberId(reservation.getMember().getId())
+                .accommodationId(reservation.getAccommodationId())
+                .roomId(reservation.getRoom().getId())
+                .roomNm(reservation.getRoom().getRoomNm())  // Room 엔티티에 roomNm 필드가 있다고 가정
+                .roomType(reservation.getRoom().getRoomType())  // Room 엔티티에 roomType 필드가 있다고 가정
+                .checkInDate(reservation.getCheckInDate())
+                .checkOutDate(reservation.getCheckOutDate())
+                .reservationDate(reservation.getReservationDate())
+                .specialRequests(reservation.getSpecialRequests())
+                .accommodationTitle(reservation.getRoom().getAccommodation().getTitle())  // Accommodation 엔티티에 title 필드가 있다고 가정
+                .name(reservation.getName())
+                .phoneNumber(reservation.getPhoneNumber())
+                .price(reservation.getPayment().getPrice())
+                .addr(reservation.getAddr())
+                .numberOfGuests(reservation.getNumberOfGuests())
+                .build();
+
+
         String paymentUid = reservation.getPayment().getPaymentUid();
         hello.yuhanTrip.domain.Payment payment = paymentService.findPayment(paymentUid);
 
@@ -118,21 +138,11 @@ public class PaymentController {
         paymentCancelDTO.setCancelRequestAmount(payment.getPrice());
         paymentCancelDTO.setReservationId(reservationId);
 
-        String accessToken = getAccessToken();
-        if (accessToken != null) {
-            PaymentAccessToken paymentAccessToken = new PaymentAccessToken();
-            paymentAccessToken.setReservationId(reservationId);
-            paymentAccessToken.setPaymentAccessToken(accessToken);
-            paymentAccessTokenRepository.save(paymentAccessToken);
-            log.info("Access Token: {}", accessToken);
-        } else {
-            log.error("Failed to retrieve access token.");
-        }
 
+        model.addAttribute("reservationDTO", reservationDTO);
         model.addAttribute("paymentCancelDTO", paymentCancelDTO);
         return "reservationCancel";
     }
-
 
 
     @PostMapping("/payment/cancel")
@@ -141,6 +151,29 @@ public class PaymentController {
             // 결제 취소 처리
             paymentService.cancelReservation(paymentCancelDTO);
 
+
+            Long reservationId = paymentCancelDTO.getReservationId();
+            Reservation reservation = reservationService.findReservation(reservationId);
+            CancelReservation cancelReservation = CancelReservation.builder()
+                    .reservationUid(reservation.getReservationUid())
+                    .member(reservation.getMember())
+                    .room(reservation.getRoom())
+                    .accommodationId(reservation.getAccommodationId())
+                    .checkInDate(reservation.getCheckInDate())
+                    .checkOutDate(reservation.getCheckOutDate())
+                    .reservationDate(reservation.getReservationDate())
+                    .specialRequests(reservation.getSpecialRequests())
+                    .name(reservation.getName())
+                    .phoneNumber(reservation.getPhoneNumber())
+                    .addr(reservation.getAddr())
+                    .numberOfGuests(reservation.getNumberOfGuests())
+                    .price(reservation.getPayment().getPrice())  // Reservation에 가격 필드가 있다고 가정
+                    .build();
+
+
+            reservationService.removeReservation(reservation.getReservationUid());
+            reservationService.cancelReservationRegister(cancelReservation);
+            paymentService.remove(paymentCancelDTO.getPaymentUid());
             // 성공적인 경우 200 OK 응답
             return ResponseEntity.ok("결제 취소 요청이 성공적으로 처리되었습니다.");
 
@@ -153,38 +186,4 @@ public class PaymentController {
     }
 
 
-
-    private String getAccessToken() {
-        String url = "https://api.iamport.kr/users/getToken";
-        RestTemplate restTemplate = new RestTemplate();
-
-        log.info("Request URL: {}", url);
-        log.info("imp_key: {}", impKey);
-        log.info("imp_secret: {}", impSecret);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("imp_key", impKey);
-        body.add("imp_secret", impSecret);
-
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
-
-
-        ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
-
-        log.info("Response Status Code: {}", response.getStatusCode());
-        log.info("Response Body: {}", response.getBody());
-
-        if (response.getStatusCode() == HttpStatus.OK) {
-            Map<String, Object> responseBody = response.getBody();
-            if (responseBody != null) {
-                Map<String, String> responseData = (Map<String, String>) responseBody.get("response");
-                return responseData.get("access_token");
-            }
-        }
-
-        return null;
-    }
 }
