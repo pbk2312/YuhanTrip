@@ -32,6 +32,9 @@ public class Member {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reservation> reservations;
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CancelReservation> cancelReservations;
+
 
     public Member toMember(PasswordEncoder passwordEncoder) {
         // 회원 객체를 생성하고 반환

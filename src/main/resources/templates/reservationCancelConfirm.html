@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="info">
+    <div class="reservation-container">
+        <div th:each="reservation : ${cancelReservations}" class="reservation-item">
+            <p><strong>예약 번호:</strong> <span th:text="${reservation.reservationUid}">예약 번호</span></p>
+            <p><strong>숙소 이름:</strong> <span th:text="${reservation.room.getAccommodation().getTitle()}">숙소 이름</span>
+            </p>
+            <p><strong>객실 이름:</strong> <span th:text="${reservation.room.getRoomNm()}">객실 이름</span></p>
+            <p><strong>예약자명:</strong> <span th:text="${reservation.getName()}">예약자명</span></p>
+            <p><strong>체크인 날짜:</strong> <span th:text="${reservation.checkInDate}">체크인 날짜</span></p>
+            <p><strong>체크아웃 날짜:</strong> <span th:text="${reservation.checkOutDate}">체크아웃 날짜</span></p>
+            <p><strong>결제 금액:</strong> <span th:text="${reservation.getPrice()}">결제 금액</span> 원</p>
+            <p><strong>투숙 인원:</strong> <span th:text="${reservation.getNumberOfGuests()}">투숙 인원</span> 명</p>
+            <hr/>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

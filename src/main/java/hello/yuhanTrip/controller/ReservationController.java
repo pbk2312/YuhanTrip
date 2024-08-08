@@ -322,9 +322,44 @@ public class ReservationController {
         }
     }
 
+    @GetMapping("/reservationConfirm/cancel")
+    public String cancelPaymentPage(
+            @CookieValue(value = "accessToken", required = false) String accessToken,
+            Model model
+    ) {
+
+        // 인증 확인
+        if (accessToken == null || !tokenProvider.validate(accessToken)) {
+            return "redirect:/member/login"; // 로그인 페이지로 리다이렉트
+        }
+
+        Authentication authentication = tokenProvider.getAuthentication(accessToken);
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        log.info("예약 확정 확인 유저 : {}", userDetails.getUsername());
+
+        Member member = memberService.findByEmail(userDetails.getUsername());
+
+
+        List<CancelReservation> cancelReservations = member.getCancelReservations();
+
+        // 모델에 예약 리스트 추가
+        model.addAttribute("cancelReservations", cancelReservations);
+
+
+        return "reservationCancelConfirm";
+    }
+
+
+
+
+
+
 
     @GetMapping("/fail-payment")
     public String failPaymentPage() {
         return "fail-payment";
     }
+
+
+
 }

@@ -5,11 +5,13 @@ import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.request.CancelData;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
+import hello.yuhanTrip.domain.PaymentAccessToken;
 import hello.yuhanTrip.domain.PaymentStatus;
 import hello.yuhanTrip.domain.Reservation;
 import hello.yuhanTrip.dto.payment.PaymentCallbackRequest;
 import hello.yuhanTrip.dto.payment.PaymentCancelDTO;
 import hello.yuhanTrip.dto.payment.PaymentDTO;
+import hello.yuhanTrip.repository.PaymentAccessTokenRepository;
 import hello.yuhanTrip.repository.PaymentRepository;
 import hello.yuhanTrip.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -26,6 +29,8 @@ import java.math.BigDecimal;
 @Log4j2
 public class PaymentServiceImpl implements PaymentService {
 
+
+    private final PaymentAccessTokenRepository paymentAccessTokenRepository;
     private final ReservationRepository reservationRepository;
     private final PaymentRepository paymentRepository;
     private final IamportClient iamportClient;
@@ -108,5 +113,56 @@ public class PaymentServiceImpl implements PaymentService {
     public hello.yuhanTrip.domain.Payment findPayment(String paymentUid) {
         hello.yuhanTrip.domain.Payment byPaymentUid = paymentRepository.findByPaymentUid(paymentUid);
         return byPaymentUid;
+    }
+
+    @Override
+    public void remove(String paymentUid) {
+        hello.yuhanTrip.domain.Payment payment = findPayment(paymentUid);
+        paymentRepository.delete(payment);
+    }
+
+
+
+    public void cancelReservation(PaymentCancelDTO paymentCancelDTO) {
+        try {
+            IamportResponse<Payment> response = iamportClient.paymentByImpUid(paymentCancelDTO.getPaymentUid());
+
+            if (response == null || response.getResponse() == null) {
+                throw new IllegalArgumentException("Invalid payment information.");
+            }
+
+            // refundAmount가 Long 타입인 경우, int로 변환
+            int refundAmount = paymentCancelDTO.getCancelRequestAmount().intValue();
+
+            CancelData cancelData = createCancelData(response, refundAmount);
+            IamportResponse<Payment> cancelResponse = iamportClient.cancelPaymentByImpUid(cancelData);
+
+            // 환불 처리 결과에 대한 추가 로직
+            if (cancelResponse.getCode() != 0) {
+                throw new RuntimeException("Failed to cancel payment: " + cancelResponse.getMessage());
+            }
+
+        } catch (IamportResponseException e) {
+            // Iamport API 응답 예외 처리
+            e.printStackTrace();
+            // 적절한 오류 처리 로직
+        } catch (IOException e) {
+            // I/O 예외 처리
+            e.printStackTrace();
+            // 적절한 오류 처리 로직
+        } catch (Exception e) {
+            // 기타 예외 처리
+            e.printStackTrace();
+            // 적절한 오류 처리 로직
+        }
+    }
+
+    private CancelData createCancelData(IamportResponse<Payment> response, int refundAmount) {
+        if (refundAmount == 0) { //전액 환불일 경우
+            return new CancelData(response.getResponse().getImpUid(), true);
+        }
+        //부분 환불일 경우 checksum을 입력해 준다.
+        return new CancelData(response.getResponse().getImpUid(), true, new BigDecimal(refundAmount));
+
     }
 }

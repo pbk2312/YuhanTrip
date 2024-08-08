@@ -1,5 +1,6 @@
 package hello.yuhanTrip.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
 import hello.yuhanTrip.domain.PaymentAccessToken;
@@ -20,6 +21,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -99,13 +102,12 @@ public class PaymentController {
         return new ResponseEntity<>(iamportResponse, HttpStatus.OK);
     }
 
+
     @GetMapping("/paymentCancelPage")
     public String paymentCancel(@RequestParam("reservationId") Long reservationId,
-                                Model model
-    ) {
+                                Model model) {
 
-
-        log.info("환불 받을 려는 예약 번호 :{}", reservationId);
+        log.info("환불 받을 예약 번호: {}", reservationId);
 
         Reservation reservation = reservationService.findReservation(reservationId);
         String paymentUid = reservation.getPayment().getPaymentUid();
@@ -127,89 +129,53 @@ public class PaymentController {
             log.error("Failed to retrieve access token.");
         }
 
-
         model.addAttribute("paymentCancelDTO", paymentCancelDTO);
         return "reservationCancel";
     }
 
 
+
     @PostMapping("/payment/cancel")
-    public ResponseEntity<String> cancelPayment(@RequestBody PaymentCancelDTO cancelDTO) {
-        log.info("결제 취소 요청: {}", cancelDTO);
-
+    public ResponseEntity<String> cancelPayment(@RequestBody PaymentCancelDTO paymentCancelDTO) {
         try {
-            String paymentUid = cancelDTO.getPaymentUid();
-            Long cancelRequestAmount = cancelDTO.getCancelRequestAmount();
-            String reason = cancelDTO.getReason();
-            Long reservationId = cancelDTO.getReservationId();
+            // 결제 취소 처리
+            paymentService.cancelReservation(paymentCancelDTO);
 
-            hello.yuhanTrip.domain.Payment payment = paymentService.findPayment(paymentUid);
+            // 성공적인 경우 200 OK 응답
+            return ResponseEntity.ok("결제 취소 요청이 성공적으로 처리되었습니다.");
 
-            // 결제정보로부터 imp_uid와 환불 가능 금액 계산
-            String impUid = payment.getPaymentUid();
-            Long cancelAmount = payment.getPrice();
-            Long cancelableAmount = cancelAmount;
-
-            if (cancelableAmount <= 0) {
-                return ResponseEntity.badRequest().body("이미 전액 환불된 주문입니다.");
-            }
-
-            // 포트원 REST API로 결제 환불 요청
-
-            PaymentAccessToken paymentAccessToken = paymentAccessTokenRepository.findByReservationId(reservationId).orElseThrow(() -> new RuntimeException("찾을 수 없다"));
-
-            String accessToken = paymentAccessToken.getPaymentAccessToken();
-
-            ResponseEntity<Map> getCancelDataResponse = cancelPaymentViaPortOne(impUid, reason, cancelRequestAmount, cancelableAmount, accessToken);
-
-            if (getCancelDataResponse.getStatusCode() == HttpStatus.OK) {
-                Map<String, Object> responseBody = getCancelDataResponse.getBody();
-                if (responseBody != null) {
-                    Map<String, Object> responseData = (Map<String, Object>) responseBody.get("response");
-                    // 환불 결과 동기화 등 필요한 로직 추가
-                    return ResponseEntity.ok("환불이 성공적으로 처리되었습니다.");
-                }
-            }
-
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("환불 처리 중 오류가 발생했습니다.");
         } catch (Exception e) {
-            log.error("환불 처리 중 오류 발생", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("환불 처리 중 오류가 발생했습니다.");
+            // 예외 처리 및 500 Internal Server Error 응답
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("결제 취소 요청 처리 중 오류가 발생했습니다.");
         }
     }
 
-    private ResponseEntity<Map> cancelPaymentViaPortOne(String impUid, String reason, Long cancelRequestAmount, Long cancelableAmount, String accessToken) {
-        RestTemplate restTemplate = new RestTemplate();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(accessToken); // 액세스 토큰 설정
-
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("reason", reason);
-        requestBody.put("imp_uid", impUid);
-        requestBody.put("amount", cancelRequestAmount);
-        requestBody.put("checksum", cancelableAmount);
-
-        HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
-
-        return restTemplate.exchange("https://api.iamport.kr/payments/cancel", HttpMethod.POST, request, Map.class);
-    }
 
     private String getAccessToken() {
         String url = "https://api.iamport.kr/users/getToken";
         RestTemplate restTemplate = new RestTemplate();
 
+        log.info("Request URL: {}", url);
+        log.info("imp_key: {}", impKey);
+        log.info("imp_secret: {}", impSecret);
+
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        Map<String, String> body = new HashMap<>();
-        body.put("imp_key", impKey);
-        body.put("imp_secret", impSecret);
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("imp_key", impKey);
+        body.add("imp_secret", impSecret);
 
-        HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+
 
         ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
+
+        log.info("Response Status Code: {}", response.getStatusCode());
+        log.info("Response Body: {}", response.getBody());
 
         if (response.getStatusCode() == HttpStatus.OK) {
             Map<String, Object> responseBody = response.getBody();
@@ -221,6 +187,4 @@ public class PaymentController {
 
         return null;
     }
-
-
 }

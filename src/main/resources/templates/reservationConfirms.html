@@ -196,11 +196,13 @@
                 <p><strong>투숙 인원:</strong> <span th:text="${reservation.getNumberOfGuests()}">투숙 인원</span> 명</p>
                 <div class="reservation-actions">
                     <a th:href="'/reservationUpdate?reservationId=' + ${reservation.id}" class="btn btn-primary update-button">예약 수정</a>
+                    <a th:href="'/paymentCancelPage?reservationId=' + ${reservation.id}" class="btn btn-danger cancel-button">예약 취소</a>
                 </div>
                 <hr/>
             </div>
         </div>
     </div>
+
 
     <div class="footer">
         <a href="/home/homepage">홈으로</a>

@@ -3,6 +3,7 @@ package hello.yuhanTrip.service;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
 import hello.yuhanTrip.dto.payment.PaymentCallbackRequest;
+import hello.yuhanTrip.dto.payment.PaymentCancelDTO;
 import hello.yuhanTrip.dto.payment.PaymentDTO;
 
 public interface PaymentService {
@@ -14,5 +15,10 @@ public interface PaymentService {
     IamportResponse<Payment> paymentByCallback(PaymentCallbackRequest request);
 
     hello.yuhanTrip.domain.Payment findPayment(String paymentUid);
+
+    void remove(String paymentUid);
+
+
+    void cancelReservation(PaymentCancelDTO paymentCancelDTO);
 
 }

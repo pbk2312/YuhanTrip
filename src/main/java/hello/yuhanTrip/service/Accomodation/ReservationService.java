@@ -1,8 +1,10 @@
 package hello.yuhanTrip.service.Accomodation;
 
+import hello.yuhanTrip.domain.CancelReservation;
 import hello.yuhanTrip.domain.Reservation;
 import hello.yuhanTrip.dto.ReservationUpdateDTO;
 import hello.yuhanTrip.jwt.TokenProvider;
+import hello.yuhanTrip.repository.CancelReservationRepository;
 import hello.yuhanTrip.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,9 +23,7 @@ import java.util.List;
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
-
-    private final TokenProvider tokenProvider;
-
+    private final CancelReservationRepository cancelReservationRepository;
 
     @Transactional
     public void reservationRegister(Reservation reservation) {
@@ -62,6 +63,18 @@ public class ReservationService {
 
         reservationRepository.delete(reservation);
     }
+
+    @Transactional
+    public void cancelReservationRegister(CancelReservation cancelReservation) {
+        cancelReservationRepository.save(cancelReservation);
+    }
+
+    @Transactional
+    public CancelReservation cancelReservationConfirm(Long id) {
+        CancelReservation cancelReservation = cancelReservationRepository.findById(id).orElseThrow(() -> new RuntimeException("예약 정보가 없다"));
+        return cancelReservation;
+    }
+
 
     public Reservation updateReservation(ReservationUpdateDTO reservationDTO, String username) {
 
