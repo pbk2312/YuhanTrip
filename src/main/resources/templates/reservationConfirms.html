@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
     <meta name="description" content=""/>
     <meta name="author" content=""/>
-    <title>Yuhan Trip - Start Bootstrap Template</title>
+    <title>예약 내역</title>
     <!-- Favicon-->
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico"/>
     <!-- Bootstrap icons-->
@@ -13,42 +13,20 @@
     <!-- Core theme CSS (includes Bootstrap)-->
     <link href="../css/homestyles.css" rel="stylesheet">
     <style>
-        /* CSS styles */
         body {
             background: url('/los-angeles-2289637_640.jpg') no-repeat center center fixed;
             background-size: cover;
-            margin: 0;
-            padding: 0;
             color: #333;
         }
 
         header {
-            background: transparent;
-            padding: 10px 0;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 15px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.5);
         }
 
-        header .container {
-            text-align: center;
-        }
-
-        header .text-center {
-            color: #fff;
-        }
-
-        header .display-4 {
-            font-size: 3rem; /* Increased font size for better visibility */
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Added text shadow */
-        }
-
-        header .lead {
-            font-size: 1.25rem; /* Slightly larger font size */
-            color: rgba(255, 255, 255, 0.8); /* Lightened the color */
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Added text shadow */
-        }
-
         .navbar {
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.9);
             border-bottom: 1px solid #ddd;
         }
 
@@ -66,28 +44,24 @@
             color: #0056b3;
         }
 
-
-
-
         .info {
             background-color: rgba(255, 255, 255, 0.9);
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             padding: 20px;
-            margin: 20px;
+            margin: 20px auto;
+            max-width: 800px;
         }
 
         .info p {
-            margin: 10px 0;
+            margin: 0 0 10px 0;
+            line-height: 1.6;
         }
 
         .info .btn {
             margin-top: 10px;
-        }
-
-        .footer {
-            text-align: center;
-            margin: 20px;
+            border-radius: 20px;
+            font-weight: 600;
         }
 
         .footer a {
@@ -100,48 +74,54 @@
             text-decoration: underline;
         }
 
-        /* Add these styles to your existing CSS */
+        .reservation-header {
+            position: relative;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .reservation-header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .cancel-view-button {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            padding: 5px 10px;
+            background-color: #6c757d;
+            color: #fff;
+        }
+
         .reservation-container {
             display: flex;
-            flex-wrap: wrap;
-            gap: 20px; /* Adjust spacing between items */
+            flex-direction: row; /* 가로 방향으로 변경 */
+            flex-wrap: wrap; /* 가로 공간이 부족하면 다음 줄로 넘어가도록 설정 */
+            gap: 20px;
         }
 
         .reservation-item {
-            flex: 1 1 calc(50% - 20px); /* 50% width with a gap adjustment */
-            box-sizing: border-box; /* Ensure padding and border are included in the width */
-            padding: 10px;
+            flex: 1 1 calc(33.333% - 20px); /* 3개의 열로 표시 */
+            padding: 15px;
             border: 1px solid #ddd;
             border-radius: 8px;
             background: rgba(255, 255, 255, 0.9);
-        }
-
-        .footer {
-            text-align: center;
-            margin: 20px;
-            background-color: #fff; /* White background for footer */
-            padding: 10px 0;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .footer a {
-            color: #007bff;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .footer a:hover {
-            text-decoration: underline;
+            min-width: 250px; /* 최소 너비를 설정하여 아이템이 너무 좁아지지 않도록 함 */
         }
 
         .reservation-actions {
-            text-align: right; /* Align buttons to the right */
+            text-align: right;
+            margin-top: 10px;
         }
 
-        .update-button {
-            display: inline-block;
+        .update-button, .cancel-button, .cancel-view-button {
+            border-radius: 20px;
+            font-weight: 600;
         }
+
     </style>
 </head>
 <body>
@@ -162,15 +142,12 @@
                        data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <li><a class="dropdown-item" href="#!">All Products</a></li>
-                        <li>
-                            <hr class="dropdown-divider"/>
-                        </li>
+                        <li><hr class="dropdown-divider"/></li>
                         <li><a class="dropdown-item" href="#!">Popular Items</a></li>
                         <li><a class="dropdown-item" href="#!">New Arrivals</a></li>
                     </ul>
                 </li>
             </ul>
-            <!-- Authentication buttons -->
             <div id="authButtons" class="d-flex">
                 <button id="authButton" class="btn btn-outline-dark me-2" type="button"></button>
                 <button id="deleteAccountButton" class="btn btn-outline-danger" type="button" style="display: none;">
@@ -184,6 +161,10 @@
 <!-- Main Content-->
 <div class="container">
     <div class="info">
+        <div class="reservation-header">
+            <h1 class="mb-4">예약 내역</h1>
+            <a href="/reservationConfirm/cancel" class="btn btn-secondary cancel-view-button">예약 취소 내역 보기</a>
+        </div>
         <div class="reservation-container">
             <div th:each="reservation : ${reservations}" class="reservation-item">
                 <p><strong>예약 번호:</strong> <span th:text="${reservation.reservationUid}">예약 번호</span></p>
@@ -198,18 +179,10 @@
                     <a th:href="'/reservationUpdate?reservationId=' + ${reservation.id}" class="btn btn-primary update-button">예약 수정</a>
                     <a th:href="'/paymentCancelPage?reservationId=' + ${reservation.id}" class="btn btn-danger cancel-button">예약 취소</a>
                 </div>
-                <hr/>
             </div>
         </div>
     </div>
-
-
-    <div class="footer">
-        <a href="/home/homepage">홈으로</a>
-    </div>
 </div>
-
-
 <!-- jQuery, Popper.js, and Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>

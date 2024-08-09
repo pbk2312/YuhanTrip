@@ -1,26 +1,256 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <title>예약 취소 내역</title>
+    <!-- Favicon-->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico"/>
+    <!-- Bootstrap icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet"/>
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="../css/homestyles.css" rel="stylesheet">
+    <style>
+        body {
+            background: url('/los-angeles-2289637_640.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #333;
+        }
+
+        header {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.9);
+            border-bottom: 1px solid #ddd;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .navbar-nav .nav-link {
+            color: #007bff;
+            font-weight: 500;
+        }
+
+        .navbar-nav .nav-link.active {
+            color: #0056b3;
+        }
+
+        .info {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 800px;
+        }
+
+        .info p {
+            margin: 0 0 10px 0;
+            line-height: 1.6;
+        }
+
+        .info .btn {
+            margin-top: 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .footer a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .reservation-header {
+            position: relative;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .reservation-header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: red; /* 제목을 빨간색으로 변경 */
+        }
+
+        .cancel-view-button {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            padding: 5px 10px;
+            background-color: #6c757d;
+            color: #fff;
+        }
+
+        .reservation-container {
+            display: flex;
+            flex-direction: row; /* 가로 방향으로 변경 */
+            flex-wrap: wrap; /* 가로 공간이 부족하면 다음 줄로 넘어가도록 설정 */
+            gap: 20px;
+        }
+
+        .reservation-item {
+            flex: 1 1 calc(33.333% - 20px); /* 3개의 열로 표시 */
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            min-width: 250px; /* 최소 너비를 설정하여 아이템이 너무 좁아지지 않도록 함 */
+        }
+
+        .reservation-actions {
+            text-align: right;
+            margin-top: 10px;
+        }
+
+        .update-button, .cancel-button, .cancel-view-button {
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+    </style>
 </head>
 <body>
-<div class="info">
-    <div class="reservation-container">
-        <div th:each="reservation : ${cancelReservations}" class="reservation-item">
-            <p><strong>예약 번호:</strong> <span th:text="${reservation.reservationUid}">예약 번호</span></p>
-            <p><strong>숙소 이름:</strong> <span th:text="${reservation.room.getAccommodation().getTitle()}">숙소 이름</span>
-            </p>
-            <p><strong>객실 이름:</strong> <span th:text="${reservation.room.getRoomNm()}">객실 이름</span></p>
-            <p><strong>예약자명:</strong> <span th:text="${reservation.getName()}">예약자명</span></p>
-            <p><strong>체크인 날짜:</strong> <span th:text="${reservation.checkInDate}">체크인 날짜</span></p>
-            <p><strong>체크아웃 날짜:</strong> <span th:text="${reservation.checkOutDate}">체크아웃 날짜</span></p>
-            <p><strong>결제 금액:</strong> <span th:text="${reservation.getPrice()}">결제 금액</span> 원</p>
-            <p><strong>투숙 인원:</strong> <span th:text="${reservation.getNumberOfGuests()}">투숙 인원</span> 명</p>
-            <hr/>
+<!-- Navigation-->
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container px-4 px-lg-5">
+        <a class="navbar-brand" href="#!">YuhanTrip</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                <li class="nav-item"><a class="nav-link active" aria-current="page" href="/home/homepage">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="#!">All Products</a></li>
+                        <li><hr class="dropdown-divider"/></li>
+                        <li><a class="dropdown-item" href="#!">Popular Items</a></li>
+                        <li><a class="dropdown-item" href="#!">New Arrivals</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <div id="authButtons" class="d-flex">
+                <button id="authButton" class="btn btn-outline-dark me-2" type="button"></button>
+                <button id="deleteAccountButton" class="btn btn-outline-danger" type="button" style="display: none;">
+                    회원탈퇴
+                </button>
+            </div>
         </div>
     </div>
+</nav>
 
+<!-- Main Content-->
+<div class="container">
+    <div class="info">
+        <div class="reservation-header">
+            <h1 class="mb-4">예약 취소 내역</h1>
+            <a href="/reservationConfirm" class="btn btn-secondary cancel-view-button">예약 내역 보기</a>
+        </div>
+        <div class="reservation-container">
+            <div th:each="reservation : ${cancelReservations}" class="reservation-item">
+                <p><strong>예약 번호:</strong> <span th:text="${reservation.reservationUid}">예약 번호</span></p>
+                <p><strong>숙소 이름:</strong> <span th:text="${reservation.room.getAccommodation().getTitle()}">숙소 이름</span></p>
+                <p><strong>객실 이름:</strong> <span th:text="${reservation.room.getRoomNm()}">객실 이름</span></p>
+                <p><strong>예약자명:</strong> <span th:text="${reservation.getName()}">예약자명</span></p>
+                <p><strong>체크인 날짜:</strong> <span th:text="${reservation.checkInDate}">체크인 날짜</span></p>
+                <p><strong>체크아웃 날짜:</strong> <span th:text="${reservation.checkOutDate}">체크아웃 날짜</span></p>
+                <p><strong>취소 금액:</strong> <span th:text="${reservation.getPrice()}">결제 금액</span> 원</p>
+                <p><strong>투숙 인원:</strong> <span th:text="${reservation.getNumberOfGuests()}">투숙 인원</span> 명</p>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- jQuery, Popper.js, and Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+<!-- Core theme JS-->
+<script src="js/scripts.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const accessToken = localStorage.getItem('accessToken');
+        const authButton = document.getElementById('authButton');
+        const deleteAccountButton = document.getElementById('deleteAccountButton');
+
+        if (accessToken) {
+            if (isTokenExpired(accessToken)) {
+                logout();
+            } else {
+                authButton.textContent = 'Logout';
+                authButton.onclick = confirmLogout;
+                deleteAccountButton.style.display = 'block';
+                deleteAccountButton.onclick = () => {
+                    window.location.href = '/member/withdrawalMembership';
+                };
+            }
+        } else {
+            authButton.textContent = 'Login';
+            authButton.onclick = () => window.location.href = '/member/login';
+            if (window.location.pathname === '/member/withdrawalMembership') {
+                window.location.href = '/member/login';
+            }
+        }
+    });
+
+    function isTokenExpired(token) {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const currentTime = Math.floor(Date.now() / 1000);
+        return payload.exp < currentTime;
+    }
+
+    function confirmLogout() {
+        if (confirm("로그아웃 하시겠습니까?")) {
+            logout();
+        }
+    }
+
+    function logout() {
+        fetch('/member/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ /* 필요 시 요청 본문 추가 */ })
+        })
+            .then(response => {
+                if (response.ok) {
+                    deleteAccessToken();
+                    document.getElementById('authButton').textContent = 'Login';
+                    document.getElementById('deleteAccountButton').style.display = 'none';
+                    document.getElementById('authButton').onclick = () => window.location.href = '/member/login';
+                    window.location.href = '/home/homepage'; // 로그아웃 후 /home/homepage로 리다이렉트
+                } else {
+                    console.error('로그아웃 요청 실패');
+                }
+            })
+            .catch(error => console.error('로그아웃 요청 중 오류 발생:', error));
+    }
+
+    function deleteAccessToken() {
+        localStorage.removeItem('accessToken');
+    }
+
+</script>
 </body>
 </html>

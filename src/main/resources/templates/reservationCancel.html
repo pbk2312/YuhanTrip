@@ -1,41 +1,242 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+  <meta name="description" content=""/>
+  <meta name="author" content=""/>
   <title>결제 취소</title>
-  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <!-- Favicon-->
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico"/>
+  <!-- Bootstrap icons-->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet"/>
+  <!-- Core theme CSS (includes Bootstrap)-->
+  <link href="../css/homestyles.css" rel="stylesheet">
+  <style>
+    /* CSS styles */
+    body {
+      background: url('/los-angeles-2289637_640.jpg') no-repeat center center fixed;
+      background-size: cover;
+      margin: 0;
+      padding: 0;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background: transparent;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    }
+
+    header .container {
+      text-align: center;
+    }
+
+    header .text-center {
+      color: #fff;
+    }
+
+    header .display-4 {
+      font-size: 3rem; /* Increased font size for better visibility */
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Added text shadow */
+    }
+
+    header .lead {
+      font-size: 1.25rem; /* Slightly larger font size */
+      color: rgba(255, 255, 255, 0.8); /* Lightened the color */
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Added text shadow */
+    }
+
+    .navbar {
+      background: rgba(255, 255, 255, 0.8);
+      border-bottom: 1px solid #ddd;
+    }
+
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .navbar-nav .nav-link {
+      color: #007bff;
+      font-weight: 500;
+    }
+
+    .navbar-nav .nav-link.active {
+      color: #0056b3;
+    }
+
+    .container {
+      flex: 1;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-top: 20px;
+    }
+
+    .info p {
+      margin: 10px 0;
+    }
+
+    .info .btn {
+      margin-top: 10px;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      border-top: 1px solid #ddd;
+    }
+
+    .footer a {
+      color: #007bff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    .reservation-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    .reservation-table th, .reservation-table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    .reservation-table th {
+      background-color: #f2f2f2;
+    }
+
+    .mb-3 label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    .mb-3 input, .mb-3 textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    .btn-primary {
+      background-color: #007bff;
+      border-color: #007bff;
+      padding: 10px 20px;
+      border-radius: 5px;
+    }
+
+    .btn-primary:hover {
+      background-color: #0056b3;
+      border-color: #004085;
+    }
+  </style>
 </head>
 <body>
+<!-- Navigation-->
+<nav class="navbar navbar-expand-lg navbar-light">
+  <div class="container px-4 px-lg-5">
+    <a class="navbar-brand" href="#!">YuhanTrip</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+        <li class="nav-item"><a class="nav-link active" aria-current="page" href="/home/homepage">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
+             data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li><a class="dropdown-item" href="#!">All Products</a></li>
+            <li><hr class="dropdown-divider"/></li>
+            <li><a class="dropdown-item" href="#!">Popular Items</a></li>
+            <li><a class="dropdown-item" href="#!">New Arrivals</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
 
-<h1>결제 취소</h1>
+<!-- Main Content-->
+<div class="container">
+  <h1 class="text-center">결제 취소</h1>
+  <!-- 예약 내역을 보여주는 부분 -->
+  <div>
+    <h2>예약 내역</h2>
+    <table class="reservation-table">
+      <tr>
+        <th>숙소 이름</th>
+        <td><span th:text="${reservationDTO.accommodationTitle}"></span></td>
+        <th>객실 이름</th>
+        <td><span th:text="${reservationDTO.roomNm}"></span></td>
+      </tr>
+      <tr>
+        <th>체크인 날짜</th>
+        <td><span th:text="${reservationDTO.checkInDate}"></span></td>
+        <th>체크아웃 날짜</th>
+        <td><span th:text="${reservationDTO.checkOutDate}"></span></td>
+      </tr>
+      <tr>
+        <th>예약 날짜</th>
+        <td><span th:text="${reservationDTO.reservationDate}"></span></td>
+        <th>객실 타입</th>
+        <td><span th:text="${reservationDTO.roomType}"></span></td>
+      </tr>
+      <tr>
+        <th>예약자 이름</th>
+        <td><span th:text="${reservationDTO.name}"></span></td>
+        <th>고객 전화번호</th>
+        <td><span th:text="${reservationDTO.phoneNumber}"></span></td>
+      </tr>
+      <tr>
+        <th>예약 금액</th>
+        <td><span th:text="${reservationDTO.price}"></span></td>
+        <th>숙박 인원수</th>
+        <td><span th:text="${reservationDTO.numberOfGuests}"></span></td>
+      </tr>
+    </table>
+  </div>
 
-<!-- 예약 내역을 보여주는 부분 -->
-<div>
-  <h2>예약 내역</h2>
-  <p>객실 이름: <span th:text="${reservationDTO.roomNm}"></span></p>
-  <p>객실 타입: <span th:text="${reservationDTO.roomType}"></span></p>
-  <p>체크인 날짜: <span th:text="${reservationDTO.checkInDate}"></span></p>
-  <p>체크아웃 날짜: <span th:text="${reservationDTO.checkOutDate}"></span></p>
-  <p>예약 날짜: <span th:text="${reservationDTO.reservationDate}"></span></p>
-  <p>숙소 이름: <span th:text="${reservationDTO.accommodationTitle}"></span></p>
-  <p>예약자 이름: <span th:text="${reservationDTO.name}"></span></p>
-  <p>고객 전화번호: <span th:text="${reservationDTO.phoneNumber}"></span></p>
-  <p>예약 금액: <span th:text="${reservationDTO.price}"></span></p>
-  <p>숙박 인원수: <span th:text="${reservationDTO.numberOfGuests}"></span></p>
+  <!-- 결제 취소 폼 -->
+  <form id="cancelForm">
+    <input type="hidden" id="paymentUid" name="paymentUid" th:value="${paymentCancelDTO.paymentUid}">
+    <input type="hidden" id="cancelRequestAmount" name="cancelRequestAmount" th:value="${paymentCancelDTO.cancelRequestAmount}">
+    <input type="hidden" id="reservationId" name="reservationId" th:value="${paymentCancelDTO.reservationId}">
+
+    <div class="mb-3">
+      <label for="reason" class="form-label">예약 취소 사유</label>
+      <textarea class="form-control" id="reason" name="reason" rows="4" placeholder="취소 사유를 입력하세요"></textarea>
+    </div>
+    <button type="button" class="btn btn-primary" onclick="cancelPay()">환불 및 예약 취소</button>
+  </form>
 </div>
+<!-- Footer -->
+<footer class="footer">
+  <p>© 2023 YuhanTrip. All Rights Reserved.</p>
+</footer>
 
-<!-- 결제 취소 폼 -->
-<form id="cancelForm">
-  <input type="hidden" id="paymentUid" name="paymentUid" th:value="${paymentCancelDTO.paymentUid}">
-  <input type="hidden" id="cancelRequestAmount" name="cancelRequestAmount" th:value="${paymentCancelDTO.cancelRequestAmount}">
-  <input type="hidden" id="reservationId" name="reservationId" th:value="${paymentCancelDTO.reservationId}">
-
-  <label for="reason">취소 사유:</label><br>
-  <input type="text" id="reason" name="reason"><br>
-  <button type="button" onclick="cancelPay()">환불 및 예약 취소</button>
-</form>
-
+<!-- jQuery, Popper.js, and Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+<!-- Core theme JS-->
+<script src="js/scripts.js"></script>
 <script>
   function cancelPay() {
     const paymentUid = $('#paymentUid').val();
@@ -62,15 +263,14 @@
       data: JSON.stringify(cancelDTO),
       success: function(response) {
         alert('결제 취소 요청이 성공적으로 처리되었습니다.');
-        // 추가적인 성공 처리 로직
+        window.location.href = '/reservationConfirm/cancel'; // 결제 취소 성공 시 이동할 페이지
       },
       error: function(xhr, status, error) {
         alert('결제 취소 요청에 실패했습니다. 다시 시도해 주세요.');
-        // 추가적인 오류 처리 로직
+        window.location.href = '/reservationConfirm'; // 결제 취소 실패 시 이동할 페이지
       }
     });
   }
 </script>
-
 </body>
 </html>
