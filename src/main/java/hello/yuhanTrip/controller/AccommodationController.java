@@ -1,21 +1,27 @@
 package hello.yuhanTrip.controller;
 
 import hello.yuhanTrip.domain.Accommodation;
+import hello.yuhanTrip.domain.Member;
 import hello.yuhanTrip.domain.RegionCode;
 import hello.yuhanTrip.domain.Room;
+import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.service.Accomodation.AccommodationService;
+import hello.yuhanTrip.service.MemberLikeService;
+import hello.yuhanTrip.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @Controller
@@ -25,6 +31,9 @@ import java.util.List;
 public class AccommodationController {
 
     private final AccommodationService accommodationService;
+    private final TokenProvider tokenProvider;
+    private final MemberService memberService;
+    private final MemberLikeService memberLikeService;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -207,16 +216,31 @@ public class AccommodationController {
     }
 
 
-    // 날짜 포맷 예외 처리
-    @ControllerAdvice
-    public static class GlobalExceptionHandler {
-
-        @ExceptionHandler(DateTimeParseException.class)
-        @ResponseStatus(HttpStatus.BAD_REQUEST)
-        public String handleDateTimeParseException(DateTimeParseException ex, Model model) {
-            log.error("날짜 포맷 오류 발생: {}", ex.getMessage());
-            model.addAttribute("errorMessage", "잘못된 날짜 포맷입니다. 날짜 형식은 dd. MM. yy 여야 합니다.");
-            return "error"; // 또는 적절한 오류 페이지로 리다이렉트
+    @GetMapping("/memberLikeHistory")
+    public String memberLikeHistory(
+            @CookieValue(value = "accessToken", required = false) String accessToken,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "2") int size,
+            Model model
+    ) {
+        // 인증 확인
+        if (accessToken == null || !tokenProvider.validate(accessToken)) {
+            return "redirect:/member/login"; // 로그인 페이지로 리다이렉트
         }
+
+        Authentication authentication = tokenProvider.getAuthentication(accessToken);
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        Member member = memberService.findByEmail(userDetails.getUsername());
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Accommodation> likesByMember = memberLikeService.getLikesByMember(member, pageable);
+
+        model.addAttribute("likesByMember", likesByMember);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", likesByMember.getTotalPages());
+
+        return "likesByMember";
     }
+
+
 }

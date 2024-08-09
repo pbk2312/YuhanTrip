@@ -63,10 +63,6 @@
             padding: 1rem;
         }
 
-        .action-button:hover {
-            color: #f0f8ff;
-            background-color: rgba(0, 0, 0, 0.8);
-        }
 
         .pagination {
             justify-content: center;
@@ -164,19 +160,6 @@
     });
 </script>
 <style>
-    .error-message {
-        position: absolute;
-        background: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-        border-radius: 0.25rem;
-        padding: 0.5rem;
-        margin-top: 0.5rem;
-        font-size: 0.875em;
-        z-index: 1000;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-
 
 
     .form-group {
@@ -185,12 +168,11 @@
 </style>
 
 
-
 <body>
 <!-- Navigation-->
 <nav class="navbar navbar-expand-lg navbar-light">
     <div class="container px-4 px-lg-5">
-        <a class="navbar-brand" href="#!">YuhanTrip</a>
+        <a class="navbar-brand" href="/home/homepage">YuhanTrip</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -200,10 +182,11 @@
                 <li class="nav-item"><a class="nav-link active" aria-current="page" href="/home/homepage">Home</a></li>
                 <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="/accommodation/accommodations"
+                       role="button"
                        data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="#!">All Products</a></li>
+                        <li><a class="dropdown-item" href="/accommodation/accommodations">All Products</a></li>
                         <li>
                             <hr class="dropdown-divider"/>
                         </li>
@@ -266,7 +249,8 @@
 
                 <div class="form-group">
                     <label for="numGuests">숙박 인원수</label>
-                    <input type="number" id="numGuests" name="numGuests" class="form-control" min="1" max="10" th:value="${numGuests != null ? numGuests : 1}">
+                    <input type="number" id="numGuests" name="numGuests" class="form-control" min="1" max="10"
+                           th:value="${numGuests != null ? numGuests : 1}">
                 </div>
 
 
@@ -274,23 +258,31 @@
             </form>
 
 
+
+
+
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-4">
                 <!-- Accommodations cards -->
                 <div class="col" th:each="accommodation : ${accommodations}">
-                    <a th:href="@{${'/accommodation/info?id=' + accommodation.id +
-            (checkin != null ? '&checkin=' + checkin : '') +
-            (checkout != null ? '&checkout=' + checkout : '') +
-            (numGuests != null ? '&numGuests=' + numGuests : '')}}"
-                       class="text-decoration-none text-dark">
-                        <div class="card">
+                    <div class="card">
+                        <a th:href="@{${'/accommodation/info?id=' + accommodation.id +
+                (checkin != null ? '&checkin=' + checkin : '') +
+                (checkout != null ? '&checkout=' + checkout : '') +
+                (numGuests != null ? '&numGuests=' + numGuests : '')}}"
+                           class="text-decoration-none text-dark">
                             <img th:src="${accommodation.firstimage != '' ? accommodation.firstimage : '/Noimage.png'}"
                                  class="card-img-top" alt="이미지">
                             <div class="card-body">
                                 <h5 class="card-title" th:text="${accommodation.title}">숙소 이름</h5>
                                 <p class="card-text" th:text="${accommodation.addr1}">주소</p>
                             </div>
+                        </a>
+                        <div class="card-footer">
+                            <button class="btn btn-outline-danger btn-sm like-button" th:data-id="${accommodation.id}">
+                                <i class="bi bi-heart"></i>
+                            </button>
                         </div>
-                    </a>
+                    </div>
                 </div>
             </div>
 
@@ -343,7 +335,7 @@
             </nav>
 
         </div>
-    </section>
+</section>
 </div>
 
 <!-- jQuery, Popper.js, and Bootstrap JS -->
@@ -414,6 +406,80 @@
     function deleteAccessToken() {
         localStorage.removeItem('accessToken');
     }
+
+
+
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const likeButtons = document.querySelectorAll('.like-button');
+
+        likeButtons.forEach(button => {
+            button.addEventListener('click', event => {
+                event.preventDefault();
+                event.stopPropagation();
+
+                const accommodationId = button.getAttribute('data-id');
+                const icon = button.querySelector('i');
+                const isLiked = icon.classList.contains('bi-heart-fill');
+                const action = isLiked ? 'remove' : 'add';
+
+                fetch(`/api/likes/${action}?accommodationId=${encodeURIComponent(accommodationId)}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                    },
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok.');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // 하트 아이콘을 토글
+                            icon.classList.toggle('bi-heart-fill', !isLiked);
+                            icon.classList.toggle('bi-heart', isLiked);
+                        } else {
+                            alert(data.message || '좋아요 요청이 실패했습니다. 다시 시도해 주세요.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('로그인 후 이용해주세요');
+                    });
+            });
+        });
+
+        // 좋아요 상태 확인
+        likeButtons.forEach(button => {
+            const accommodationId = button.getAttribute('data-id');
+            fetch(`/api/likes/status?accommodationId=${encodeURIComponent(accommodationId)}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const icon = button.querySelector('i');
+                        icon.classList.toggle('bi-heart-fill', data.isLiked);
+                        icon.classList.toggle('bi-heart', !data.isLiked);
+                    } else {
+                        console.error(data.message || '좋아요 상태 확인에 실패했습니다.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('좋아요 상태 확인에 실패했습니다. 다시 시도해 주세요.');
+                });
+        });
+    });
+
+
 </script>
 
 </body>

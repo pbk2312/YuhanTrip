@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toggle Like Test</title>
+  <script>
+    async function toggleLike() {
+      const accommodationId = document.getElementById('accommodationId').value;
+      const accessToken = document.getElementById('accessToken').value;
+
+      if (!accommodationId || !accessToken) {
+        alert('Please provide both Accommodation ID and Access Token.');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/likes/toggle?' + new URLSearchParams({
+          accommodationId: accommodationId
+        }), {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Cookie': 'accessToken=' + accessToken
+          }
+        });
+
+        const result = await response.text();
+        if (response.ok) {
+          alert('Success: ' + result);
+        } else {
+          alert('Error: ' + result);
+        }
+      } catch (error) {
+        alert('An error occurred: ' + error);
+      }
+    }
+  </script>
+</head>
+<body>
+<h1>Toggle Like Test</h1>
+<div>
+  <label for="accommodationId">Accommodation ID:</label>
+  <input type="number" id="accommodationId" name="accommodationId">
+</div>
+<div>
+  <label for="accessToken">Access Token:</label>
+  <input type="text" id="accessToken" name="accessToken">
+</div>
+<button onclick="toggleLike()">Toggle Like</button>
+</body>
+</html>

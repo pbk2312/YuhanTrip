@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Like {
+public class MemberLike {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

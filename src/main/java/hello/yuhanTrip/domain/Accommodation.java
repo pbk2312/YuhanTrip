@@ -44,5 +44,9 @@ public class Accommodation {
     @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Room> rooms;      // 객실 리스트
 
+
+    @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberLike> memberLikes; // 추가된 부분
+
 }
 

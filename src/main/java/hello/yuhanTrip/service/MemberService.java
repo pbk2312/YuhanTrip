@@ -26,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Random;
 
 @Service
@@ -42,6 +43,7 @@ public class MemberService {
     private final ResetTokenRepository resetTokenReposiotry;
     private final EmailProvider emailProvider;
 
+    
     public String register(MemberRequestDTO memberRequestDTO) {
         String email = memberRequestDTO.getEmail();
         String password = memberRequestDTO.getPassword();

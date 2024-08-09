@@ -22,56 +22,68 @@
             color: #333;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+
         .navbar {
             background: rgba(255, 255, 255, 0.9);
             border-bottom: 1px solid #ccc;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+
         .navbar-brand {
             font-size: 1.75rem;
             font-weight: bold;
             color: #333;
         }
+
         .navbar-nav .nav-link {
             color: #333;
             font-weight: 500;
             margin-right: 20px;
             transition: color 0.3s;
         }
+
         .navbar-nav .nav-link.active {
             color: #0056b3;
         }
+
         .navbar-nav .nav-link:hover {
             color: #007bff;
         }
+
         .card {
             border-radius: 5px;
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             margin-bottom: 15px;
         }
+
         .card-img-top {
             height: 400px;
             object-fit: cover;
         }
+
         .card-body {
             text-align: center;
             padding: 20px;
             background-color: #fff;
         }
+
         .card-title {
             font-size: 2rem;
             font-weight: bold;
             color: #007bff;
         }
+
         .info-container {
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
+
         .details {
             margin-bottom: 40px;
         }
+
         .details h2 {
             font-size: 1.75rem;
             color: #343a40;
@@ -79,18 +91,22 @@
             padding-bottom: 10px;
             margin-bottom: 20px;
         }
+
         .details p {
             font-size: 1.125rem;
             margin-bottom: 15px;
         }
+
         .details strong {
             color: #343a40;
         }
+
         .price-card h3 {
             font-size: 2.5rem;
             font-weight: bold;
             margin: 0;
         }
+
         .map-button, .reservation-button {
             display: inline-flex;
             align-items: center;
@@ -104,21 +120,26 @@
             text-decoration: none;
             transition: background-color 0.3s, transform 0.3s;
         }
+
         .map-button:hover, .reservation-button:hover {
             background-color: #0056b3;
             transform: scale(1.05);
         }
+
         .map-button i, .reservation-button i {
             margin-right: 8px;
         }
+
         footer {
             background-color: #343a40;
             color: #fff;
             padding: 20px 0;
         }
+
         footer p {
             margin: 0;
         }
+
         .info-container {
             display: flex;
             flex-direction: column;
@@ -128,6 +149,7 @@
             border-radius: 8px; /* Optional: add rounded corners */
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: add shadow for depth */
         }
+
         .details {
             background-color: #fff; /* Add background color */
             padding: 20px; /* Add padding for content spacing */
@@ -135,6 +157,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: add shadow for depth */
             margin-bottom: 40px; /* Existing margin */
         }
+
         .room-card {
             display: flex;
             flex-wrap: wrap;
@@ -146,6 +169,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             background-color: #fff;
         }
+
         .room-img {
             width: 150px;
             height: 150px;
@@ -153,24 +177,28 @@
             border-radius: 8px;
             margin-right: 16px;
         }
+
         .room-details {
             flex: 1;
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
         }
+
         .room-details p {
             flex: 1 1 45%;
             margin: 4px 0;
             font-size: 1rem;
             color: #555;
         }
+
         .room-details h3 {
             flex: 1 1 100%;
             font-size: 1.5rem;
             margin-bottom: 8px;
             color: #007bff;
         }
+
         .login-message {
             display: none;
             background-color: #f8d7da;
@@ -181,6 +209,7 @@
             border-radius: 5px;
             font-size: 0.875rem;
         }
+
         .login-message.show {
             display: block;
         }
@@ -223,7 +252,7 @@
 <!-- Navigation-->
 <nav class="navbar navbar-expand-lg navbar-light">
     <div class="container px-4 px-lg-5">
-        <a class="navbar-brand" href="#!">YuhanTrip</a>
+        <a class="navbar-brand" href="/home/homepage">YuhanTrip</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -236,7 +265,7 @@
                     <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
                        data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="#!">All Products</a></li>
+                        <li><a class="dropdown-item" href="/accommodation/accommodations">All Products</a></li>
                         <li>
                             <hr class="dropdown-divider"/>
                         </li>
@@ -263,7 +292,8 @@
         <div class="container">
             <!-- 숙소의 이미지와 제목 -->
             <div class="card mb-4">
-                <img th:src="@{${accommodation.firstimage}}" class="card-img-top" alt="숙소 이미지">
+                <img th:src="${accommodation.firstimage != '' ? accommodation.firstimage : '/Noimage.png'}"
+                     class="card-img-top" alt="이미지">
                 <div class="card-body">
                     <h1 class="card-title" th:text="${accommodation.title}">숙소 제목</h1>
                 </div>
@@ -284,12 +314,12 @@
 
                 <div class="form-group">
                     <label for="numGuests">숙박 인원수</label>
-                    <input type="number" id="numGuests" name="numGuests" class="form-control" min="1" max="10" th:value="${numGuests != null ? numGuests : 1}">
+                    <input type="number" id="numGuests" name="numGuests" class="form-control" min="1" max="10"
+                           th:value="${numGuests != null ? numGuests : 1}">
                 </div>
                 <!-- 검색 버튼 -->
                 <button type="submit" class="btn btn-primary mt-2">검색</button>
             </form>
-
 
 
             <!-- 상세 정보 섹션 -->
@@ -306,12 +336,15 @@
                                 <div class="room-details">
                                     <h3 th:text="${room.roomNm}">객실 이름</h3>
                                     <p><strong>타입:</strong> <span th:text="${room.roomType}">객실 타입</span></p>
-                                    <p><strong>최대 수용 인원:</strong> <span th:text="${room.maxOccupancy}">최대 수용 인원</span></p>
+                                    <p><strong>최대 수용 인원:</strong> <span th:text="${room.maxOccupancy}">최대 수용 인원</span>
+                                    </p>
                                     <p><strong>면적:</strong> <span th:text="${room.roomArea}">객실 면적</span>㎡</p>
                                     <p><strong>가격:</strong> <span th:text="${room.getPriceAsLong()}">가격</span>원</p>
                                     <p><strong>편의시설:</strong> <span th:text="${room.amenities}">편의시설</span></p>
-                                    <p><strong>흡연 가능 여부:</strong> <span th:text="${room.smokingYn ? '예' : '아니오'}">흡연 가능 여부</span></p>
-                                    <p><strong>조식 포함 여부:</strong> <span th:text="${room.breakfastInclYn ? '예' : '아니오'}">조식 포함 여부</span></p>
+                                    <p><strong>흡연 가능 여부:</strong> <span th:text="${room.smokingYn ? '예' : '아니오'}">흡연 가능 여부</span>
+                                    </p>
+                                    <p><strong>조식 포함 여부:</strong> <span th:text="${room.breakfastInclYn ? '예' : '아니오'}">조식 포함 여부</span>
+                                    </p>
                                     <p><strong>체크인 시간:</strong> <span th:text="${room.checkInTime}">체크인 시간</span></p>
                                     <p><strong>체크아웃 시간:</strong> <span th:text="${room.checkOutTime}">체크아웃 시간</span></p>
                                     <p><strong>객실 소개:</strong> <span th:text="${room.roomIntr}">객실 소개</span></p>
@@ -332,7 +365,6 @@
                         <p>선택하신 날짜에 예약 가능한 객실이 없습니다.</p>
                     </div>
                 </div>
-
 
 
                 <!-- 숙소의 상세 정보 -->
