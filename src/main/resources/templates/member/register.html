@@ -20,7 +20,7 @@
                 <div class="row justify-content-center">
                     <div class="col-lg-7">
                         <div class="card shadow-lg border-0 rounded-lg mt-5">
-                            <div class="card-header"><h3 class="text-center font-weight-light my-4">Create Account</h3>
+                            <div class="card-header"><h3 class="text-center font-weight-light my-4">회원가입</h3>
                             </div>
                             <div class="card-body">
                                 <form th:action="@{/member/register}" th:object="${memberRequestDTO}" method="post">
@@ -30,13 +30,13 @@
                                                 <input class="form-control" id="inputEmail" type="email"
                                                        th:field="*{email}"
                                                        placeholder="name@example.com" required/>
-                                                <label for="inputEmail">Email address</label>
+                                                <label for="inputEmail">이메일 주소</label>
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-floating mb-3">
                                                 <button id="sendVerificationEmailButton" class="btn btn-primary"
-                                                        type="button">Send Verification Email
+                                                        type="button">이메일 인증번호 전송
                                                 </button>
                                             </div>
                                         </div>
@@ -54,22 +54,52 @@
                                             인증번호 확인
                                         </button>
                                     </div>
+                                    <!-- 이름 입력란 -->
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="inputName" type="text"
+                                               th:field="*{name}" placeholder="Enter your name" required/>
+                                        <label for="inputName">이름</label>
+                                    </div>
+                                    <!-- 닉네임 입력란 -->
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="inputNickname" type="text"
+                                               th:field="*{nickname}" placeholder="Enter your nickname" required/>
+                                        <label for="inputNickname">닉네임</label>
+                                    </div>
+                                    <!-- 전화번호 입력란 -->
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="inputPhoneNumber" type="text"
+                                               th:field="*{phoneNumber}" placeholder="Enter your phone number" required/>
+                                        <label for="inputPhoneNumber">전화번호</label>
+                                    </div>
+                                    <!-- 주소 입력란 -->
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="inputAddress" type="text"
+                                               th:field="*{address}" placeholder="Enter your address" required/>
+                                        <label for="inputAddress">주소</label>
+                                    </div>
+                                    <!-- 생년월일 입력란 -->
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="inputDateOfBirth" type="date"
+                                               th:field="*{dateOfBirth}" placeholder="Enter your date of birth" required/>
+                                        <label for="inputDateOfBirth">생년월일</label>
+                                    </div>
                                     <div class="form-floating mb-3">
                                         <input class="form-control" id="inputPassword" type="password"
                                                th:field="*{password}" placeholder="Create a password" required/>
-                                        <label for="inputPassword">Password</label>
+                                        <label for="inputPassword">비밀번호</label>
                                     </div>
                                     <!-- 추가: 비밀번호 확인란 -->
                                     <div class="form-floating mb-3">
                                         <input class="form-control" id="inputCheckPassword" type="password"
                                                th:field="*{checkPassword}" placeholder="Confirm your password"
                                                required/>
-                                        <label for="inputCheckPassword">Confirm Password</label>
+                                        <label for="inputCheckPassword">비밀번호 확인</label>
                                     </div>
                                     <!-- 추가: 회원가입 버튼 -->
                                     <div class="mt-4 mb-0">
                                         <div class="d-grid">
-                                            <button class="btn btn-primary btn-block" type="submit">Create Account
+                                            <button class="btn btn-primary btn-block" type="submit">가입하기
                                             </button>
                                         </div>
                                     </div>

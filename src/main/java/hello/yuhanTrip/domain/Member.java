@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -27,6 +28,13 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private MemberRole memberRole;
 
+
+    // 추가된 필드들
+    private String name;
+    private String nickname;  // 닉네임 필드 추가
+    private String phoneNumber;
+    private String address;
+    private LocalDate dateOfBirth;  // 생일 필드를 LocalDate로 수정
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reservation> reservations;

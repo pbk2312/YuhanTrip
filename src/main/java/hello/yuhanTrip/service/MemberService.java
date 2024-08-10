@@ -26,7 +26,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Random;
 
 @Service
@@ -43,7 +42,7 @@ public class MemberService {
     private final ResetTokenRepository resetTokenReposiotry;
     private final EmailProvider emailProvider;
 
-    
+
     public String register(MemberRequestDTO memberRequestDTO) {
         String email = memberRequestDTO.getEmail();
         String password = memberRequestDTO.getPassword();
@@ -106,13 +105,13 @@ public class MemberService {
     }
 
     @Transactional
-    public String logout(LogoutDTO logoutDTO) {
+    public void logout(LogoutDTO logoutDTO) {
 
         String email = logoutDTO.getEmail();
         refreshTokenRepository.deleteByEmail(email);
 
-        return "로그아웃 되었습니다.";
     }
+
 
     public String sendPasswordResetEmail(EmailRequestDTO emailRequestDTO) {
 
@@ -142,7 +141,7 @@ public class MemberService {
 
     // 비밀번호 재설정
     @Transactional
-    public String memberChangePassword(MemberChangePasswordDTO memberChangePasswordDTO) {
+    public void memberChangePassword(MemberChangePasswordDTO memberChangePasswordDTO) {
         String email = memberChangePasswordDTO.getEmail();
         String password = memberChangePasswordDTO.getPassword();
         String checkPassword = memberChangePasswordDTO.getCheckPassword();
@@ -161,8 +160,6 @@ public class MemberService {
         memberRepository.updatePasswordByEmail(email, hashedPassword);
 
         log.info("성공적으로 DB에 반영");
-
-        return "비밀번호 변경이 완료되었습니다.";
     }
 
     @Transactional
@@ -184,11 +181,13 @@ public class MemberService {
 
     }
 
+
+
     // 회원 찾기
     public Member findByEmail(String email) {
-        Member member = memberRepository.findByEmail(email)
+        return memberRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user"));
-        return member;
+
     }
 
 

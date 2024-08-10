@@ -4,12 +4,12 @@ package hello.yuhanTrip.controller;
 import hello.yuhanTrip.domain.*;
 import hello.yuhanTrip.dto.ReservationDTO;
 import hello.yuhanTrip.dto.ReservationUpdateDTO;
+import hello.yuhanTrip.exception.UnauthorizedException;
 import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.repository.PaymentRepository;
 import hello.yuhanTrip.service.Accomodation.AccommodationService;
 import hello.yuhanTrip.service.Accomodation.ReservationService;
 import hello.yuhanTrip.service.MemberService;
-import hello.yuhanTrip.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -47,14 +47,8 @@ public class ReservationController {
             @RequestParam(value = "checkout", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkout,
             @CookieValue(value = "accessToken", required = false) String accessToken) {
 
-        if (accessToken == null || !tokenProvider.validate(accessToken)) {
-            return "redirect:/member/login";
-        }
 
-        Authentication authentication = tokenProvider.getAuthentication(accessToken);
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        log.info("예약 시도 유저 : {}", userDetails.getUsername());
-
+        Member member = getUserDetails(accessToken);
 
         Room room = accommodationService.getRoomInfo(roomId);
         log.info("객실 이름 : {} ", room.getRoomType());
@@ -71,12 +65,14 @@ public class ReservationController {
         reservationDTO.setLocalDate(LocalDate.now());
         reservationDTO.setCheckInDate(checkin);
         reservationDTO.setCheckOutDate(checkout);
+        reservationDTO.setName(member.getName());
+        reservationDTO.setAddr(member.getAddress());
+        reservationDTO.setPhoneNumber(member.getPhoneNumber());
 
 
         model.addAttribute("reservation", reservationDTO);
-        return "reservation";
+        return "/reservation/reservation";
     }
-
 
     @GetMapping("/reservation/fail")
     public String reservationFailAndGoHome(
@@ -88,15 +84,16 @@ public class ReservationController {
         } catch (RuntimeException e) {
             // 예약이 없을 경우 사용자에게 오류 메시지를 보여줍니다.
             model.addAttribute("errorMessage", "예약 정보가 없습니다.");
-            return "accommodations"; // 오류 페이지로 이동 (적절한 오류 페이지를 설정)
+            return "/accommodation/accommodations"; // 오류 페이지로 이동 (적절한 오류 페이지를 설정)
         } catch (Exception e) {
             // 기타 예외 처리
             model.addAttribute("errorMessage", "예약 삭제 중 오류가 발생했습니다.");
-            return "accommodations"; // 오류 페이지로 이동
+            return "/accommodation/accommodations"; // 오류 페이지로 이동
         }
 
         return "redirect:/home/homepage";
     }
+
 
 
     @PostMapping("/reservation/submit")
@@ -106,20 +103,10 @@ public class ReservationController {
     ) {
         log.info("예약 요청을 처리합니다...");
 
-
         log.info("Received ReservationDTO: {}", reservationDTO);
         log.info("Room ID from DTO: {}", reservationDTO.getRoomId());
 
-        // 인증 확인
-        if (accessToken == null || !tokenProvider.validate(accessToken)) {
-            log.info("사용자가 인증되지 않았습니다.");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "유저를 찾을 수 없습니다."));
-        }
-
-        Authentication authentication = tokenProvider.getAuthentication(accessToken);
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        log.info("예약 시도 유저: {}", userDetails.getUsername());
+        Member member = getUserDetails(accessToken);
 
         try {
             // 객실 정보 조회
@@ -130,24 +117,8 @@ public class ReservationController {
                         .body(Map.of("message", "숙소를 찾을 수 없습니다."));
             }
 
-            // 체크인 및 체크아웃 날짜 검증
-            LocalDate today = LocalDate.now();
-            if (reservationDTO.getCheckInDate().isBefore(today)) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(Map.of("message", "체크인 날짜는 오늘보다 이전일 수 없습니다."));
-            }
-
-            if (reservationDTO.getCheckOutDate().isBefore(reservationDTO.getCheckInDate()) ||
-                    reservationDTO.getCheckOutDate().isEqual(reservationDTO.getCheckInDate())) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(Map.of("message", "체크아웃 날짜는 체크인 날짜보다 이후여야 합니다."));
-            }
-
-            if (reservationDTO.getNumberOfGuests() > room.getMaxOccupancy()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(Map.of("message", "숙박 인원 수가 방 최대 수용 인원수 보다 많습니다"));
-            }
-
+            // 체크인 및 체크아웃 날짜 검증 (서비스에서 처리)
+            reservationService.validateReservationDates(reservationDTO, room);
 
             // 기존 예약 확인
             boolean dateOverlapping = reservationService.isDateOverlapping(
@@ -170,7 +141,6 @@ public class ReservationController {
             Payment savedPayment = paymentRepository.save(payment); // Payment 저장
 
             // 사용자 정보 및 예약 저장
-            Member member = memberService.findByEmail(userDetails.getUsername());
             Reservation reservation = Reservation.builder()
                     .addr(reservationDTO.getAddr())
                     .reservationUid(UUID.randomUUID().toString()) // 예약번호 생성 및 설정
@@ -178,7 +148,7 @@ public class ReservationController {
                     .room(room)
                     .checkInDate(reservationDTO.getCheckInDate())
                     .checkOutDate(reservationDTO.getCheckOutDate())
-                    .reservationDate(today)
+                    .reservationDate(LocalDate.now())
                     .specialRequests(reservationDTO.getSpecialRequests())
                     .name(reservationDTO.getName())
                     .phoneNumber(reservationDTO.getPhoneNumber())
@@ -199,6 +169,10 @@ public class ReservationController {
 
             return ResponseEntity.ok(response);
 
+        } catch (IllegalArgumentException e) {
+            log.error("예약 처리 중 검증 오류 발생: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", e.getMessage()));
         } catch (Exception e) {
             log.error("예약 처리 중 오류 발생: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -212,16 +186,10 @@ public class ReservationController {
             Model model
     ) {
 
-        // 인증 확인
-        if (accessToken == null || !tokenProvider.validate(accessToken)) {
-            return "redirect:/member/login"; // 로그인 페이지로 리다이렉트
-        }
 
-        Authentication authentication = tokenProvider.getAuthentication(accessToken);
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        log.info("예약 확정 확인 유저 : {}", userDetails.getUsername());
+        Member member = getUserDetails(accessToken);
+        log.info("예약 확정 확인 유저 : {}", member.getName());
 
-        Member member = memberService.findByEmail(userDetails.getUsername());
 
         List<Reservation> reservations = member.getReservations();
 
@@ -229,7 +197,7 @@ public class ReservationController {
         model.addAttribute("reservations", reservations);
 
 
-        return "reservationConfirms";
+        return "/reservation/reservationConfirms";
     }
 
 
@@ -239,21 +207,14 @@ public class ReservationController {
             @RequestParam("reservationId") Long id,
             Model model
     ) {
-        // 인증 확인
-        if (accessToken == null || !tokenProvider.validate(accessToken)) {
-            return "redirect:/member/login"; // 로그인 페이지로 리다이렉트
-        }
 
-        Authentication authentication = tokenProvider.getAuthentication(accessToken);
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        log.info("예약 수정 유저 : {}", userDetails.getUsername());
-        log.info("예약 수정 번호 : {}", id);
+        Member member = getUserDetails(accessToken);
 
         // 예약 정보 조회
         Reservation reservation = reservationService.findReservation(id);
 
         // 예약의 소유자와 로그인한 유저 비교
-        if (!reservation.getMember().getEmail().equals(userDetails.getUsername())) {
+        if (!reservation.getMember().getEmail().equals(member.getName())) {
             // 유저가 예약의 소유자가 아니면 접근 거부 처리
             return "redirect:/accessDenied"; // 접근 거부 페이지로 리다이렉트
         }
@@ -261,7 +222,7 @@ public class ReservationController {
         // 예약 정보 모델에 추가
         model.addAttribute("reservationInfo", reservation);
 
-        return "reservationUpdate";
+        return "/reservation/reservationUpdate";
     }
 
 
@@ -270,16 +231,14 @@ public class ReservationController {
             @RequestBody ReservationUpdateDTO reservationUpdateDTO,
             @CookieValue(value = "accessToken", required = false) String accessToken
     ) {
+
+        Member member = getUserDetails(accessToken);
+
+
         log.info("예약 수정 : {}", reservationUpdateDTO);
         Reservation reservation = reservationService.findReservation(reservationUpdateDTO.getId());
-        // 인증 확인
-        if (accessToken == null || !tokenProvider.validate(accessToken)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "로그인이 필요합니다."));
-        }
 
-        Authentication authentication = tokenProvider.getAuthentication(accessToken);
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
 
         try {
             // 체크인 및 체크아웃 날짜 검증
@@ -308,7 +267,7 @@ public class ReservationController {
             }
 
             log.info("예약 수정 시도...");
-            reservationService.updateReservation(reservationUpdateDTO, userDetails.getUsername());
+            reservationService.updateReservation(reservationUpdateDTO, member.getName());
 
             // 성공 응답
             return ResponseEntity.ok(Map.of("message", "예약이 성공적으로 수정되었습니다."));
@@ -328,16 +287,8 @@ public class ReservationController {
             Model model
     ) {
 
-        // 인증 확인
-        if (accessToken == null || !tokenProvider.validate(accessToken)) {
-            return "redirect:/member/login"; // 로그인 페이지로 리다이렉트
-        }
+        Member member = getUserDetails(accessToken);
 
-        Authentication authentication = tokenProvider.getAuthentication(accessToken);
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        log.info("예약 확정 확인 유저 : {}", userDetails.getUsername());
-
-        Member member = memberService.findByEmail(userDetails.getUsername());
 
 
         List<CancelReservation> cancelReservations = member.getCancelReservations();
@@ -346,13 +297,8 @@ public class ReservationController {
         model.addAttribute("cancelReservations", cancelReservations);
 
 
-        return "reservationCancelConfirm";
+        return "/reservation/reservationCancelConfirm";
     }
-
-
-
-
-
 
 
     @GetMapping("/fail-payment")
@@ -361,5 +307,17 @@ public class ReservationController {
     }
 
 
+
+    public Member getUserDetails(String accessToken) {
+        if (accessToken == null || !tokenProvider.validate(accessToken)) {
+            throw new UnauthorizedException("인증되지 않은 사용자입니다.");
+        }
+
+        Authentication authentication = tokenProvider.getAuthentication(accessToken);
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        log.info("예약 시도 유저 : {}", userDetails.getUsername());
+
+        return memberService.findByEmail(userDetails.getUsername());
+    }
 
 }

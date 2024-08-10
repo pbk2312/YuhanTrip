@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마이페이지 확인</title>
+    <link rel="stylesheet" href="/css/style.css"> <!-- 스타일시트 링크 (선택적) -->
+</head>
+<body>
+<header>
+    <h1>마이페이지</h1>
+</header>
+
+<main>
+    <h2>회원 정보 확인</h2>
+
+    <form id="checkPasswordForm">
+        <label for="password">비밀번호:</label>
+        <input type="password" id="password" name="password" required>
+        <button type="submit">비밀번호 확인</button>
+    </form>
+
+    <!-- 비밀번호 확인 결과를 사용자에게 보여줄 수 있는 공간 -->
+    <div id="message"></div>
+</main>
+
+<footer>
+    <p>&copy; 2024 YuhanTrip</p>
+</footer>
+
+<script>
+    document.getElementById('checkPasswordForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // 폼의 기본 제출 동작 방지
+
+        var formData = new FormData(this);
+
+        fetch('/mypage/checkPassword', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = '/mypage/memberInfo'; // 성공 시 리다이렉트
+                } else {
+                    return response.text().then(text => {
+                        document.getElementById('message').textContent = '비밀번호가 일치하지 않습니다.';
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    });
+</script>
+</body>
+</html>

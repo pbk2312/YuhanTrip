@@ -1,16 +1,14 @@
 package hello.yuhanTrip.controller;
 
 import hello.yuhanTrip.domain.ResetToken;
-import hello.yuhanTrip.dto.LoginDTO;
-import hello.yuhanTrip.dto.LogoutDTO;
-import hello.yuhanTrip.dto.WithdrawalMembershipDTO;
+import hello.yuhanTrip.dto.*;
 import hello.yuhanTrip.dto.email.EmailRequestDTO;
 import hello.yuhanTrip.dto.register.MemberChangePasswordDTO;
+import hello.yuhanTrip.dto.register.MemberRequestDTO;
 import hello.yuhanTrip.dto.token.TokenDTO;
 import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.repository.ResetTokenRepository;
 import hello.yuhanTrip.service.MemberService;
-import hello.yuhanTrip.dto.register.MemberRequestDTO;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +19,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -34,29 +31,29 @@ import java.time.LocalDateTime;
 public class MemberController {
 
     private final MemberService memberService;
-    private final ResetTokenRepository resetTokenReposiotry;
+    private final ResetTokenRepository resetTokenRepository;
     private final TokenProvider tokenProvider;
 
     @GetMapping("/register")
     public String showRegisterForm(@ModelAttribute MemberRequestDTO memberRequestDTO) {
-        return "register";
+        return "/member/register";
     }
 
     @PostMapping("/register")
-    public String register(@ModelAttribute MemberRequestDTO memberRequestDTO, BindingResult bindingResult) {
+    public String register(@ModelAttribute MemberRequestDTO memberRequestDTO) {
         try {
             String result = memberService.register(memberRequestDTO);
             log.info("Registration result: {}", result);
-            return "redirect:/member/login"; // 회원 등록 성공 시 로그인 페이지로 리다이렉트
+            return "redirect:/member/login";
         } catch (Exception e) {
             log.error("Error registering member: {}", e.getMessage());
-            return "redirect:/member/error"; // 회원 등록 실패 시 에러 페이지로 리다이렉트
+            return "redirect:/member/error";
         }
     }
 
     @GetMapping("/login")
     public String showLogin(@ModelAttribute LoginDTO loginDTO) {
-        return "login";
+        return "/member/login";
     }
 
     @PostMapping("/login")
@@ -65,39 +62,22 @@ public class MemberController {
         TokenDTO tokenDTO = memberService.login(loginDTO);
         log.info("로그인이 완료되었습니다. 반환된 토큰: {}", tokenDTO);
 
-        // 쿠키에 accessToken 저장
-        Cookie accessTokenCookie = new Cookie("accessToken", tokenDTO.getAccessToken());
-        accessTokenCookie.setHttpOnly(true); // 클라이언트 측 스크립트에서 접근 불가
-        accessTokenCookie.setSecure(true); // HTTPS에서만 전송
-        accessTokenCookie.setPath("/"); // 모든 경로에서 쿠키 전송
-        accessTokenCookie.setMaxAge(60 * 60); // 쿠키 유효 기간 설정 (60분)
-        response.addCookie(accessTokenCookie);
+        addCookie(response, "accessToken", tokenDTO.getAccessToken(), 60 * 60);
 
         return ResponseEntity.ok(tokenDTO);
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(
-            @CookieValue(value = "accessToken", required = false) String accessToken,
-            HttpServletResponse response) {
+    public ResponseEntity<String> logout(@CookieValue(value = "accessToken", required = false) String accessToken, HttpServletResponse response) {
+        if (isInvalidToken(accessToken)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
-        Authentication authentication = tokenProvider.getAuthentication(accessToken);
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        UserDetails userDetails = getUserDetails(accessToken);
+        log.info("로그아웃 요청 - 유저: {}", userDetails.getUsername());
 
-        String username = userDetails.getUsername();
-        LogoutDTO logoutDTO = new LogoutDTO();
-        logoutDTO.setEmail(username);
-
-        log.info("로그아웃 요청");
-        memberService.logout(logoutDTO);
-        // 쿠키에서 accessToken 삭제
-        Cookie accessTokenCookie = new Cookie("accessToken", null);
-        accessTokenCookie.setHttpOnly(true); // 클라이언트 측 스크립트에서 접근 불가
-        accessTokenCookie.setSecure(true); // HTTPS에서만 전송
-        accessTokenCookie.setPath("/"); // 모든 경로에서 쿠키 전송
-        accessTokenCookie.setMaxAge(0); // 쿠키 즉시 삭제
-        response.addCookie(accessTokenCookie);
-        log.info("토큰 삭제");
+        memberService.logout(new LogoutDTO(userDetails.getUsername()));
+        removeCookie(response, "accessToken");
 
         log.info("로그아웃 완료");
         return ResponseEntity.ok("로그아웃 완료");
@@ -106,96 +86,55 @@ public class MemberController {
     @GetMapping("/sendResetPasswordEmail")
     public String sendResetPasswordForm(Model model) {
         model.addAttribute("emailRequestDTO", new EmailRequestDTO());
-        return "resetPasswordForm";
+        return "/member/resetPasswordForm";
     }
 
     @PostMapping("/sendResetPasswordEmail")
     public String sendResetPasswordEmail(@RequestBody EmailRequestDTO emailRequestDTO, RedirectAttributes redirectAttributes) {
         try {
             String message = memberService.sendPasswordResetEmail(emailRequestDTO);
-            redirectAttributes.addFlashAttribute("message", message); // Flash attribute for one-time display
-            return "redirect:/member/login"; // 이메일 전송 성공 시 로그인 페이지로 리다이렉트
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/member/login";
         } catch (RuntimeException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage()); // 오류 메시지를 플래시 어트리뷰트에 추가
-            return "redirect:/member/resetPasswordForm"; // 이메일 전송 실패 시 비밀번호 재설정 폼으로 리다이렉트
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/member/resetPasswordForm";
         }
     }
 
     @GetMapping("/updatePassword")
-    public String updatePassword(@RequestParam("token") String resetToken,
-                                 @RequestParam("email") String email,
-                                 Model model) {
+    public String updatePassword(@RequestParam("token") String resetToken, @RequestParam("email") String email, Model model) {
+        validateResetToken(email, resetToken);
 
-        // ResetToken을 검증합니다.
-        ResetToken storedToken = resetTokenReposiotry.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("ResetToken을 찾을 수 없습니다."));
-
-        // 저장된 토큰과 요청된 토큰이 일치하는지 확인합니다.
-        if (!storedToken.getResetToken().equals(resetToken)) {
-            throw new RuntimeException("유효하지 않은 ResetToken입니다.");
-        }
-
-        // 만료 여부를 검사합니다.
-        LocalDateTime expiryDate = storedToken.getExpiryDate();
-        if (expiryDate != null && expiryDate.isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("ResetToken이 만료되었습니다.");
-        }
-
-        // ResetToken이 유효하고 만료되지 않았다면 비밀번호 재설정 페이지로 이동합니다.
-        // 이메일과 토큰을 모델에 추가하여 비밀번호 재설정 페이지에 사용할 수 있도록 합니다.
         model.addAttribute("email", email);
         model.addAttribute("resetToken", resetToken);
 
-        return "updatePassword";
+        return "/member/updatePassword";
     }
 
     @PostMapping("/updatePassword")
-    public String changePassword(@RequestParam("token") String resetToken,
-                                 @RequestParam("email") String email,
-                                 @ModelAttribute MemberChangePasswordDTO memberChangePasswordDTO,
-                                 RedirectAttributes redirectAttributes) {
+    public String changePassword(@RequestParam("token") String resetToken, @RequestParam("email") String email,
+                                 @ModelAttribute MemberChangePasswordDTO memberChangePasswordDTO, RedirectAttributes redirectAttributes) {
+        validateResetToken(email, resetToken);
 
-        // ResetToken을 검증합니다.
-        ResetToken storedToken = resetTokenReposiotry.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("ResetToken을 찾을 수 없습니다."));
-
-        // 저장된 토큰과 요청된 토큰이 일치하는지 확인합니다.
-        if (!storedToken.getResetToken().equals(resetToken)) {
-            throw new RuntimeException("유효하지 않은 ResetToken입니다.");
-        }
-
-        // 만료 여부를 검사합니다.
-        LocalDateTime expiryDate = storedToken.getExpiryDate();
-        if (expiryDate != null && expiryDate.isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("ResetToken이 만료되었습니다.");
-        }
-
-        // 비밀번호 변경을 수행합니다.
-        memberChangePasswordDTO.setEmail(email); // 클라이언트가 보낸 JSON 데이터에서 이메일 설정
+        memberChangePasswordDTO.setEmail(email);
         memberService.memberChangePassword(memberChangePasswordDTO);
 
-        // 비밀번호 변경 성공 메시지를 플래시 어트리뷰트에 추가하여 한 번만 사용할 수 있도록 합니다.
         redirectAttributes.addFlashAttribute("successMessage", "비밀번호 변경이 완료되었습니다.");
-
-        // 비밀번호 변경 후 홈 페이지로 리다이렉트합니다.
         return "redirect:/home/homepage";
     }
 
     @GetMapping("/withdrawalMembership")
-    public String getWithdrawalMembershipForm(@CookieValue(value = "accessToken", required = false) String accessToken,
-                                              Model model) {
-        if (accessToken == null || !tokenProvider.validate(accessToken)) {
+    public String getWithdrawalMembershipForm(@CookieValue(value = "accessToken", required = false) String accessToken, Model model) {
+        if (isInvalidToken(accessToken)) {
             return "redirect:/member/login";
         }
 
-        Authentication authentication = tokenProvider.getAuthentication(accessToken);
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        UserDetails userDetails = getUserDetails(accessToken);
         log.info("회원 탈퇴 시도 유저 : {}", userDetails.getUsername());
 
-        WithdrawalMembershipDTO withdrawalMembershipDTO = new WithdrawalMembershipDTO();
-        model.addAttribute("withdrawalMembershipDTO", withdrawalMembershipDTO);
+        model.addAttribute("withdrawalMembershipDTO", new WithdrawalMembershipDTO());
 
-        return "withdrawalMembership";
+        return "/member/withdrawalMembership";
     }
 
     @PostMapping("/deleteAccount")
@@ -204,15 +143,12 @@ public class MemberController {
                                               HttpServletResponse response) {
         log.info("회원 탈퇴를 진행합니다...");
 
-        if (accessToken == null || !tokenProvider.validate(accessToken)) {
+        if (isInvalidToken(accessToken)) {
             log.info("사용자가 인증되지 않았습니다.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        Authentication authentication = tokenProvider.getAuthentication(accessToken);
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        log.info("회원탈퇴 이메일: {}", userDetails.getUsername());
-
+        UserDetails userDetails = getUserDetails(accessToken);
         withdrawalMembershipDTO.setEmail(userDetails.getUsername());
 
         try {
@@ -220,15 +156,7 @@ public class MemberController {
 
             if ("회원 정보가 정상적으로 삭제되었습니다.".equals(message)) {
                 log.info("회원 정보가 정상적으로 삭제되었습니다.");
-
-                // 쿠키에서 accessToken 삭제
-                Cookie accessTokenCookie = new Cookie("accessToken", null);
-                accessTokenCookie.setHttpOnly(true); // 클라이언트 측 스크립트에서 접근 불가
-                accessTokenCookie.setSecure(true); // HTTPS에서만 전송
-                accessTokenCookie.setPath("/"); // 모든 경로에서 쿠키 전송
-                accessTokenCookie.setMaxAge(0); // 쿠키 즉시 삭제
-                response.addCookie(accessTokenCookie);
-
+                removeCookie(response, "accessToken");
                 return ResponseEntity.ok().build();
             } else {
                 log.warn("회원 탈퇴 실패: {}", message);
@@ -237,6 +165,46 @@ public class MemberController {
         } catch (Exception e) {
             log.error("회원 탈퇴 중 오류 발생: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    private boolean isInvalidToken(String accessToken) {
+        return accessToken == null || !tokenProvider.validate(accessToken);
+    }
+
+    private UserDetails getUserDetails(String accessToken) {
+        Authentication authentication = tokenProvider.getAuthentication(accessToken);
+        return (UserDetails) authentication.getPrincipal();
+    }
+
+    private void addCookie(HttpServletResponse response, String name, String value, int maxAge) {
+        Cookie cookie = new Cookie(name, value);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(maxAge);
+        response.addCookie(cookie);
+    }
+
+    private void removeCookie(HttpServletResponse response, String name) {
+        Cookie cookie = new Cookie(name, null);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+    }
+
+    private void validateResetToken(String email, String resetToken) {
+        ResetToken storedToken = resetTokenRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("ResetToken을 찾을 수 없습니다."));
+
+        if (!storedToken.getResetToken().equals(resetToken)) {
+            throw new RuntimeException("유효하지 않은 ResetToken입니다.");
+        }
+
+        if (storedToken.getExpiryDate() != null && storedToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("ResetToken이 만료되었습니다.");
         }
     }
 }

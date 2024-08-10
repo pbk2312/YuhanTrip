@@ -2,8 +2,9 @@ package hello.yuhanTrip.service.Accomodation;
 
 import hello.yuhanTrip.domain.CancelReservation;
 import hello.yuhanTrip.domain.Reservation;
+import hello.yuhanTrip.domain.Room;
+import hello.yuhanTrip.dto.ReservationDTO;
 import hello.yuhanTrip.dto.ReservationUpdateDTO;
-import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.repository.CancelReservationRepository;
 import hello.yuhanTrip.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -38,8 +38,8 @@ public class ReservationService {
     @Transactional
     public Reservation findReservation(Long id) {
         log.info("예약 정보 찾기");
-        Reservation reservation = reservationRepository.findById(id).orElseThrow(() -> new RuntimeException("예약 정보를 찾을 수 없다"));
-        return reservation;
+        return reservationRepository.findById(id).orElseThrow(() -> new RuntimeException("예약 정보를 찾을 수 없다"));
+
     }
 
     public boolean isDateOverlapping(Long roomId, LocalDate checkInDate, LocalDate checkOutDate) {
@@ -69,11 +69,6 @@ public class ReservationService {
         cancelReservationRepository.save(cancelReservation);
     }
 
-    @Transactional
-    public CancelReservation cancelReservationConfirm(Long id) {
-        CancelReservation cancelReservation = cancelReservationRepository.findById(id).orElseThrow(() -> new RuntimeException("예약 정보가 없다"));
-        return cancelReservation;
-    }
 
 
     public Reservation updateReservation(ReservationUpdateDTO reservationDTO, String username) {
@@ -99,6 +94,25 @@ public class ReservationService {
         return reservationRepository.save(reservation);
     }
 
+    public void validateReservationDates(ReservationDTO reservationDTO, Room room) {
+        LocalDate today = LocalDate.now();
+
+        // 체크인 날짜가 오늘 이전인지 확인
+        if (reservationDTO.getCheckInDate().isBefore(today)) {
+            throw new IllegalArgumentException("체크인 날짜는 오늘보다 이전일 수 없습니다.");
+        }
+
+        // 체크아웃 날짜가 체크인 날짜 이전 또는 동일한지 확인
+        if (reservationDTO.getCheckOutDate().isBefore(reservationDTO.getCheckInDate()) ||
+                reservationDTO.getCheckOutDate().isEqual(reservationDTO.getCheckInDate())) {
+            throw new IllegalArgumentException("체크아웃 날짜는 체크인 날짜보다 이후여야 합니다.");
+        }
+
+        // 예약 인원이 객실 최대 수용 인원보다 많은지 확인
+        if (reservationDTO.getNumberOfGuests() > room.getMaxOccupancy()) {
+            throw new IllegalArgumentException("숙박 인원 수가 방 최대 수용 인원수 보다 많습니다");
+        }
+    }
 
 }
 

@@ -102,7 +102,7 @@ public class AccommodationController {
 
         log.info("현재 페이지: {}, 전체 페이지: {}, 시작 페이지: {}, 끝 페이지: {}", currentPage, totalPages, startPage, endPage);
 
-        return "accommodations"; // 뷰 이름
+        return "/accommodation/accommodations"; // 뷰 이름
     }
 
 
@@ -178,7 +178,7 @@ public class AccommodationController {
 
         log.info("현재 페이지: {}, 전체 페이지: {}, 시작 페이지: {}, 끝 페이지: {}", currentPage, totalPages, startPage, endPage);
 
-        return "accommodations"; // 뷰 이름
+        return "/accommodation/accommodations"; // 뷰 이름
     }
 
 
@@ -212,15 +212,17 @@ public class AccommodationController {
         model.addAttribute("accommodation", accommodation);
 
 
-        return "accommodationInfo"; // 상세 페이지의 뷰 이름
+        return "/accommodation/accommodationInfo"; // 상세 페이지의 뷰 이름
     }
+
+
 
 
     @GetMapping("/memberLikeHistory")
     public String memberLikeHistory(
             @CookieValue(value = "accessToken", required = false) String accessToken,
             @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "2") int size,
+            @RequestParam(value = "size", defaultValue = "3") int size,
             Model model
     ) {
         // 인증 확인
@@ -228,18 +230,28 @@ public class AccommodationController {
             return "redirect:/member/login"; // 로그인 페이지로 리다이렉트
         }
 
-        Authentication authentication = tokenProvider.getAuthentication(accessToken);
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        Member member = memberService.findByEmail(userDetails.getUsername());
+        try {
+            // 페이지 번호와 사이즈 검증
+            page = Math.max(page, 0); // 페이지 번호는 음수일 수 없음
+            size = Math.max(size, 1); // 페이지 사이즈는 1 이상이어야 함
 
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Accommodation> likesByMember = memberLikeService.getLikesByMember(member, pageable);
+            Authentication authentication = tokenProvider.getAuthentication(accessToken);
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            Member member = memberService.findByEmail(userDetails.getUsername());
 
-        model.addAttribute("likesByMember", likesByMember);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", likesByMember.getTotalPages());
+            Pageable pageable = PageRequest.of(page, size);
+            Page<Accommodation> likesByMember = memberLikeService.getLikesByMember(member, pageable);
 
-        return "likesByMember";
+            model.addAttribute("likesByMember", likesByMember);
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", likesByMember.getTotalPages());
+            model.addAttribute("pageSize", size); // 페이지 사이즈 모델에 추가
+
+            return "/accommodation/likesByMember";
+        } catch (Exception e) {
+            log.error("Error processing /memberLikeHistory request", e);
+            return "error"; // 오류 페이지로 리다이렉트
+        }
     }
 
 

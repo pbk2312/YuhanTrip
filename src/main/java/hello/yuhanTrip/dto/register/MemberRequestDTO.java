@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -31,10 +32,27 @@ public class MemberRequestDTO {
 
 
     @NotBlank
-    private String certificationNumber; // 추가: 인증번호 필드
+    private String certificationNumber;
+
+    @NotBlank
+    private String name;
+
+    @NotBlank
+    private String nickname;
+
+    @NotBlank
+    private String phoneNumber;
+
+    @NotBlank
+    private String address;
+
+    @NotBlank
+    private LocalDate dateOfBirth;
+
 
     @NotBlank
     private MemberRole memberRole;
+
 
 
 
@@ -43,9 +61,15 @@ public class MemberRequestDTO {
         return Member.builder()
                 .email(email)
                 .password(passwordEncoder.encode(password))
-                .memberRole(MemberRole.MEMBER)
+                .name(name)  // 추가된 필드 반영
+                .nickname(nickname)  // 추가된 필드 반영
+                .phoneNumber(phoneNumber)  // 추가된 필드 반영
+                .address(address)  // 추가된 필드 반영
+                .dateOfBirth(dateOfBirth)  // 추가된 필드 반영
+                .memberRole(MemberRole.MEMBER)  // role도 DTO에서 직접 설정하도록 변경
                 .build();
     }
+
 
     public UsernamePasswordAuthenticationToken toAuthentication() {
         return new UsernamePasswordAuthenticationToken(email, password);

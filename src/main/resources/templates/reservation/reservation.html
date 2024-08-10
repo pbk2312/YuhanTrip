@@ -232,19 +232,19 @@
                 </div>
                 <div class="form-group">
                     <div class="form-label-group">
-                        <input type="text" id="name" name="name" class="form-control" placeholder="고객 이름" required>
+                        <input type="text" id="name" name="name" class="form-control" th:value="${reservation.name}" required>
                         <label for="name">고객 이름</label>
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="form-label-group">
-                        <input type="tel" id="phoneNumber" name="phoneNumber" class="form-control" placeholder="고객 전화번호" required>
+                        <input type="tel" id="phoneNumber" name="phoneNumber" class="form-control" placeholder="고객 전화번호" th:value="${reservation.phoneNumber}" required>
                         <label for="phoneNumber">고객 전화번호</label>
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="form-label-group">
-                        <input type="text" id="addr" name="addr" class="form-control" placeholder="고객 주소" required>
+                        <input type="text" id="addr" name="addr" class="form-control" placeholder="고객 주소" th:value="${reservation.addr}" required>
                         <label for="addr">고객 주소</label>
                     </div>
                 </div>
@@ -264,6 +264,7 @@
         </div>
     </div>
 </div>
+
 
 <!-- jQuery, Popper.js, and Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

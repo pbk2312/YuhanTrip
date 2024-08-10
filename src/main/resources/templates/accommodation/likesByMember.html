@@ -44,16 +44,6 @@
       color: #0056b3;
     }
 
-    .info {
-      background-color: rgba(255, 255, 255, 0.9);
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      padding: 20px;
-      margin: 20px auto;
-      max-width: 1200px; /* 최대 너비를 1200px로 증가 */
-      width: 100%; /* 전체 너비 사용 */
-    }
-
 
     .info p {
       margin: 0 0 10px 0;
@@ -77,73 +67,43 @@
     }
 
 
-    .reservation-header h1 {
-      margin: 0;
-      font-size: 24px;
-    }
-
-
-    .reservation-container {
-      display: flex;
-      flex-direction: row; /* 가로 방향으로 변경 */
-      flex-wrap: wrap; /* 가로 공간이 부족하면 다음 줄로 넘어가도록 설정 */
-      gap: 10px; /* 아이템 간의 간격 조정 */
-      justify-content: center; /* 중앙 정렬 */
-    }
-
-    .reservation-item {
-      flex: 1 1 calc(25% - 10px); /* 4개의 열로 표시 */
-      padding: 10px; /* 패딩 조정 */
+    .reservation-item .card {
+      background-color: rgba(255, 255, 255, 0.9);
       border: 1px solid #ddd;
-      border-radius: 8px; /* 모서리 둥글기 조정 */
-      background: rgba(255, 255, 255, 0.9);
-      min-width: 100px; /* 최소 너비 조정 */
-      font-size: 0.9rem; /* 글자 크기 조정 */
-      display: flex;
-      flex-direction: column; /* 세로 방향으로 아이템 내용 정렬 */
-      align-items: center; /* 중앙 정렬 */
-      text-align: center; /* 텍스트 중앙 정렬 */
+      border-radius: 10px;
+      overflow: hidden;
+      transition: transform 0.3s ease-in-out;
     }
 
-    .reservation-item img {
-      width: 80%; /* 이미지 크기를 조정하여 더 잘 보이게 함 */
-      height: auto; /* 이미지 비율 유지 */
-      border-radius: 4px; /* 이미지 모서리 둥글기 조정 */
-      margin-bottom: 10px; /* 이미지와 텍스트 사이의 간격 조정 */
+    .reservation-item .card:hover {
+      transform: translateY(-10px);
     }
 
-    .reservation-item p {
-      margin: 5px 0; /* 각 단락의 상하 여백 조정 */
+    .reservation-item .card-img-top {
+      height: 200px;
+      object-fit: cover;
     }
 
-
-
-    /* Pagination 스타일 추가 */
-    .pagination {
-      display: flex;
-      justify-content: center;
-      margin-top: 20px;
+    .reservation-item .card-body {
+      padding: 15px;
     }
 
-    .page-link {
-      margin: 0 5px;
-      padding: 10px 15px;
-      border: 1px solid #ddd;
-      border-radius: 20px;
-      text-decoration: none;
+    .pagination .page-link {
       color: #007bff;
-      font-weight: 600;
-      background-color: #fff;
+      font-weight: 500;
     }
 
-    .page-link.active {
+    .pagination .page-link.active {
       background-color: #007bff;
-      color: #fff;
+      color: white;
+      border-color: #007bff;
     }
 
-    .page-link:hover {
-      background-color: #e9ecef;
+
+    h1 {
+      color: #f7c6c7;
     }
+
 
   </style>
 </head>
@@ -182,31 +142,59 @@
 </nav>
 
 <!-- Main Content-->
-<div class="container">
+
+<div class="container my-5">
   <div class="info">
-    <h1>좋아요 목록</h1>
+    <h1 class="text-center mb-4">관심 목록</h1>
     <div class="reservation-container">
-      <div th:if="${#lists.isEmpty(likesByMember)}">
+      <div th:if="${#lists.isEmpty(likesByMember)}" class="text-center">
         <p>관심 있는 숙소가 없습니다.</p>
       </div>
       <div th:unless="${#lists.isEmpty(likesByMember)}">
-        <div th:each="accommodation : ${likesByMember.content}" class="reservation-item">
-          <p><strong>숙소 이름:</strong> <span th:text="${accommodation.title}">숙소 이름</span></p>
-          <p><strong>주소:</strong> <span th:text="'Address: ' + ${accommodation.addr1} + ' ' + ${accommodation.addr2}">주소</span></p>
-          <p><strong>전화번호:</strong> <span th:text="'Phone: ' + ${accommodation.tel}">전화번호</span></p>
-          <img th:src="${accommodation.firstimage != '' ? accommodation.firstimage : '/Noimage.png'}"
-               class="card-img-top" alt="이미지">
-        </div>
-        <!-- Pagination -->
-        <div class="pagination">
-          <a th:href="@{/memberLikeHistory(page=${currentPage - 1})}" th:if="${currentPage > 0}" class="page-link">이전</a>
-          <a th:href="@{/memberLikeHistory(page=${currentPage})}" th:text="${currentPage + 1}" class="page-link active"></a>
-          <a th:href="@{/memberLikeHistory(page=${currentPage + 1})}" th:if="${currentPage < totalPages - 1}" class="page-link">다음</a>
+        <div class="row">
+          <div th:each="accommodation : ${likesByMember.content}" class="reservation-item col-md-4 mb-4">
+            <div class="card h-100">
+              <a th:href="@{${'/accommodation/info?id=' + accommodation.id }}" class="text-decoration-none text-dark">
+                <img th:src="${accommodation.firstimage != '' ? accommodation.firstimage : '/Noimage.png'}" class="card-img-top" alt="이미지">
+                <div class="card-body">
+                  <h5 class="card-title" th:text="${accommodation.title}">숙소 이름</h5>
+                  <p class="card-text">
+                    <strong>주소:</strong> <span th:text="${accommodation.addr1} + ' ' + ${accommodation.addr2}">주소</span>
+                  </p>
+                  <p class="card-text">
+                    <strong>전화번호:</strong> <span th:text="${accommodation.tel}">전화번호</span>
+                  </p>
+                </div>
+              </a>
+              <div class="card-footer">
+                <button class="btn btn-outline-danger btn-sm like-button" th:data-id="${accommodation.id}">
+                  <i class="bi bi-heart"></i> 삭제
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+        <!-- Pagination -->
+        <div class="pagination justify-content-center mt-4">
+          <a th:href="@{/accommodation/memberLikeHistory(page=${currentPage - 1}, size=${pageSize})}"
+             th:if="${currentPage > 0}" class="page-link">이전</a>
+
+          <a th:href="@{/accommodation/memberLikeHistory(page=${currentPage}, size=${pageSize})}"
+             th:text="${currentPage + 1}" class="page-link active"></a>
+
+          <a th:href="@{/accommodation/memberLikeHistory(page=${currentPage + 1}, size=${pageSize})}"
+             th:if="${currentPage < totalPages - 1}" class="page-link">다음</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- jQuery, Popper.js, and Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
@@ -214,6 +202,70 @@
 <!-- Core theme JS-->
 <script src="js/scripts.js"></script>
 <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const likeButtons = document.querySelectorAll('.like-button');
+
+    // 초기 하트 상태 설정 (서버에서 가져온 데이터에 따라 다를 수 있음)
+    likeButtons.forEach(button => {
+      const icon = button.querySelector('i');
+      const isLiked = button.getAttribute('data-liked') === 'true'; // 데이터 속성에서 좋아요 상태 가져오기
+
+      if (isLiked) {
+        icon.classList.add('bi-heart-fill');
+        icon.classList.remove('bi-heart');
+      } else {
+        icon.classList.add('bi-heart');
+        icon.classList.remove('bi-heart-fill');
+      }
+    });
+
+    // 버튼 클릭 이벤트 핸들러
+    likeButtons.forEach(button => {
+      button.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const accommodationId = button.getAttribute('data-id'); // 데이터 속성에서 ID 가져오기
+        const icon = button.querySelector('i');
+        const isLiked = icon.classList.contains('bi-heart-fill');
+
+        if (isLiked && !confirm("정말로 이 항목을 삭제하시겠습니까?")) {
+          return; // 사용자가 삭제를 취소하면 아무 작업도 하지 않음
+        }
+
+        fetch(`/api/likes/remove?accommodationId=${encodeURIComponent(accommodationId)}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          }
+        })
+                .then(response => {
+                  if (!response.ok) {
+                    throw new Error('Network response was not ok.');
+                  }
+                  return response.json();
+                })
+                .then(data => {
+                  if (data.status === 'success') {
+                    // 삭제 후 하트 아이콘을 빈 상태로 설정
+                    icon.classList.remove('bi-heart-fill');
+                    icon.classList.add('bi-heart');
+                    // 페이지 새로 고침
+                    location.reload();
+                  } else {
+                    alert(data.message || '좋아요 요청이 실패했습니다. 다시 시도해 주세요.');
+                  }
+                })
+                .catch(error => {
+                  console.error('Error:', error);
+                  alert('서버 오류: ' + error.message);
+                });
+      });
+    });
+  });
+
+
   document.addEventListener('DOMContentLoaded', () => {
     const accessToken = localStorage.getItem('accessToken');
     const authButton = document.getElementById('authButton');

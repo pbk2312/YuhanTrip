@@ -20,13 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-
-
-import java.util.Map;
 
 
 @Controller
@@ -141,7 +135,7 @@ public class PaymentController {
 
         model.addAttribute("reservationDTO", reservationDTO);
         model.addAttribute("paymentCancelDTO", paymentCancelDTO);
-        return "reservationCancel";
+        return "/reservation/reservationCancel";
     }
 
 
