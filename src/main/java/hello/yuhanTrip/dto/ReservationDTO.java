@@ -1,11 +1,7 @@
 package hello.yuhanTrip.dto;
 
-import hello.yuhanTrip.domain.Accommodation;
-import hello.yuhanTrip.domain.Member;
-import hello.yuhanTrip.domain.Reservation;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data

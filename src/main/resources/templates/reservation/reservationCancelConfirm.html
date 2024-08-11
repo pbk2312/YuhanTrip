@@ -174,7 +174,7 @@
                 <p><strong>예약자명:</strong> <span th:text="${reservation.getName()}">예약자명</span></p>
                 <p><strong>체크인 날짜:</strong> <span th:text="${reservation.checkInDate}">체크인 날짜</span></p>
                 <p><strong>체크아웃 날짜:</strong> <span th:text="${reservation.checkOutDate}">체크아웃 날짜</span></p>
-                <p><strong>취소 금액:</strong> <span th:text="${reservation.getPrice()}">결제 금액</span> 원</p>
+                <p><strong>취소 금액:</strong> <span th:text="${reservation.getPayment().getPrice()}">결제 금액</span> 원</p>
                 <p><strong>투숙 인원:</strong> <span th:text="${reservation.getNumberOfGuests()}">투숙 인원</span> 명</p>
             </div>
         </div>

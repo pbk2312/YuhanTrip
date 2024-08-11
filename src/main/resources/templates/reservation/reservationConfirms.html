@@ -122,6 +122,13 @@
             font-weight: 600;
         }
 
+        .reservation-item.completed {
+            opacity: 0.5; /* 숙박 완료된 항목은 반투명하게 */
+        }
+
+        .reservation-item.reserved {
+            opacity: 1; /* 예약된 항목은 선명하게 */
+        }
     </style>
 </head>
 <body>
@@ -142,7 +149,9 @@
                        data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <li><a class="dropdown-item" href="/accommodation/accommodations">All Products</a></li>
-                        <li><hr class="dropdown-divider"/></li>
+                        <li>
+                            <hr class="dropdown-divider"/>
+                        </li>
                         <li><a class="dropdown-item" href="#!">Popular Items</a></li>
                         <li><a class="dropdown-item" href="#!">New Arrivals</a></li>
                     </ul>
@@ -166,7 +175,8 @@
             <a href="/reservationConfirm/cancel" class="btn btn-secondary cancel-view-button">예약 취소 내역 보기</a>
         </div>
         <div class="reservation-container">
-            <div th:each="reservation : ${reservations}" class="reservation-item">
+            <div th:each="reservation : ${reservations}" class="reservation-item"
+                 th:data-status="${reservation.reservationStatus}">
                 <p><strong>예약 번호:</strong> <span th:text="${reservation.reservationUid}">예약 번호</span></p>
                 <p><strong>숙소 이름:</strong> <span th:text="${reservation.room.getAccommodation().getTitle()}">숙소 이름</span></p>
                 <p><strong>객실 이름:</strong> <span th:text="${reservation.room.getRoomNm()}">객실 이름</span></p>
@@ -176,13 +186,16 @@
                 <p><strong>결제 금액:</strong> <span th:text="${reservation.getPayment().price}">결제 금액</span> 원</p>
                 <p><strong>투숙 인원:</strong> <span th:text="${reservation.getNumberOfGuests()}">투숙 인원</span> 명</p>
                 <div class="reservation-actions">
-                    <a th:href="'/reservationUpdate?reservationId=' + ${reservation.id}" class="btn btn-primary update-button">예약 수정</a>
-                    <a th:href="'/paymentCancelPage?reservationId=' + ${reservation.id}" class="btn btn-danger cancel-button">예약 취소</a>
+                    <a th:href="@{/reservationUpdate(reservationId=${reservation.id})}" class="btn btn-primary update-button">예약 수정</a>
+                    <a th:href="@{/paymentCancelPage(reservationId=${reservation.id})}" class="btn btn-danger cancel-button">예약 취소</a>
+                    <!-- 후기 작성 버튼, 기본적으로 숨김 -->
+                    <a href="#" class="btn btn-info review-button" style="display: none;" th:data-id="${reservation.id}">후기 작성</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 <!-- jQuery, Popper.js, and Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
@@ -190,6 +203,34 @@
 <!-- Core theme JS-->
 <script src="js/scripts.js"></script>
 <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const reservationItems = document.querySelectorAll('.reservation-item');
+
+        reservationItems.forEach(item => {
+            const status = item.getAttribute('data-status');
+            const updateButton = item.querySelector('.update-button');
+            const cancelButton = item.querySelector('.cancel-button');
+            const reviewButton = item.querySelector('.review-button');
+
+            if (status === 'COMPLETED') {
+                item.classList.add('completed');
+
+                // "예약 수정" 및 "예약 취소" 버튼 숨기기
+                if (updateButton) updateButton.style.display = 'none';
+                if (cancelButton) cancelButton.style.display = 'none';
+
+                // "후기 작성" 버튼 표시 및 링크 설정
+                if (reviewButton) {
+                    reviewButton.style.display = 'inline-block';
+                    const reservationId = reviewButton.getAttribute('data-id'); // data-id 속성에서 ID를 가져옵니다.
+                    reviewButton.href = '/reviewWrite?reservationId=' + reservationId;
+                }
+            } else if (status === 'RESERVED') {
+                item.classList.add('reserved');
+            }
+        });
+    });
+
     document.addEventListener('DOMContentLoaded', () => {
         const accessToken = localStorage.getItem('accessToken');
         const authButton = document.getElementById('authButton');
@@ -252,7 +293,6 @@
     function deleteAccessToken() {
         localStorage.removeItem('accessToken');
     }
-
 </script>
 </body>
 </html>

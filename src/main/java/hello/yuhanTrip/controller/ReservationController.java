@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -95,7 +96,6 @@ public class ReservationController {
     }
 
 
-
     @PostMapping("/reservation/submit")
     public ResponseEntity<Map<String, Object>> submitReservation(
             @RequestBody ReservationDTO reservationDTO,
@@ -155,6 +155,7 @@ public class ReservationController {
                     .payment(savedPayment) // 저장된 Payment 객체 설정
                     .numberOfGuests(reservationDTO.getNumberOfGuests())
                     .accommodationId(room.getAccommodation().getId())
+                    .reservationStatus(ReservationStatus.RESERVED)
                     .build();
 
             reservationService.reservationRegister(reservation);
@@ -180,22 +181,37 @@ public class ReservationController {
         }
     }
 
+
+
     @GetMapping("/reservationConfirm")
     public String successPaymentPage(
             @CookieValue(value = "accessToken", required = false) String accessToken,
             Model model
     ) {
-
-
+        // 1. 사용자 정보 조회
         Member member = getUserDetails(accessToken);
         log.info("예약 확정 확인 유저 : {}", member.getName());
 
-
+        // 2. 사용자의 예약 목록 조회
         List<Reservation> reservations = member.getReservations();
+        LocalDate today = LocalDate.now();
 
-        // 모델에 예약 리스트 추가
-        model.addAttribute("reservations", reservations);
+        // 3. 예약 상태를 확인하고 업데이트
+        for (Reservation reservation : reservations) {
+            if (reservation.getReservationStatus() == ReservationStatus.RESERVED &&
+                    reservation.getCheckOutDate().isBefore(today)) {
+                reservation.setReservationStatus(ReservationStatus.COMPLETED);
+                reservationService.updateReservationStatus(reservation); // 상태 업데이트 후 저장
+            }
+        }
 
+        // 4. CANCELLED 상태의 예약을 제외한 리스트 필터링
+        List<Reservation> activeReservations = reservations.stream()
+                .filter(reservation -> reservation.getReservationStatus() != ReservationStatus.CANCELLED)
+                .collect(Collectors.toList());
+
+        // 5. 모델에 필터링된 예약 리스트 추가
+        model.addAttribute("reservations", activeReservations);
 
         return "/reservation/reservationConfirms";
     }
@@ -214,7 +230,8 @@ public class ReservationController {
         Reservation reservation = reservationService.findReservation(id);
 
         // 예약의 소유자와 로그인한 유저 비교
-        if (!reservation.getMember().getEmail().equals(member.getName())) {
+        if (!reservation.getMember().getEmail().equals(member.getEmail())) {
+            log.info("예약자 이메일 : {} ,사용자 이메일 :{}", reservation.getMember().getEmail(), member.getEmail());
             // 유저가 예약의 소유자가 아니면 접근 거부 처리
             return "redirect:/accessDenied"; // 접근 거부 페이지로 리다이렉트
         }
@@ -237,7 +254,6 @@ public class ReservationController {
 
         log.info("예약 수정 : {}", reservationUpdateDTO);
         Reservation reservation = reservationService.findReservation(reservationUpdateDTO.getId());
-
 
 
         try {
@@ -281,21 +297,25 @@ public class ReservationController {
         }
     }
 
+
     @GetMapping("/reservationConfirm/cancel")
     public String cancelPaymentPage(
             @CookieValue(value = "accessToken", required = false) String accessToken,
             Model model
     ) {
-
+        // 1. 사용자 정보 조회
         Member member = getUserDetails(accessToken);
 
+        // 2. 사용자의 예약 목록 조회
+        List<Reservation> reservations = member.getReservations();
 
+        // 3. CANCELLED 상태의 예약만 필터링
+        List<Reservation> cancelledReservations = reservations.stream()
+                .filter(reservation -> ReservationStatus.CANCELLED.equals(reservation.getReservationStatus()))
+                .collect(Collectors.toList());
 
-        List<CancelReservation> cancelReservations = member.getCancelReservations();
-
-        // 모델에 예약 리스트 추가
-        model.addAttribute("cancelReservations", cancelReservations);
-
+        // 4. 모델에 취소된 예약 리스트 추가
+        model.addAttribute("cancelReservations", cancelledReservations);
 
         return "/reservation/reservationCancelConfirm";
     }
@@ -305,7 +325,6 @@ public class ReservationController {
     public String failPaymentPage() {
         return "fail-payment";
     }
-
 
 
     public Member getUserDetails(String accessToken) {

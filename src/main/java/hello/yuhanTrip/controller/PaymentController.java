@@ -2,14 +2,14 @@ package hello.yuhanTrip.controller;
 
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
-import hello.yuhanTrip.domain.CancelReservation;
-import hello.yuhanTrip.domain.Reservation;
+import hello.yuhanTrip.domain.*;
 import hello.yuhanTrip.dto.ReservationDTO;
 import hello.yuhanTrip.dto.payment.PaymentCallbackRequest;
 import hello.yuhanTrip.dto.payment.PaymentCancelDTO;
 import hello.yuhanTrip.dto.payment.PaymentDTO;
 import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.repository.ReservationRepository;
+import hello.yuhanTrip.service.Accomodation.AccommodationService;
 import hello.yuhanTrip.service.Accomodation.ReservationService;
 import hello.yuhanTrip.service.PaymentService;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +32,7 @@ public class PaymentController {
     private final TokenProvider tokenProvider;
     private final PaymentService paymentService;
     private final ReservationService reservationService;
+    private final AccommodationService accommodationService;
 
     @Value("${imp_key}")
     private String impKey;
@@ -94,49 +95,56 @@ public class PaymentController {
     }
 
 
+
     @GetMapping("/paymentCancelPage")
     public String paymentCancel(@RequestParam("reservationId") Long reservationId,
                                 Model model) {
 
         log.info("환불 받을 예약 번호: {}", reservationId);
 
-
+        // 1. 예약 정보 조회
         Reservation reservation = reservationService.findReservation(reservationId);
+        Accommodation accommodation = accommodationService.getAccommodationInfo(reservation.getAccommodationId());
 
-        // ReservationDTO를 생성하고 필드를 설정함
-        ReservationDTO reservationDTO = ReservationDTO.builder()
-                .id(reservation.getId())
-                .memberId(reservation.getMember().getId())
-                .accommodationId(reservation.getAccommodationId())
-                .roomId(reservation.getRoom().getId())
-                .roomNm(reservation.getRoom().getRoomNm())  // Room 엔티티에 roomNm 필드가 있다고 가정
-                .roomType(reservation.getRoom().getRoomType())  // Room 엔티티에 roomType 필드가 있다고 가정
-                .checkInDate(reservation.getCheckInDate())
-                .checkOutDate(reservation.getCheckOutDate())
-                .reservationDate(reservation.getReservationDate())
-                .specialRequests(reservation.getSpecialRequests())
-                .accommodationTitle(reservation.getRoom().getAccommodation().getTitle())  // Accommodation 엔티티에 title 필드가 있다고 가정
-                .name(reservation.getName())
-                .phoneNumber(reservation.getPhoneNumber())
-                .price(reservation.getPayment().getPrice())
-                .addr(reservation.getAddr())
-                .numberOfGuests(reservation.getNumberOfGuests())
-                .build();
-
-
+        // 2. 결제 정보 조회
         String paymentUid = reservation.getPayment().getPaymentUid();
         hello.yuhanTrip.domain.Payment payment = paymentService.findPayment(paymentUid);
 
+        // 3. PaymentCancelDTO 생성
         PaymentCancelDTO paymentCancelDTO = new PaymentCancelDTO();
         paymentCancelDTO.setPaymentUid(paymentUid);
         paymentCancelDTO.setCancelRequestAmount(payment.getPrice());
         paymentCancelDTO.setReservationId(reservationId);
 
+        // 4. ReservationDTO 생성
+        ReservationDTO reservationDTO = ReservationDTO.builder()
+                .id(reservation.getId())
+                .memberId(reservation.getMember().getId())
+                .accommodationId(reservation.getAccommodationId())
+                .roomId(reservation.getRoom().getId())
+                .roomNm(reservation.getRoom().getRoomNm())
+                .roomType(reservation.getRoom().getRoomType())
+                .checkInDate(reservation.getCheckInDate())
+                .checkOutDate(reservation.getCheckOutDate())
+                .reservationDate(reservation.getReservationDate())
+                .specialRequests(reservation.getSpecialRequests())
+                .accommodationTitle(accommodation.getTitle())
+                .localDate(reservation.getReservationDate())
+                .name(reservation.getMember().getName())
+                .phoneNumber(reservation.getMember().getPhoneNumber())
+                .price(reservation.getPayment().getPrice())
+                .addr(reservation.getMember().getAddress())
+                .numberOfGuests(reservation.getNumberOfGuests())
+                .build();
 
+        // 5. 모델에 데이터 추가
         model.addAttribute("reservationDTO", reservationDTO);
         model.addAttribute("paymentCancelDTO", paymentCancelDTO);
+
+        // 6. 뷰로 반환
         return "/reservation/reservationCancel";
     }
+
 
 
     @PostMapping("/payment/cancel")
@@ -145,29 +153,17 @@ public class PaymentController {
             // 결제 취소 처리
             paymentService.cancelReservation(paymentCancelDTO);
 
-
             Long reservationId = paymentCancelDTO.getReservationId();
             Reservation reservation = reservationService.findReservation(reservationId);
-            CancelReservation cancelReservation = CancelReservation.builder()
-                    .reservationUid(reservation.getReservationUid())
-                    .member(reservation.getMember())
-                    .room(reservation.getRoom())
-                    .accommodationId(reservation.getAccommodationId())
-                    .checkInDate(reservation.getCheckInDate())
-                    .checkOutDate(reservation.getCheckOutDate())
-                    .reservationDate(reservation.getReservationDate())
-                    .specialRequests(reservation.getSpecialRequests())
-                    .name(reservation.getName())
-                    .phoneNumber(reservation.getPhoneNumber())
-                    .addr(reservation.getAddr())
-                    .numberOfGuests(reservation.getNumberOfGuests())
-                    .price(reservation.getPayment().getPrice())  // Reservation에 가격 필드가 있다고 가정
-                    .build();
+            reservation.setReservationStatus(ReservationStatus.CANCELLED);
+            reservationService.updateReservationStatus(reservation);
 
 
-            reservationService.removeReservation(reservation.getReservationUid());
-            reservationService.cancelReservationRegister(cancelReservation);
-            paymentService.remove(paymentCancelDTO.getPaymentUid());
+            hello.yuhanTrip.domain.Payment payment = paymentService.findPayment(paymentCancelDTO.getPaymentUid());
+
+
+
+            paymentService.updatePaymentStatus(payment.getId(), PaymentStatus.CANCELLED);
             // 성공적인 경우 200 OK 응답
             return ResponseEntity.ok("결제 취소 요청이 성공적으로 처리되었습니다.");
 

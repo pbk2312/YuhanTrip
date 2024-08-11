@@ -2,6 +2,7 @@ package hello.yuhanTrip.service;
 
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
+import hello.yuhanTrip.domain.PaymentStatus;
 import hello.yuhanTrip.dto.payment.PaymentCallbackRequest;
 import hello.yuhanTrip.dto.payment.PaymentCancelDTO;
 import hello.yuhanTrip.dto.payment.PaymentDTO;
@@ -20,5 +21,9 @@ public interface PaymentService {
 
 
     void cancelReservation(PaymentCancelDTO paymentCancelDTO);
+
+    void updatePaymentStatus(Long paymentId, PaymentStatus status);
+
+
 
 }

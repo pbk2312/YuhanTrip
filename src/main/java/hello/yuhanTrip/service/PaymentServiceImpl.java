@@ -153,6 +153,10 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
 
+    public void updatePaymentStatus(Long paymentId, PaymentStatus status) {
+        paymentRepository.updatePaymentStatus(status, paymentId);
+    }
+
     private CancelData createCancelData(IamportResponse<Payment> response, int refundAmount) {
         if (refundAmount == 0) { //전액 환불일 경우
             return new CancelData(response.getResponse().getImpUid(), true);

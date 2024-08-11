@@ -1,11 +1,9 @@
 package hello.yuhanTrip.service.Accomodation;
 
-import hello.yuhanTrip.domain.CancelReservation;
 import hello.yuhanTrip.domain.Reservation;
 import hello.yuhanTrip.domain.Room;
 import hello.yuhanTrip.dto.ReservationDTO;
 import hello.yuhanTrip.dto.ReservationUpdateDTO;
-import hello.yuhanTrip.repository.CancelReservationRepository;
 import hello.yuhanTrip.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -23,7 +21,6 @@ import java.util.List;
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
-    private final CancelReservationRepository cancelReservationRepository;
 
     @Transactional
     public void reservationRegister(Reservation reservation) {
@@ -33,6 +30,11 @@ public class ReservationService {
         log.info("객실 예약 성공 : {}", reservationSet.getRoom().getAccommodation());
 
 
+    }
+
+    @Transactional
+    public void updateReservationStatus(Reservation reservation){
+        reservationRepository.updateReservationStatus(reservation.getId(),reservation.getReservationStatus());
     }
 
     @Transactional
@@ -64,10 +66,6 @@ public class ReservationService {
         reservationRepository.delete(reservation);
     }
 
-    @Transactional
-    public void cancelReservationRegister(CancelReservation cancelReservation) {
-        cancelReservationRepository.save(cancelReservation);
-    }
 
 
 

@@ -1,6 +1,7 @@
 package hello.yuhanTrip.controller;
 
 import hello.yuhanTrip.domain.Member;
+import hello.yuhanTrip.dto.MypageMemberDTO;
 import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
@@ -43,7 +45,6 @@ public class MypageController {
             @CookieValue(value = "accessToken", required = false) String accessToken
     ) {
 
-        log.info("비밀번호: {}" ,password);
         ResponseEntity<Void> validationResponse = validateAccessToken(accessToken);
         if (validationResponse != null) {
             return validationResponse;
@@ -58,7 +59,32 @@ public class MypageController {
     }
 
     @GetMapping("/memberInfo")
-    public String memberInfo(){
+    public String memberInfo(
+            @CookieValue(value = "accessToken", required = false) String accessToken,
+            Model model
+    ){
+        ResponseEntity<Void> validationResponse = validateAccessToken(accessToken);
+        if (validationResponse != null) {
+            return "redirect:/member/login";
+        }
+
+
+        UserDetails userDetails = getUserDetails(accessToken);
+        Member member = findMemberByEmail(userDetails.getUsername());
+
+        MypageMemberDTO mypageMemberDTO = MypageMemberDTO.builder()
+                .email(member.getEmail())
+                .address(member.getAddress())
+                .nickname(member.getNickname())
+                .phoneNumber(member.getPhoneNumber())
+                .dateOfBirth(member.getDateOfBirth())
+                .name(member.getName())
+                .build();
+
+
+        model.addAttribute("MypageMemberDTO",mypageMemberDTO);
+
+
         return "/mypage/memberInfo";
     }
 

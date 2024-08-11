@@ -65,6 +65,10 @@ public class Reservation {
     @Column(name = "number_of_guests", nullable = false)
     private int numberOfGuests;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "reservation_status", nullable = false)
+    private ReservationStatus reservationStatus; // 예약 상태를 나타내는 필드 추가
+
 
 
 

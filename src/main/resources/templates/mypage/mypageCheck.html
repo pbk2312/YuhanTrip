@@ -1,33 +1,157 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>마이페이지 확인</title>
-    <link rel="stylesheet" href="/css/style.css"> <!-- 스타일시트 링크 (선택적) -->
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <title>마이페이지 - 비밀번호 확인</title>
+    <!-- Favicon-->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico"/>
+    <!-- Bootstrap icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet"/>
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="../css/homestyles.css" rel="stylesheet">
+    <style>
+        /* CSS styles */
+        body {
+            background: url('/los-angeles-2289637_640.jpg') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.8);
+            border-bottom: 1px solid #ddd;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .navbar-nav .nav-link {
+            color: #007bff;
+            font-weight: 500;
+        }
+
+        .navbar-nav .nav-link.active {
+            color: #0056b3;
+        }
+
+        /* Form container styling */
+        #main-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 80vh;
+            padding: 20px;
+        }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .form-container h2 {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        .form-container label {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .form-container input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .form-container button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .form-container button:hover {
+            background-color: #0056b3;
+        }
+
+        .form-container #message {
+            margin-top: 10px;
+            color: red;
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
 <body>
-<header>
-    <h1>마이페이지</h1>
-</header>
+<!-- Navigation-->
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container px-4 px-lg-5">
+        <a class="navbar-brand" href="/home/homepage">YuhanTrip</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                <li class="nav-item"><a class="nav-link active" aria-current="page" href="/home/homepage">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="/accommodation/accommodations">All Products</a></li>
+                        <li>
+                            <hr class="dropdown-divider"/>
+                        </li>
+                        <li><a class="dropdown-item" href="#!">Popular Items</a></li>
+                        <li><a class="dropdown-item" href="#!">New Arrivals</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
 
-<main>
-    <h2>회원 정보 확인</h2>
+<!-- Main Content-->
+<div id="main-content">
+    <div class="form-container">
+        <h2>비밀번호 확인</h2>
+        <form id="checkPasswordForm">
+            <label for="password">비밀번호:</label>
+            <input type="password" id="password" name="password" required>
+            <button type="submit">비밀번호 확인</button>
+            <div id="message"></div>
+        </form>
+    </div>
+</div>
 
-    <form id="checkPasswordForm">
-        <label for="password">비밀번호:</label>
-        <input type="password" id="password" name="password" required>
-        <button type="submit">비밀번호 확인</button>
-    </form>
-
-    <!-- 비밀번호 확인 결과를 사용자에게 보여줄 수 있는 공간 -->
-    <div id="message"></div>
-</main>
-
-<footer>
-    <p>&copy; 2024 YuhanTrip</p>
-</footer>
-
+<!-- jQuery, Popper.js, and Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+<!-- Core theme JS-->
+<script src="js/scripts.js"></script>
 <script>
     document.getElementById('checkPasswordForm').addEventListener('submit', function(event) {
         event.preventDefault(); // 폼의 기본 제출 동작 방지
@@ -52,5 +176,6 @@
             });
     });
 </script>
+
 </body>
 </html>
