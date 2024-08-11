@@ -26,6 +26,10 @@ public class Review {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reservation_id", nullable = false)
+    private Reservation reservation;
+
     private String content;  // 리뷰 내용
     private int rating;      // 별점 (1-5)
     private LocalDate reviewDate;  // 리뷰 작성일

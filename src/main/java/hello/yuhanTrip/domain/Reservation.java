@@ -69,6 +69,10 @@ public class Reservation {
     @Column(name = "reservation_status", nullable = false)
     private ReservationStatus reservationStatus; // 예약 상태를 나타내는 필드 추가
 
+    // 리뷰와의 1대1 관계 추가
+    @OneToOne(mappedBy = "reservation", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
+    private Review review;
+
 
 
 
