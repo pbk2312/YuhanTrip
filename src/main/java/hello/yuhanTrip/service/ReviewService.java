@@ -63,4 +63,11 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
+    public List<Review> getReviewsByMember(Long memberId) {
+        return reviewRepository.findAll().stream()
+                .filter(review -> review.getMember().getId().equals(memberId))
+                .collect(Collectors.toList());
+    }
+
+
 }

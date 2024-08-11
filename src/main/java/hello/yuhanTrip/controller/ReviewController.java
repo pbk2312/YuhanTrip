@@ -3,6 +3,7 @@ package hello.yuhanTrip.controller;
 import hello.yuhanTrip.domain.Accommodation;
 import hello.yuhanTrip.domain.Member;
 import hello.yuhanTrip.domain.Reservation;
+import hello.yuhanTrip.domain.Review;
 import hello.yuhanTrip.dto.ReservationDTO;
 import hello.yuhanTrip.dto.ReviewWriteDTO;
 import hello.yuhanTrip.exception.UnauthorizedException;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -125,6 +127,26 @@ public class ReviewController {
                     .body("리뷰 제출 중 오류가 발생했습니다.");
         }
     }
+
+    @GetMapping("/myReviews")
+    public String getMyReviews(
+            @CookieValue(value = "accessToken", required = false) String accessToken,
+            Model model
+    ) {
+        // 로그인한 사용자의 정보를 가져옴
+        Member member = getUserDetails(accessToken);
+
+        // 사용자가 작성한 리뷰 목록을 가져옴
+        List<Review> reviews = reviewService.getReviewsByMember(member.getId());
+
+
+        // 모델에 리뷰 리스트를 담아서 뷰에 전달
+        model.addAttribute("reviews", reviews);
+        model.addAttribute("member", member);
+
+        return "/mypage/myReviews"; // myReviews.html 뷰로 이동
+    }
+
 
 
 
