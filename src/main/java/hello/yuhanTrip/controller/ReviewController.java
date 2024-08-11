@@ -24,7 +24,9 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -45,86 +47,88 @@ public class ReviewController {
             @RequestParam("reservationId") Long reservationId,
             Model model
     ) {
-        // 로그인한 사용자의 정보를 가져옴
-        Member member = getUserDetails(accessToken);
-        Reservation reservation = reservationService.findReservation(reservationId);
-        Accommodation accommodationInfo = accommodationService.getAccommodationInfo(reservation.getAccommodationId());
+        try {
+            // 로그인한 사용자의 정보를 가져옴
+            Member member = getUserDetails(accessToken);
+            Reservation reservation = reservationService.findReservation(reservationId);
+            Accommodation accommodationInfo = accommodationService.getAccommodationInfo(reservation.getAccommodationId());
 
-        ReservationDTO reservationDTO = ReservationDTO.builder()
-                .id(reservation.getId())
-                .memberId(reservation.getMember().getId())
-                .accommodationId(reservation.getAccommodationId())
-                .roomId(reservation.getRoom().getId())
-                .roomNm(reservation.getRoom().getRoomNm()) // 예시: roomNumber는 Room 객체의 속성
-                .roomType(reservation.getRoom().getRoomType()) // 예시: roomType은 Room 객체의 속성
-                .checkInDate(reservation.getCheckInDate())
-                .checkOutDate(reservation.getCheckOutDate())
-                .reservationDate(reservation.getReservationDate())
-                .specialRequests(reservation.getSpecialRequests())
-                .accommodationTitle(accommodationInfo.getTitle()) // 숙소 제목을 가져오는 서비스 메서드 호출
-                .name(reservation.getName())
-                .phoneNumber(reservation.getPhoneNumber())
-                .addr(reservation.getAddr())
-                .numberOfGuests(reservation.getNumberOfGuests())
-                .price(reservation.getPayment().getPrice()) // 예시: price는 Room 객체의 속성
-                .build();
+            ReservationDTO reservationDTO = ReservationDTO.builder()
+                    .id(reservation.getId())
+                    .memberId(reservation.getMember().getId())
+                    .accommodationId(reservation.getAccommodationId())
+                    .roomId(reservation.getRoom().getId())
+                    .roomNm(reservation.getRoom().getRoomNm())
+                    .roomType(reservation.getRoom().getRoomType())
+                    .checkInDate(reservation.getCheckInDate())
+                    .checkOutDate(reservation.getCheckOutDate())
+                    .reservationDate(reservation.getReservationDate())
+                    .specialRequests(reservation.getSpecialRequests())
+                    .accommodationTitle(accommodationInfo.getTitle())
+                    .name(reservation.getName())
+                    .phoneNumber(reservation.getPhoneNumber())
+                    .addr(reservation.getAddr())
+                    .numberOfGuests(reservation.getNumberOfGuests())
+                    .price(reservation.getPayment().getPrice())
+                    .build();
 
-        // 사용자가 작성할 리뷰에 대한 기본 정보를 DTO에 담아 모델에 전달
-        ReviewWriteDTO reviewWriteDTO = ReviewWriteDTO.builder()
-                .reviewDate(LocalDate.now()) // 리뷰 작성일 기본값 설정
-                .build();
+            ReviewWriteDTO reviewWriteDTO = ReviewWriteDTO.builder()
+                    .reviewDate(LocalDate.now())
+                    .build();
 
-        // 모델에 DTO와 기타 필요한 데이터 담기
-        model.addAttribute("reviewWriteDTO", reviewWriteDTO);
-        model.addAttribute("member", member);
-        model.addAttribute("reservationDTO", reservationDTO);
+            model.addAttribute("reviewWriteDTO", reviewWriteDTO);
+            model.addAttribute("member", member);
+            model.addAttribute("reservationDTO", reservationDTO);
 
-        return "/mypage/reviewWrite"; // reviewWrite.html 뷰로 이동
+            return "/mypage/reviewWrite";
+        } catch (Exception e) {
+            log.error("리뷰 작성 페이지 로드 중 오류 발생", e);
+            return "error"; // 오류 페이지로 리다이렉트
+        }
     }
 
-
     @PostMapping("/submitReview")
-    public ResponseEntity<?> submitReview(
+    public ResponseEntity<String> submitReview(
             @CookieValue(value = "accessToken", required = false) String accessToken,
             @RequestParam("reservationId") Long reservationId,
             @RequestParam("rating") int rating,
-            @RequestParam(value = "content", required = false) String content
+            @RequestParam(value = "content", required = false) String content,
+            @RequestParam(value = "images", required = false) List<MultipartFile> images
     ) {
-        log.info("폼 제출");
         try {
-            // 로그로 content 확인
-            log.info("content : {} " ,content);
-            // 로그인한 사용자의 정보를 가져옴
+            log.info("리뷰 제출 요청: 예약ID={}, 평가={}, 내용={}, 이미지 개수={}", reservationId, rating, content, images != null ? images.size() : 0);
+
             Member member = getUserDetails(accessToken);
 
-            // 예약 정보를 가져옴
             Reservation reservation = reservationService.findReservation(reservationId);
             if (reservation == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("예약 정보를 찾을 수 없습니다.");
+                        .body("해당 예약 정보를 찾을 수 없습니다.");
             }
 
-            // 리뷰 추가 서비스 호출
-            reviewService.addReview(
+            reviewService.addReviewWithImages(
                     reservation.getAccommodationId(),
                     member.getEmail(),
                     reservationId,
                     content,
-                    rating
+                    rating,
+                    images
             );
 
-            // 성공 메시지 반환
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body("리뷰가 성공적으로 제출되었습니다.");
+            return ResponseEntity.ok("리뷰가 성공적으로 제출되었습니다.");
         } catch (UnauthorizedException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("인증되지 않은 사용자입니다.");
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(e.getMessage());
-        } catch (Exception e) {
+        } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("리뷰 제출 중 오류가 발생했습니다.");
+                    .body("이미지 업로드 중 오류가 발생했습니다.");
+        } catch (Exception e) {
+            log.error("리뷰 제출 중 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("리뷰 제출 중 예상치 못한 오류가 발생했습니다.");
         }
     }
 
@@ -133,24 +137,21 @@ public class ReviewController {
             @CookieValue(value = "accessToken", required = false) String accessToken,
             Model model
     ) {
-        // 로그인한 사용자의 정보를 가져옴
-        Member member = getUserDetails(accessToken);
+        try {
+            Member member = getUserDetails(accessToken);
+            List<Review> reviews = reviewService.getReviewsByMember(member.getId());
 
-        // 사용자가 작성한 리뷰 목록을 가져옴
-        List<Review> reviews = reviewService.getReviewsByMember(member.getId());
+            model.addAttribute("reviews", reviews);
+            model.addAttribute("member", member);
 
-
-        // 모델에 리뷰 리스트를 담아서 뷰에 전달
-        model.addAttribute("reviews", reviews);
-        model.addAttribute("member", member);
-
-        return "/mypage/myReviews"; // myReviews.html 뷰로 이동
+            return "/mypage/myReviews";
+        } catch (Exception e) {
+            log.error("내 리뷰 페이지 로드 중 오류 발생", e);
+            return "error"; // 오류 페이지로 리다이렉트
+        }
     }
 
-
-
-
-    public Member getUserDetails(String accessToken) {
+    private Member getUserDetails(String accessToken) {
         if (accessToken == null || !tokenProvider.validate(accessToken)) {
             throw new UnauthorizedException("인증되지 않은 사용자입니다.");
         }

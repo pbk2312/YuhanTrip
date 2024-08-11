@@ -167,7 +167,7 @@
     </div>
 
     <div class="review-section">
-        <form th:action="@{/submitReview}" method="post">
+        <form th:action="@{/submitReview}" method="post" enctype="multipart/form-data">
             <input type="hidden" name="reservationId" th:value="${reservationDTO.id}">
 
             <label>별점 (1-5):</label>
@@ -199,6 +199,10 @@
                 <textarea id="content" name="content" placeholder="리뷰를 작성하세요"></textarea>
             </div>
 
+            <!-- 이미지 업로드 필드 추가 -->
+            <label for="reviewImages">이미지 업로드:</label>
+            <input type="file" id="reviewImages" name="reviewImages" multiple>
+
             <input type="submit" value="리뷰 제출" class="submit-btn">
         </form>
     </div>
@@ -212,12 +216,12 @@
 <script src="js/scripts.js"></script>
 
 <script>
-
     document.addEventListener('DOMContentLoaded', function () {
         const reviewForm = document.querySelector('form');
         const reviewTypeSelect = document.getElementById('review-type');
         const additionalReviewSection = document.getElementById('additional-review-section');
         const contentTextarea = document.getElementById('content');
+        const reviewImagesInput = document.getElementById('reviewImages');
 
         // 리뷰 선택에 따라 추가 리뷰 입력 표시/숨김 및 내용 설정
         reviewTypeSelect.addEventListener('change', function () {
@@ -267,7 +271,7 @@
                 .then(response => response.text())  // 응답을 텍스트로 처리
                 .then(message => {
                     if (message === '리뷰가 성공적으로 제출되었습니다.') {
-                        window.location.href = '/myReview';  // 성공 시 페이지 이동
+                        window.location.href = '/myReviews';  // 성공 시 페이지 이동
                     } else {
                         alert(message);  // 오류 메시지 표시
                     }
@@ -278,7 +282,6 @@
                 });
         });
     });
-
 </script>
 
 </body>
