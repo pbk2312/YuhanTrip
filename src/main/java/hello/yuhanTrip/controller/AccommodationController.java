@@ -22,7 +22,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -37,6 +39,7 @@ public class AccommodationController {
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
+
     @GetMapping("/accommodations")
     public String listAccommodations(Model model,
                                      @RequestParam(required = false) String region,
@@ -48,31 +51,26 @@ public class AccommodationController {
 
         log.info("숙소 리스트를 조회합니다.... 페이지: {}, 사이즈: {}, 지역: {}, 체크인 날짜: {}, 체크아웃 날짜: {}, 숙박 인원 수: {}", page, size, region, checkin, checkout, numGuests);
 
-        // 페이지 번호와 사이즈 검증
         page = Math.max(page, 0);
 
         Page<Accommodation> accommodationsPage;
 
         if (region != null && !region.isEmpty()) {
-            // 지역 코드로 숙소 리스트 조회
             Integer areaCode = RegionCode.getCodeByRegion(region);
             if (areaCode == null) {
                 log.error("잘못된 지역 이름: {}", region);
-                return "error"; // 잘못된 지역 이름 처리
+                return "error";
             }
 
-            // 체크인, 체크아웃, 숙박 인원 수가 널이 아닌 경우 필터링을 포함한 조회
             if (checkin != null && checkout != null && numGuests != null) {
                 accommodationsPage = accommodationService.getAvailableAccommodations(
                         String.valueOf(areaCode), checkin, checkout, numGuests, page, size);
             } else {
-                // 필터링 없이 전체 숙소 조회
                 accommodationsPage = accommodationService.getAccommodationsByAreaCode(String.valueOf(areaCode), page, size);
             }
 
             model.addAttribute("region", region);
         } else {
-            // 전체 숙소 리스트 조회
             if (checkin != null && checkout != null && numGuests != null) {
                 accommodationsPage = accommodationService.getAvailableAccommodations(
                         null, checkin, checkout, numGuests, page, size);
@@ -84,7 +82,6 @@ public class AccommodationController {
         int totalPages = accommodationsPage.getTotalPages();
         int currentPage = page;
 
-        // 페이지 번호 범위 계산
         int startPage = Math.max(0, currentPage - 5);
         int endPage = Math.min(totalPages - 1, currentPage + 5);
 
@@ -95,14 +92,21 @@ public class AccommodationController {
         model.addAttribute("endPage", endPage);
         model.addAttribute("pageSize", size);
 
-        // 필터링 조건을 모델에 추가
         model.addAttribute("checkin", checkin);
         model.addAttribute("checkout", checkout);
         model.addAttribute("numGuests", numGuests);
 
+        // 각 숙소의 평균 별점을 계산하여 모델에 추가
+        Map<Long, Double> accommodationRatings = new HashMap<>();
+        for (Accommodation accommodation : accommodationsPage.getContent()) {
+            double averageRating = accommodationService.calculateAverageRating(accommodation);
+            accommodationRatings.put(accommodation.getId(), averageRating);
+        }
+        model.addAttribute("accommodationRatings", accommodationRatings);
+
         log.info("현재 페이지: {}, 전체 페이지: {}, 시작 페이지: {}, 끝 페이지: {}", currentPage, totalPages, startPage, endPage);
 
-        return "/accommodation/accommodations"; // 뷰 이름
+        return "/accommodation/accommodations";
     }
 
 

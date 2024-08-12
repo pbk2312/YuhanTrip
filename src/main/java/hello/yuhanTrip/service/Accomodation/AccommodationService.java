@@ -3,6 +3,7 @@ package hello.yuhanTrip.service.Accomodation;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hello.yuhanTrip.domain.Accommodation;
+import hello.yuhanTrip.domain.Review;
 import hello.yuhanTrip.domain.Room;
 import hello.yuhanTrip.repository.AccommodationRepository;
 import hello.yuhanTrip.repository.RoomRepository;
@@ -274,6 +275,15 @@ public class AccommodationService {
         Room room = roomReposiotry.findById(id)
                 .orElseThrow(() -> new RuntimeException("객실 정보 없음"));
         return room;
+    }
+
+    public double calculateAverageRating(Accommodation accommodation) {
+        List<Review> reviews = accommodation.getReviews();
+        if (reviews.isEmpty()) {
+            return 0.0; // 리뷰가 없을 경우 0점 반환
+        }
+        double sum = reviews.stream().mapToInt(Review::getRating).sum();
+        return sum / reviews.size();
     }
 
 }
