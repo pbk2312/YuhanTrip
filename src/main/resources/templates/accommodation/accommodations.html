@@ -102,57 +102,6 @@
         }
 
 
-        .card-footer {
-            display: flex;
-            align-items: center; /* 수직 정렬 */
-            justify-content: space-between; /* 버튼과 별을 카드의 양쪽 끝으로 배치 */
-        }
-
-        .rating-info {
-            display: flex;
-            align-items: center; /* 수직 정렬 */
-            gap: 10px; /* 별과 평균 평점 사이의 간격 조정 */
-        }
-
-        .star-rating {
-            display: flex; /* 별 아이콘을 나란히 배치 */
-        }
-
-        .star-rating .bi-star {
-            font-size: 1.5rem; /* 별 아이콘 크기 조정 */
-        }
-
-        .average-rating {
-            font-size: 1rem; /* 평균 평점 텍스트 크기 조정 */
-            color: #333; /* 평균 평점 텍스트 색상 */
-        }
-        .card-footer {
-            display: flex;
-            align-items: center; /* 수직 정렬 */
-            justify-content: space-between; /* 버튼과 별을 카드의 양쪽 끝으로 배치 */
-        }
-
-        .rating-info {
-            display: flex;
-            align-items: center; /* 수직 정렬 */
-            gap: 10px; /* 별과 평균 평점 사이의 간격 조정 */
-        }
-
-        .star-rating {
-            display: flex; /* 별 아이콘을 나란히 배치 */
-        }
-
-        .star-rating .bi-star {
-            font-size: 1.5rem; /* 별 아이콘 크기 조정 */
-        }
-
-        .average-rating {
-            font-size: 1rem; /* 평균 평점 텍스트 크기 조정 */
-            color: #333; /* 평균 평점 텍스트 색상 */
-        }
-
-
-
     </style>
 </head>
 
@@ -312,14 +261,15 @@
 
 
 
+
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-4">
                 <!-- Accommodations cards -->
                 <div class="col" th:each="accommodation : ${accommodations}">
                     <div class="card">
                         <a th:href="@{${'/accommodation/info?id=' + accommodation.id +
-                (checkin != null ? '&checkin=' + checkin : '') +
-                (checkout != null ? '&checkout=' + checkout : '') +
-                (numGuests != null ? '&numGuests=' + numGuests : '')}}"
+            (checkin != null ? '&checkin=' + checkin : '') +
+            (checkout != null ? '&checkout=' + checkout : '') +
+            (numGuests != null ? '&numGuests=' + numGuests : '')}}"
                            class="text-decoration-none text-dark">
                             <img th:src="${accommodation.firstimage != '' ? accommodation.firstimage : '/Noimage.png'}"
                                  class="card-img-top" alt="이미지">
@@ -328,26 +278,21 @@
                                 <p class="card-text" th:text="${accommodation.addr1}">주소</p>
                             </div>
                         </a>
-                        <div class="card-footer">
-                            <!-- 하트 버튼 -->
+                        <div class="card-footer d-flex align-items-center justify-content-between">
                             <button class="btn btn-outline-danger btn-sm like-button" th:data-id="${accommodation.id}">
                                 <i class="bi bi-heart"></i>
                             </button>
-
-
-                            <!-- 별 평점 및 평균 평점 표시 -->
-                            <div class="rating-info">
-                                <div class="star-rating">
-                                    <!-- 별 아이콘을 표시 (별 1개만) -->
-                                    <span class="bi bi-star" th:style="'color: ' + (${accommodationRatings[accommodation.id]} >= 1 ? '#ffd700' : 'lightgray')"></span>
-                                </div>
-                                <span class="average-rating" th:text="${accommodationRatings[accommodation.id]} + ' / 5.0'"></span>
+                            <div class="d-flex align-items-center">
+                                <!-- 별 아이콘 -->
+                                <i class="bi bi-star-fill text-warning"></i>
+                                <!-- 평균 평점 표시 -->
+                                <span th:text="${accommodation.averageRating} + '/5.0'">평점</span>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
+
 
 
             <nav class="mt-4">

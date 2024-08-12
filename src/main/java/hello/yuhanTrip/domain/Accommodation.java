@@ -40,6 +40,7 @@ public class Accommodation {
     private String title;
     private String booktour;
     private String sigungucode;
+    private double averageRating;
 
     @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Room> rooms;      // 객실 리스트
@@ -50,6 +51,8 @@ public class Accommodation {
 
     @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews;  // 추가된 부분
+
+
 
 
 }

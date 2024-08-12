@@ -6,6 +6,7 @@ import hello.yuhanTrip.domain.Accommodation;
 import hello.yuhanTrip.domain.Review;
 import hello.yuhanTrip.domain.Room;
 import hello.yuhanTrip.repository.AccommodationRepository;
+import hello.yuhanTrip.repository.ReviewRepository;
 import hello.yuhanTrip.repository.RoomRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,20 +39,22 @@ public class AccommodationService {
     private final AccommodationRepository accommodationRepository;
     private final RoomRepository roomReposiotry;
 
+    private final ReviewRepository reviewRepository; // ReviewRepository 주입
+
     private static final String[] IMAGE_URLS = {
             "http://localhost:8080/villa-1737168_1280.jpg",
             "http://localhost:8080/ai-generated-8856798_1280.jpg"
     };
 
 
-    public AccommodationService(RestTemplate restTemplate, ObjectMapper objectMapper, AccommodationRepository accommodationRepository, RoomRepository roomReposiotry) {
+    public AccommodationService(RestTemplate restTemplate, ObjectMapper objectMapper,
+                                AccommodationRepository accommodationRepository, RoomRepository roomReposiotry, ReviewRepository reviewRepository) {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
         this.accommodationRepository = accommodationRepository;
         this.roomReposiotry = roomReposiotry;
+        this.reviewRepository = reviewRepository;
     }
-
-
 
 
     @Transactional
@@ -90,6 +93,7 @@ public class AccommodationService {
                 try {
                     roomReposiotry.saveAll(rooms);
                     accommodation.setRooms(rooms); // 숙소에 객실 리스트 설정
+                    accommodation.setAverageRating(0.0);
                 } catch (Exception e) {
                     log.error("객실 정보를 저장하는 중 오류가 발생했습니다.", e);
                     throw new RuntimeException("객실 저장 중 오류 발생", e); // 예외 던져 트랜잭션 롤백 유도
@@ -271,19 +275,21 @@ public class AccommodationService {
 
     }
 
+
     public Room getRoomInfo(Long id) {
         Room room = roomReposiotry.findById(id)
                 .orElseThrow(() -> new RuntimeException("객실 정보 없음"));
         return room;
     }
 
-    public double calculateAverageRating(Accommodation accommodation) {
-        List<Review> reviews = accommodation.getReviews();
+    public double calculateAverageRating(Long accommodationId) {
+        List<Review> reviews = reviewRepository.findByAccommodationId(accommodationId);
         if (reviews.isEmpty()) {
-            return 0.0; // 리뷰가 없을 경우 0점 반환
+            return 0;
         }
-        double sum = reviews.stream().mapToInt(Review::getRating).sum();
-        return sum / reviews.size();
+        return reviews.stream()
+                .mapToInt(Review::getRating)
+                .average()
+                .orElse(0);
     }
-
 }

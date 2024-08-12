@@ -79,13 +79,20 @@ public class AccommodationController {
             }
         }
 
+        // 평균 평점 계산
+        List<Accommodation> accommodations = accommodationsPage.getContent();
+        for (Accommodation accommodation : accommodations) {
+            double averageRating = accommodationService.calculateAverageRating(accommodation.getId());
+            accommodation.setAverageRating(averageRating); // Accommodation 클래스에 averageRating 필드가 필요함
+        }
+
         int totalPages = accommodationsPage.getTotalPages();
         int currentPage = page;
 
         int startPage = Math.max(0, currentPage - 5);
         int endPage = Math.min(totalPages - 1, currentPage + 5);
 
-        model.addAttribute("accommodations", accommodationsPage.getContent());
+        model.addAttribute("accommodations", accommodations);
         model.addAttribute("currentPage", currentPage);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("startPage", startPage);
@@ -95,14 +102,6 @@ public class AccommodationController {
         model.addAttribute("checkin", checkin);
         model.addAttribute("checkout", checkout);
         model.addAttribute("numGuests", numGuests);
-
-        // 각 숙소의 평균 별점을 계산하여 모델에 추가
-        Map<Long, Double> accommodationRatings = new HashMap<>();
-        for (Accommodation accommodation : accommodationsPage.getContent()) {
-            double averageRating = accommodationService.calculateAverageRating(accommodation);
-            accommodationRatings.put(accommodation.getId(), averageRating);
-        }
-        model.addAttribute("accommodationRatings", accommodationRatings);
 
         log.info("현재 페이지: {}, 전체 페이지: {}, 시작 페이지: {}, 끝 페이지: {}", currentPage, totalPages, startPage, endPage);
 
