@@ -181,6 +181,18 @@ public class MemberService {
 
     }
 
+    @Transactional
+    public void updateMember(Member member) {
+        memberRepository.updateMemberInfo(
+                member.getEmail(),
+                member.getName(),
+                member.getNickname(),
+                member.getPhoneNumber(),
+                member.getDateOfBirth(),
+                member.getAddress()
+        );
+    }
+
 
 
     // 회원 찾기

@@ -15,6 +15,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
 @Controller
 @RequiredArgsConstructor
 @Log4j2
@@ -62,7 +64,7 @@ public class MypageController {
     public String memberInfo(
             @CookieValue(value = "accessToken", required = false) String accessToken,
             Model model
-    ){
+    ) {
         ResponseEntity<Void> validationResponse = validateAccessToken(accessToken);
         if (validationResponse != null) {
             return "redirect:/member/login";
@@ -82,11 +84,86 @@ public class MypageController {
                 .build();
 
 
-        model.addAttribute("MypageMemberDTO",mypageMemberDTO);
+        model.addAttribute("MypageMemberDTO", mypageMemberDTO);
 
 
         return "/mypage/memberInfo";
     }
+
+
+    @GetMapping("/editMemberInfo")
+    public String geteditMemberInfo(
+            @CookieValue(value = "accessToken", required = false) String accessToken,
+            Model model
+    ) {
+
+        ResponseEntity<Void> validationResponse = validateAccessToken(accessToken);
+        if (validationResponse != null) {
+            return "redirect:/member/login";
+        }
+
+
+        UserDetails userDetails = getUserDetails(accessToken);
+        Member member = findMemberByEmail(userDetails.getUsername());
+
+        MypageMemberDTO mypageMemberDTO = MypageMemberDTO.builder()
+                .email(member.getEmail())
+                .address(member.getAddress())
+                .nickname(member.getNickname())
+                .phoneNumber(member.getPhoneNumber())
+                .dateOfBirth(member.getDateOfBirth())
+                .name(member.getName())
+                .build();
+
+
+        model.addAttribute("MypageMemberDTO", mypageMemberDTO);
+
+
+        return "/mypage/editMemberInfo";
+
+
+    }
+
+
+    @PostMapping("/editMemberInfoSubmit")
+    public ResponseEntity<Void> editMemberInfoSubmit(
+            @CookieValue(value = "accessToken", required = false) String accessToken,
+            @RequestParam String name,
+            @RequestParam String nickname,
+            @RequestParam String phoneNumber,
+            @RequestParam LocalDate dateOfBirth,
+            @RequestParam String address
+    ) {
+        // 1. 토큰 유효성 검사
+        ResponseEntity<Void> validationResponse = validateAccessToken(accessToken);
+        if (validationResponse != null) {
+            return validationResponse;
+        }
+
+        // 2. 사용자 정보 가져오기
+        UserDetails userDetails = getUserDetails(accessToken);
+        Member member = findMemberByEmail(userDetails.getUsername());
+
+        // 3. 회원 정보 업데이트
+        member.setName(name);
+        member.setNickname(nickname);
+        member.setPhoneNumber(phoneNumber);
+        member.setDateOfBirth(dateOfBirth);
+        member.setAddress(address);
+
+        try {
+            // 4. 업데이트된 정보 저장
+            memberService.updateMember(member);
+
+            // 5. 성공적으로 업데이트된 경우 OK 응답 반환
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            log.error("회원 정보 수정 중 오류 발생: ", e);
+            // 6. 오류 발생 시 INTERNAL_SERVER_ERROR 응답 반환
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 
 
     // 인증 토큰 유효성 검증 메소드
