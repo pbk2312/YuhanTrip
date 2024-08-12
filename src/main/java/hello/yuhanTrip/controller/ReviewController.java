@@ -14,6 +14,7 @@ import hello.yuhanTrip.service.MemberService;
 import hello.yuhanTrip.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -132,17 +133,22 @@ public class ReviewController {
         }
     }
 
+
     @GetMapping("/myReviews")
     public String getMyReviews(
             @CookieValue(value = "accessToken", required = false) String accessToken,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "2") int size, // 한 페이지당 2개의 리뷰를 보여줌
             Model model
     ) {
         try {
             Member member = getUserDetails(accessToken);
-            List<Review> reviews = reviewService.getReviewsByMember(member.getId());
+            Page<Review> reviewsPage = reviewService.getReviewsByMemberWithPagination(member.getId(), page, size);
 
-            model.addAttribute("reviews", reviews);
+            model.addAttribute("reviews", reviewsPage.getContent());
             model.addAttribute("member", member);
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", reviewsPage.getTotalPages());
 
             return "/mypage/myReviews";
         } catch (Exception e) {

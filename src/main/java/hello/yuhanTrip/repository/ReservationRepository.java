@@ -1,12 +1,14 @@
 package hello.yuhanTrip.repository;
 
+import hello.yuhanTrip.domain.Member;
 import hello.yuhanTrip.domain.Reservation;
 import hello.yuhanTrip.domain.ReservationStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -43,5 +45,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     @Query("select o from Reservation o where o.reservationUid = :reservationUid")
     Optional<Reservation> findByReservationUid(@Param("reservationUid") String reservationUid);
+
+    @Query("SELECT r FROM Reservation r WHERE r.member = :member AND r.reservationStatus != :status")
+    Page<Reservation> findByMember(@Param("member") Member member, @Param("status") ReservationStatus status, Pageable pageable);
 
 }

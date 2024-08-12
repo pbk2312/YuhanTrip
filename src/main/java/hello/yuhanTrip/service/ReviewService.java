@@ -12,6 +12,9 @@ import hello.yuhanTrip.service.Accomodation.ReservationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,6 +40,7 @@ public class ReviewService {
 
     @Value("${upload.dir}")
     private String uploadDir;  // 주입된 업로드 디렉토리 경로
+
 
     public Review addReviewWithImages(Long accommodationId, String memberEmail, Long reservationId, String content, int rating, List<MultipartFile> images) throws IOException {
         log.info("리뷰 추가 시작: accommodationId={}, memberEmail={}, reservationId={}, rating={}", accommodationId, memberEmail, reservationId, rating);
@@ -67,24 +71,32 @@ public class ReviewService {
         reservation.setReview(review);
         Review savedReview = reviewRepository.save(review);
 
+        log.info("이미지 저장 시작.....");
+
         // 이미지 저장 및 ReviewImage 엔티티 생성
         if (images != null && !images.isEmpty()) {
             for (MultipartFile image : images) {
-                String imageUrl = saveImage(image);  // 이미지 저장 및 URL 생성
-                ReviewImage reviewImage = ReviewImage.builder()
-                        .review(savedReview)
-                        .imageUrl(imageUrl)
-                        .build();
-                reviewImageRepository.save(reviewImage);
+                if (image != null && !image.isEmpty()) {
+                    String imageUrl = saveImage(image);  // 이미지 저장 및 URL 생성
+                    ReviewImage reviewImage = ReviewImage.builder()
+                            .review(savedReview)
+                            .imageUrl(imageUrl)
+                            .build();
+                    reviewImageRepository.save(reviewImage);
+                } else {
+                    log.warn("null이거나 빈 이미지가 발견되었습니다. 해당 이미지는 무시됩니다.");
+                }
             }
+        } else {
+            log.warn("이미지가 null이거나 비어 있습니다. 이미지가 저장되지 않습니다.");
         }
 
         log.info("리뷰 추가 완료: reviewId={}", savedReview.getId());
         return savedReview;
     }
 
+
     private String saveImage(MultipartFile image) throws IOException {
-        log.info("이미지 저장 시작...");
 
         // 이미지 저장 디렉토리 설정
         Path uploadPath = Paths.get(uploadDir);
@@ -119,5 +131,11 @@ public class ReviewService {
         return reviewRepository.findAll().stream()
                 .filter(review -> review.getMember().getId().equals(memberId))
                 .collect(Collectors.toList());
+    }
+
+
+    public Page<Review> getReviewsByMemberWithPagination(Long memberId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return reviewRepository.findByMemberId(memberId, pageable);
     }
 }

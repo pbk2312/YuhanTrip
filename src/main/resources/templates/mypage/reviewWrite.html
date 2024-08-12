@@ -119,6 +119,11 @@
             margin: 0 0 10px;
             font-size: 18px;
         }
+
+        #image-preview img {
+            width: 100px; /* 미리보기 이미지의 너비 */
+            margin-right: 10px; /* 이미지 간격 */
+        }
     </style>
 </head>
 <body>
@@ -201,7 +206,10 @@
 
             <!-- 이미지 업로드 필드 추가 -->
             <label for="reviewImages">이미지 업로드:</label>
-            <input type="file" id="reviewImages" name="reviewImages" multiple>
+            <input type="file" id="reviewImages" name="images" multiple>
+
+            <!-- 이미지 미리보기 필드 추가 -->
+            <div id="image-preview" style="margin-top: 10px;"></div>
 
             <input type="submit" value="리뷰 제출" class="submit-btn">
         </form>
@@ -222,6 +230,7 @@
         const additionalReviewSection = document.getElementById('additional-review-section');
         const contentTextarea = document.getElementById('content');
         const reviewImagesInput = document.getElementById('reviewImages');
+        const imagePreviewDiv = document.getElementById('image-preview');
 
         // 리뷰 선택에 따라 추가 리뷰 입력 표시/숨김 및 내용 설정
         reviewTypeSelect.addEventListener('change', function () {
@@ -255,25 +264,65 @@
             });
         });
 
-        // 폼 제출 시 AJAX 요청 처리
+        // 이미지 미리보기 및 유효성 검사
+        reviewImagesInput.addEventListener('change', function () {
+            imagePreviewDiv.innerHTML = ''; // 기존 미리보기 이미지 제거
+
+            let valid = true;
+            const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+            const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
+
+            Array.from(reviewImagesInput.files).forEach(file => {
+                if (!ALLOWED_TYPES.includes(file.type)) {
+                    valid = false;
+                    alert(`파일 타입이 유효하지 않습니다: ${file.name}`);
+                } else if (file.size > MAX_SIZE) {
+                    valid = false;
+                    alert(`파일 크기가 너무 큽니다: ${file.name}`);
+                } else {
+                    const reader = new FileReader();
+                    reader.onload = function (event) {
+                        const img = document.createElement('img');
+                        img.src = event.target.result;
+                        imagePreviewDiv.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            if (!valid) {
+                reviewImagesInput.value = ''; // 유효하지 않은 파일이 있으면 선택을 취소
+            }
+        });
+
         reviewForm.addEventListener('submit', function (event) {
             event.preventDefault();  // 기본 폼 제출 방지
 
             const formData = new FormData(reviewForm);
 
+            // 콘솔 로그로 파일 확인
+            for (let [key, value] of formData.entries()) {
+                if (value instanceof File) {
+                    console.log(`${key}: ${value.name}`);
+                } else {
+                    console.log(`${key}: ${value}`);
+                }
+            }
+
+            // AJAX 요청 처리
             fetch('/submitReview', {
                 method: 'POST',
                 body: formData,
                 headers: {
-                    'Accept': 'text/plain'  // 서버에서 문자열을 반환하므로 텍스트 응답을 기대
+                    'Accept': 'text/plain'
                 }
             })
-                .then(response => response.text())  // 응답을 텍스트로 처리
+                .then(response => response.text())
                 .then(message => {
                     if (message === '리뷰가 성공적으로 제출되었습니다.') {
-                        window.location.href = '/myReviews';  // 성공 시 페이지 이동
+                        window.location.href = '/myReviews';
                     } else {
-                        alert(message);  // 오류 메시지 표시
+                        alert(message);
                     }
                 })
                 .catch(error => {
@@ -281,6 +330,7 @@
                     alert('리뷰 제출 중 오류가 발생했습니다.');
                 });
         });
+
     });
 </script>
 

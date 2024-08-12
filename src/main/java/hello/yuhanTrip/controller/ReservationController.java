@@ -12,6 +12,9 @@ import hello.yuhanTrip.service.Accomodation.ReservationService;
 import hello.yuhanTrip.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -186,32 +189,38 @@ public class ReservationController {
     @GetMapping("/reservationConfirm")
     public String successPaymentPage(
             @CookieValue(value = "accessToken", required = false) String accessToken,
+            @RequestParam(value = "page", defaultValue = "0") int page, // 현재 페이지 번호 (기본값: 0)
             Model model
     ) {
         // 1. 사용자 정보 조회
         Member member = getUserDetails(accessToken);
         log.info("예약 확정 확인 유저 : {}", member.getName());
 
-        // 2. 사용자의 예약 목록 조회
-        List<Reservation> reservations = member.getReservations();
+        // 2. 페이지 처리 설정
+        Pageable pageable = PageRequest.of(page, 4); // 한 페이지에 4개 예약
+
+        // 3. 사용자의 예약 목록 조회 (페이지 처리)
+        Page<Reservation> reservationPage = reservationService.getReservationsByPage(member, pageable);
         LocalDate today = LocalDate.now();
 
-        // 3. 예약 상태를 확인하고 업데이트
-        for (Reservation reservation : reservations) {
+        // 4. 예약 상태를 확인하고 업데이트
+        reservationPage.getContent().forEach(reservation -> {
             if (reservation.getReservationStatus() == ReservationStatus.RESERVED &&
                     reservation.getCheckOutDate().isBefore(today)) {
                 reservation.setReservationStatus(ReservationStatus.COMPLETED);
                 reservationService.updateReservationStatus(reservation); // 상태 업데이트 후 저장
             }
-        }
+        });
 
-        // 4. CANCELLED 상태의 예약을 제외한 리스트 필터링
-        List<Reservation> activeReservations = reservations.stream()
+        // 5. CANCELLED 상태의 예약을 제외한 리스트 필터링
+        List<Reservation> activeReservations = reservationPage.getContent().stream()
                 .filter(reservation -> reservation.getReservationStatus() != ReservationStatus.CANCELLED)
                 .collect(Collectors.toList());
 
-        // 5. 모델에 필터링된 예약 리스트 추가
+        // 6. 모델에 필터링된 예약 리스트 추가
         model.addAttribute("reservations", activeReservations);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", reservationPage.getTotalPages());
 
         return "/reservation/reservationConfirms";
     }
@@ -298,8 +307,10 @@ public class ReservationController {
     }
 
 
+
     @GetMapping("/reservationConfirm/cancel")
     public String cancelPaymentPage(
+            @RequestParam(value = "page", defaultValue = "0") int page,
             @CookieValue(value = "accessToken", required = false) String accessToken,
             Model model
     ) {
@@ -314,11 +325,29 @@ public class ReservationController {
                 .filter(reservation -> ReservationStatus.CANCELLED.equals(reservation.getReservationStatus()))
                 .collect(Collectors.toList());
 
-        // 4. 모델에 취소된 예약 리스트 추가
-        model.addAttribute("cancelReservations", cancelledReservations);
+        // 4. 페이지 처리를 위한 페이징 설정
+        int pageSize = 4; // 한 페이지에 표시할 예약 수
+        int totalReservations = cancelledReservations.size();
+        int totalPages = (int) Math.ceil((double) totalReservations / pageSize);
+
+        // 페이지 번호 유효성 검사
+        if (page < 0 || page >= totalPages) {
+            page = 0;
+        }
+
+        // 페이지에 맞는 예약 리스트 추출
+        int start = page * pageSize;
+        int end = Math.min(start + pageSize, totalReservations);
+        List<Reservation> pagedReservations = cancelledReservations.subList(start, end);
+
+        // 5. 모델에 페이지 정보 및 취소된 예약 리스트 추가
+        model.addAttribute("cancelReservations", pagedReservations);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
 
         return "/reservation/reservationCancelConfirm";
     }
+
 
 
     @GetMapping("/fail-payment")

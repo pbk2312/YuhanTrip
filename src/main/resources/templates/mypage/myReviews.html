@@ -19,16 +19,19 @@
             margin: 0;
             padding: 0;
             color: #333;
+            font-family: 'Arial', sans-serif;
         }
 
         .navbar {
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.9);
             border-bottom: 1px solid #ddd;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         .navbar-brand {
-            font-size: 1.5rem;
+            font-size: 1.7rem;
             font-weight: bold;
+            color: #333;
         }
 
         .navbar-nav .nav-link {
@@ -41,44 +44,120 @@
         }
 
         .review-list {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             padding: 20px;
-            border-radius: 10px;
-            max-width: 800px;
-            margin: 30px auto;
+            border-radius: 12px;
+            max-width: 900px;
+            margin: 50px auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .review-list h1 {
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: bold;
-            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
         }
 
         .review-item {
-            background: #f8f9fa;
-            border-radius: 10px;
+            background: #f9f9f9;
+            border-radius: 12px;
             padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .review-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
         }
 
         .review-item h4 {
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            color: #555;
         }
 
         .review-item .reservation-info {
             margin-bottom: 15px;
+            color: #666;
         }
 
         .review-item .reservation-info p {
             margin: 5px 0;
+            font-size: 0.95rem;
         }
 
         .review-item .review-content {
             border-top: 1px solid #ddd;
-            padding-top: 10px;
-            margin-top: 15px;
+            padding-top: 15px;
+            margin-top: 20px;
+        }
+
+        .review-item .review-content p {
+            margin: 5px 0;
+            font-size: 1rem;
+            color: #444;
+        }
+
+        .review-item .review-content .rating {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #f39c12;
+        }
+
+        .review-item .review-content .review-date {
+            font-size: 0.85rem;
+            color: #aaa;
+            text-align: right;
+        }
+
+        .review-item .review-content .review-text {
+            font-style: italic;
+            color: #333;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .pagination ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+        }
+
+        .pagination li {
+            margin: 0 5px;
+        }
+
+        .pagination a {
+            display: block;
+            padding: 8px 16px;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .pagination a:hover {
+            background-color: #0056b3;
+        }
+
+        .pagination .active a {
+            background-color: #0056b3;
+            font-weight: bold;
+        }
+
+        .pagination .disabled a {
+            background-color: #ccc;
+            cursor: not-allowed;
         }
     </style>
 </head>
@@ -116,12 +195,12 @@
 <div id="main-content">
     <div class="review-list">
         <h1 th:text="${member.name} + '님의 리뷰 목록'">리뷰 목록</h1>
-        <ul>
+        <div>
             <!-- 리뷰 리스트를 순회하며 각 리뷰를 표시 -->
-            <li class="review-item" th:each="review : ${reviews}">
+            <div class="review-item" th:each="review : ${reviews}">
                 <!-- 예약 정보 섹션 -->
                 <div class="reservation-info">
-                    <h4>예약 정보</h4>
+                    <h4>숙박 정보</h4>
                     <p>숙소 이름: <strong th:text="${review.accommodation.title}"></strong></p>
                     <p>예약일: <span th:text="${review.reservation.reservationDate}"></span></p>
                     <p>체크인 날짜: <span th:text="${review.reservation.checkInDate}"></span></p>
@@ -132,15 +211,38 @@
 
                 <!-- 리뷰 내용 섹션 -->
                 <div class="review-content">
-                    <h4>리뷰</h4>
-                    <p>평점: <span th:text="${review.rating} + '점'"></span></p>
-                    <p th:text="${review.content}"></p>
-                    <p><em th:text="${review.reviewDate}"></em></p>
+                    <p class="rating">평점: <span th:text="${review.rating} + '점'"></span></p>
+                    <p class="review-text" th:text="${review.content}"></p>
+                    <p class="review-date" th:text="${review.reviewDate}"></p>
                 </div>
-            </li>
-        </ul>
+            </div>
+        </div>
+        <div class="pagination">
+            <ul class="pagination">
+                <!-- Previous Page Link -->
+                <li th:classappend="${currentPage == 0} ? 'disabled'">
+                    <a th:href="@{/myReviews(page=${currentPage > 0 ? currentPage - 1 : 0})}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+
+                <!-- Page Number Links -->
+                <li th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+                    th:classappend="${pageNum == currentPage} ? 'active'">
+                    <a th:href="@{/myReviews(page=${pageNum})}" th:text="${pageNum + 1}">1</a>
+                </li>
+
+                <!-- Next Page Link -->
+                <li th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                    <a th:href="@{/myReviews(page=${currentPage < totalPages - 1 ? currentPage + 1 : totalPages - 1})}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
     </div>
 </div>
+
 
 <!-- jQuery, Popper.js, and Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

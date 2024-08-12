@@ -140,6 +140,12 @@
                     </ul>
                 </li>
             </ul>
+            <div id="authButtons" class="d-flex">
+                <button id="authButton" class="btn btn-outline-dark me-2" type="button"></button>
+                <button id="deleteAccountButton" class="btn btn-outline-danger" type="button" style="display: none;">
+                    회원탈퇴
+                </button>
+            </div>
         </div>
     </div>
 </nav>
@@ -150,6 +156,7 @@
     <div class="action-buttons">
         <button class="btn btn-secondary" onclick="location.href='/reservationConfirm'">예약 내역 확인</button>
         <button class="btn btn-info" onclick="location.href='/accommodation/memberLikeHistory'">관심 있는 목록</button>
+        <button class="btn btn-info" onclick="location.href='/myReviews'">내 리뷰 보기</button>
     </div>
 
     <!-- 회원 정보 섹션 -->
@@ -191,6 +198,94 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
 <!-- Core theme JS-->
 <script src="js/scripts.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const accessToken = localStorage.getItem('accessToken');
+        const authButton = document.getElementById('authButton');
+        const deleteAccountButton = document.getElementById('deleteAccountButton');
+
+        if (accessToken) {
+            if (isTokenExpired(accessToken)) {
+                // 토큰이 만료된 경우 로그아웃
+                deleteAccessToken();
+                logout();
+            } else {
+                // 유효한 토큰이 있는 경우 로그아웃 버튼 표시
+                authButton.textContent = 'Logout';
+                authButton.onclick = confirmLogout;
+                deleteAccountButton.style.display = 'block';
+                deleteAccountButton.onclick = () => {
+                    window.location.href = '/member/withdrawalMembership';
+                };
+            }
+        } else {
+            // 토큰이 없는 경우 로그인 버튼 표시
+            authButton.textContent = 'Login';
+            authButton.onclick = () => window.location.href = '/member/login';
+            if (window.location.pathname === '/member/withdrawalMembership') {
+                window.location.href = '/member/login';
+            }
+        }
+    });
+
+    function isTokenExpired(token) {
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const currentTime = Math.floor(Date.now() / 1000);
+            return payload.exp < currentTime;
+        } catch (e) {
+            console.error('토큰 파싱 중 오류 발생:', e);
+            return true;
+        }
+    }
+
+    function confirmLogout() {
+        if (confirm("로그아웃 하시겠습니까?")) {
+            logout();
+        }
+    }
+
+    function logout() {
+        fetch('/member/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ /* 필요 시 요청 본문 추가 */ })
+        })
+            .then(response => {
+                if (response.ok) {
+                    deleteAccessToken();
+                    document.getElementById('authButton').textContent = 'Login';
+                    document.getElementById('deleteAccountButton').style.display = 'none';
+                    document.getElementById('authButton').onclick = () => window.location.href = '/member/login';
+                } else {
+                    console.error('로그아웃 요청 실패');
+                }
+            })
+            .catch(error => console.error('로그아웃 요청 중 오류 발생:', error));
+    }
+
+    function deleteAccessToken() {
+        localStorage.removeItem('accessToken');
+    }
+
+    function checkAccessTokenAndRedirect() {
+        const accessToken = localStorage.getItem('accessToken');
+        if (accessToken) {
+            if (!isTokenExpired(accessToken)) {
+                window.location.href = '/reservationConfirm';
+            } else {
+                alert('세션이 만료되었습니다. 다시 로그인 해주세요.');
+                window.location.href = '/member/login';
+            }
+        } else {
+            alert('이 페이지에 접근하려면 로그인 해주세요.');
+            window.location.href = '/member/login';
+        }
+    }
+</script>
+
 
 </body>
 </html>

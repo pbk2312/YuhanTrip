@@ -1,6 +1,8 @@
 package hello.yuhanTrip.service.Accomodation;
 
+import hello.yuhanTrip.domain.Member;
 import hello.yuhanTrip.domain.Reservation;
+import hello.yuhanTrip.domain.ReservationStatus;
 import hello.yuhanTrip.domain.Room;
 import hello.yuhanTrip.dto.ReservationDTO;
 import hello.yuhanTrip.dto.ReservationUpdateDTO;
@@ -8,6 +10,8 @@ import hello.yuhanTrip.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,8 +37,8 @@ public class ReservationService {
     }
 
     @Transactional
-    public void updateReservationStatus(Reservation reservation){
-        reservationRepository.updateReservationStatus(reservation.getId(),reservation.getReservationStatus());
+    public void updateReservationStatus(Reservation reservation) {
+        reservationRepository.updateReservationStatus(reservation.getId(), reservation.getReservationStatus());
     }
 
     @Transactional
@@ -65,8 +69,6 @@ public class ReservationService {
 
         reservationRepository.delete(reservation);
     }
-
-
 
 
     public Reservation updateReservation(ReservationUpdateDTO reservationDTO, String username) {
@@ -110,6 +112,10 @@ public class ReservationService {
         if (reservationDTO.getNumberOfGuests() > room.getMaxOccupancy()) {
             throw new IllegalArgumentException("숙박 인원 수가 방 최대 수용 인원수 보다 많습니다");
         }
+    }
+
+    public Page<Reservation> getReservationsByPage(Member member, Pageable pageable) {
+        return reservationRepository.findByMember(member, ReservationStatus.CANCELLED, pageable);
     }
 
 }

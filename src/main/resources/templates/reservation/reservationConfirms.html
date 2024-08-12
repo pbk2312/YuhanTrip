@@ -98,18 +98,18 @@
 
         .reservation-container {
             display: flex;
-            flex-direction: row; /* 가로 방향으로 변경 */
-            flex-wrap: wrap; /* 가로 공간이 부족하면 다음 줄로 넘어가도록 설정 */
+            flex-direction: row;
+            flex-wrap: wrap;
             gap: 20px;
         }
 
         .reservation-item {
-            flex: 1 1 calc(33.333% - 20px); /* 3개의 열로 표시 */
+            flex: 1 1 calc(33.333% - 20px);
             padding: 15px;
             border: 1px solid #ddd;
             border-radius: 8px;
             background: rgba(255, 255, 255, 0.9);
-            min-width: 250px; /* 최소 너비를 설정하여 아이템이 너무 좁아지지 않도록 함 */
+            min-width: 250px;
         }
 
         .reservation-actions {
@@ -123,11 +123,66 @@
         }
 
         .reservation-item.completed {
-            opacity: 0.5; /* 숙박 완료된 항목은 반투명하게 */
+            opacity: 0.5;
         }
 
         .reservation-item.reserved {
-            opacity: 1; /* 예약된 항목은 선명하게 */
+            opacity: 1;
+        }
+
+        .review-button {
+            background-color: #17a2b8;
+            color: #fff;
+            border: none;
+            font-weight: 700;
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-align: center;
+            display: inline-block;
+            text-decoration: none;
+            opacity: 1;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .review-button:hover {
+            background-color: #138496;
+            color: #e9ecef;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination .page-item {
+            margin: 0 5px;
+        }
+
+        .pagination .page-link {
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .no-reservations {
+            text-align: center;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            margin: 20px auto;
+            max-width: 800px;
+            color: #ff6f61; /* 경고 색상 */
+        }
+
+        .no-reservations h2 {
+            margin: 0;
+            font-size: 20px;
         }
     </style>
 </head>
@@ -159,8 +214,9 @@
             </ul>
             <div id="authButtons" class="d-flex">
                 <button id="authButton" class="btn btn-outline-dark me-2" type="button"></button>
-                <button id="deleteAccountButton" class="btn btn-outline-danger" type="button" style="display: none;">
-                    회원탈퇴
+                <!-- Removed delete account button -->
+                <button id="mypageButton" class="btn btn-outline-primary" type="button" style="display: none;">
+                    마이페이지
                 </button>
             </div>
         </div>
@@ -174,11 +230,14 @@
             <h1 class="mb-4">예약 내역</h1>
             <a href="/reservationConfirm/cancel" class="btn btn-secondary cancel-view-button">예약 취소 내역 보기</a>
         </div>
-        <div class="reservation-container">
+
+        <!-- 예약 내역이 있는 경우 -->
+        <div class="reservation-container" th:if="${not #lists.isEmpty(reservations)}">
             <div th:each="reservation : ${reservations}" class="reservation-item"
                  th:data-status="${reservation.reservationStatus}">
                 <p><strong>예약 번호:</strong> <span th:text="${reservation.reservationUid}">예약 번호</span></p>
-                <p><strong>숙소 이름:</strong> <span th:text="${reservation.room.getAccommodation().getTitle()}">숙소 이름</span></p>
+                <p><strong>숙소 이름:</strong> <span
+                        th:text="${reservation.room.getAccommodation().getTitle()}">숙소 이름</span></p>
                 <p><strong>객실 이름:</strong> <span th:text="${reservation.room.getRoomNm()}">객실 이름</span></p>
                 <p><strong>예약자명:</strong> <span th:text="${reservation.getName()}">예약자명</span></p>
                 <p><strong>체크인 날짜:</strong> <span th:text="${reservation.checkInDate}">체크인 날짜</span></p>
@@ -186,13 +245,47 @@
                 <p><strong>결제 금액:</strong> <span th:text="${reservation.getPayment().price}">결제 금액</span> 원</p>
                 <p><strong>투숙 인원:</strong> <span th:text="${reservation.getNumberOfGuests()}">투숙 인원</span> 명</p>
                 <div class="reservation-actions">
-                    <a th:href="@{/reservationUpdate(reservationId=${reservation.id})}" class="btn btn-primary update-button">예약 수정</a>
-                    <a th:href="@{/paymentCancelPage(reservationId=${reservation.id})}" class="btn btn-danger cancel-button">예약 취소</a>
+                    <a th:href="@{/reservationUpdate(reservationId=${reservation.id})}"
+                       class="btn btn-primary update-button">예약 수정</a>
+                    <a th:href="@{/paymentCancelPage(reservationId=${reservation.id})}"
+                       class="btn btn-danger cancel-button">예약 취소</a>
                     <!-- 후기 작성 버튼, 기본적으로 숨김 -->
-                    <a href="#" class="btn btn-info review-button" style="display: none;" th:data-id="${reservation.id}">후기 작성</a>
+                    <a href="#" class="btn btn-info review-button" style="display: none;"
+                       th:data-id="${reservation.id}">후기 작성</a>
                 </div>
             </div>
         </div>
+
+        <!-- 예약 내역이 없는 경우 -->
+        <div class="no-reservations" th:if="${#lists.isEmpty(reservations)}">
+            <h2>예약 내역이 없습니다.</h2>
+            <p>아직 예약이 없으신가요? <a href="/home/homepage">홈으로 돌아가기</a></p>
+        </div>
+
+        <!-- Pagination -->
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                <!-- Previous Page Link -->
+                <li class="page-item" th:if="${currentPage > 0}">
+                    <a class="page-link" th:href="@{/reservationConfirm(page=${currentPage - 1})}"
+                       aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <!-- Page Number Links -->
+                <li class="page-item" th:each="page : ${#numbers.sequence(0, totalPages - 1)}"
+                    th:classappend="${page == currentPage ? 'active' : ''}">
+                    <a class="page-link" th:href="@{/reservationConfirm(page=${page})}" th:text="${page + 1}">1</a>
+                </li>
+                <!-- Next Page Link -->
+                <li class="page-item" th:if="${currentPage < totalPages - 1}">
+                    <a class="page-link" th:href="@{/reservationConfirm(page=${currentPage + 1})}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
     </div>
 </div>
 
@@ -203,6 +296,35 @@
 <!-- Core theme JS-->
 <script src="js/scripts.js"></script>
 <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const accessToken = localStorage.getItem('accessToken');
+        const authButton = document.getElementById('authButton');
+        const mypageButton = document.getElementById('mypageButton');
+
+        if (accessToken) {
+            if (isTokenExpired(accessToken)) {
+                // 토큰이 만료된 경우 로그아웃
+                deleteAccessToken();
+                logout();
+            } else {
+                // 유효한 토큰이 있는 경우 로그아웃 버튼 및 마이페이지 버튼 표시
+                authButton.textContent = 'Logout';
+                authButton.onclick = confirmLogout;
+                mypageButton.style.display = 'block';
+                mypageButton.onclick = () => {
+                    window.location.href = '/mypage/check';
+                };
+            }
+        } else {
+            // 토큰이 없는 경우 로그인 버튼 표시
+            authButton.textContent = 'Login';
+            authButton.onclick = () => window.location.href = '/member/login';
+            if (window.location.pathname === '/member/withdrawalMembership') {
+                window.location.href = '/member/login';
+            }
+        }
+    });
+
     document.addEventListener('DOMContentLoaded', () => {
         const reservationItems = document.querySelectorAll('.reservation-item');
 
@@ -222,38 +344,13 @@
                 // "후기 작성" 버튼 표시 및 링크 설정
                 if (reviewButton) {
                     reviewButton.style.display = 'inline-block';
-                    const reservationId = reviewButton.getAttribute('data-id'); // data-id 속성에서 ID를 가져옵니다.
+                    const reservationId = reviewButton.getAttribute('data-id');
                     reviewButton.href = '/reviewWrite?reservationId=' + reservationId;
                 }
             } else if (status === 'RESERVED') {
                 item.classList.add('reserved');
             }
         });
-    });
-
-    document.addEventListener('DOMContentLoaded', () => {
-        const accessToken = localStorage.getItem('accessToken');
-        const authButton = document.getElementById('authButton');
-        const deleteAccountButton = document.getElementById('deleteAccountButton');
-
-        if (accessToken) {
-            if (isTokenExpired(accessToken)) {
-                logout();
-            } else {
-                authButton.textContent = 'Logout';
-                authButton.onclick = confirmLogout;
-                deleteAccountButton.style.display = 'block';
-                deleteAccountButton.onclick = () => {
-                    window.location.href = '/member/withdrawalMembership';
-                };
-            }
-        } else {
-            authButton.textContent = 'Login';
-            authButton.onclick = () => window.location.href = '/member/login';
-            if (window.location.pathname === '/member/withdrawalMembership') {
-                window.location.href = '/member/login';
-            }
-        }
     });
 
     function isTokenExpired(token) {
@@ -274,7 +371,7 @@
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ /* 필요 시 요청 본문 추가 */ })
+            body: JSON.stringify({ /* 필요 시 요청 본문 추가 */})
         })
             .then(response => {
                 if (response.ok) {
@@ -282,7 +379,7 @@
                     document.getElementById('authButton').textContent = 'Login';
                     document.getElementById('deleteAccountButton').style.display = 'none';
                     document.getElementById('authButton').onclick = () => window.location.href = '/member/login';
-                    window.location.href = '/home/homepage'; // 로그아웃 후 /home/homepage로 리다이렉트
+                    window.location.href = '/home/homepage';
                 } else {
                     console.error('로그아웃 요청 실패');
                 }

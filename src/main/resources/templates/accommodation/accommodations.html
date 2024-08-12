@@ -198,8 +198,8 @@
             <!-- Authentication buttons -->
             <div id="authButtons" class="d-flex">
                 <button id="authButton" class="btn btn-outline-dark me-2" type="button"></button>
-                <button id="deleteAccountButton" class="btn btn-outline-danger" type="button" style="display: none;">
-                    회원탈퇴
+                <button id="mypageButton" class="btn btn-outline-primary" type="button" style="display: none;">
+                    마이페이지
                 </button>
             </div>
         </div>
@@ -348,7 +348,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         const accessToken = localStorage.getItem('accessToken');
         const authButton = document.getElementById('authButton');
-        const deleteAccountButton = document.getElementById('deleteAccountButton');
+        const mypageButton = document.getElementById('mypageButton');
 
         if (accessToken) {
             if (isTokenExpired(accessToken)) {
@@ -356,14 +356,13 @@
             } else {
                 authButton.textContent = 'Logout';
                 authButton.onclick = confirmLogout;
-                deleteAccountButton.style.display = 'block';
-                deleteAccountButton.onclick = () => {
-                    window.location.href = '/member/withdrawalMembership';
-                };
+                mypageButton.style.display = 'block'; // 마이페이지 버튼 보이기
+                mypageButton.onclick = () => window.location.href = '/mypage/check';
             }
         } else {
             authButton.textContent = 'Login';
             authButton.onclick = () => window.location.href = '/member/login';
+            mypageButton.style.display = 'none'; // 마이페이지 버튼 숨기기
             if (window.location.pathname === '/member/withdrawalMembership') {
                 window.location.href = '/member/login';
             }
@@ -394,7 +393,7 @@
                 if (response.ok) {
                     deleteAccessToken();
                     document.getElementById('authButton').textContent = 'Login';
-                    document.getElementById('deleteAccountButton').style.display = 'none';
+                    document.getElementById('mypageButton').style.display = 'none';
                     document.getElementById('authButton').onclick = () => window.location.href = '/member/login';
                 } else {
                     console.error('로그아웃 요청 실패');
@@ -406,10 +405,6 @@
     function deleteAccessToken() {
         localStorage.removeItem('accessToken');
     }
-
-
-
-
 
     document.addEventListener('DOMContentLoaded', () => {
         const likeButtons = document.querySelectorAll('.like-button');
@@ -478,9 +473,8 @@
                 });
         });
     });
-
-
 </script>
+
 
 </body>
 </html>
