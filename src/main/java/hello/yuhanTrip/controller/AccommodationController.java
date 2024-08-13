@@ -83,7 +83,7 @@ public class AccommodationController {
         List<Accommodation> accommodations = accommodationsPage.getContent();
         for (Accommodation accommodation : accommodations) {
             double averageRating = accommodationService.calculateAverageRating(accommodation.getId());
-            accommodation.setAverageRating(averageRating); // Accommodation 클래스에 averageRating 필드가 필요함
+            accommodationService.updateAverageRating(accommodation.getId(),averageRating);
         }
 
         int totalPages = accommodationsPage.getTotalPages();

@@ -42,5 +42,8 @@ public interface AccommodationRepository extends JpaRepository<Accommodation,Lon
             Pageable pageable
     );
 
+    @Query("SELECT AVG(r.rating) FROM Review r WHERE r.accommodation.id = :accommodationId")
+    Double findAverageRatingByAccommodationId(@Param("accommodationId") Long accommodationId);
+
 
 }

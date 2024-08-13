@@ -246,6 +246,19 @@
         .form-horizontal button:hover {
             background-color: #0056b3; /* 버튼 호버 배경색 */
         }
+
+
+        .review-rating {
+            font-size: 1.5rem; /* 전체 후기 및 평점 글씨 크기 */
+        }
+
+        .review-rating .average-rating {
+            font-size: 1.8rem; /* 평점 숫자의 크기 */
+        }
+
+        .review-rating .review-count {
+            font-size: 1.2rem; /* 리뷰 개수의 크기 */
+        }
     </style>
 </head>
 <body>
@@ -326,64 +339,78 @@
             <div class="info-container">
                 <!-- 객실 정보 섹션 -->
                 <div class="details">
-                    <h2>객실 정보</h2>
-                    <!-- 객실이 있는 경우 -->
-                    <div th:if="${availableRooms != null and #lists.size(availableRooms) > 0}">
-                        <div th:each="room : ${availableRooms}">
-                            <!-- 객실 카드 -->
-                            <div class="room-card">
-                                <img th:src="@{${room.roomImgUrl}}" class="room-img" alt="객실 이미지">
-                                <div class="room-details">
-                                    <h3 th:text="${room.roomNm}">객실 이름</h3>
-                                    <p><strong>타입:</strong> <span th:text="${room.roomType}">객실 타입</span></p>
-                                    <p><strong>최대 수용 인원:</strong> <span th:text="${room.maxOccupancy}">최대 수용 인원</span>
-                                    </p>
-                                    <p><strong>면적:</strong> <span th:text="${room.roomArea}">객실 면적</span>㎡</p>
-                                    <p><strong>가격:</strong> <span th:text="${room.getPriceAsLong()}">가격</span>원</p>
-                                    <p><strong>편의시설:</strong> <span th:text="${room.amenities}">편의시설</span></p>
-                                    <p><strong>흡연 가능 여부:</strong> <span th:text="${room.smokingYn ? '예' : '아니오'}">흡연 가능 여부</span>
-                                    </p>
-                                    <p><strong>조식 포함 여부:</strong> <span th:text="${room.breakfastInclYn ? '예' : '아니오'}">조식 포함 여부</span>
-                                    </p>
-                                    <p><strong>체크인 시간:</strong> <span th:text="${room.checkInTime}">체크인 시간</span></p>
-                                    <p><strong>체크아웃 시간:</strong> <span th:text="${room.checkOutTime}">체크아웃 시간</span></p>
-                                    <p><strong>객실 소개:</strong> <span th:text="${room.roomIntr}">객실 소개</span></p>
-                                    <!-- 예약하기 버튼 -->
-                                    <p><strong>예약하기:</strong>
-                                        <button class="reservation-button" th:data-id="${room.id}">
-                                            <i class="bi bi-calendar-check"></i> 예약하기
-                                        </button>
-                                    </p>
-                                    <!-- 로그인 메시지 -->
-                                    <div class="login-message">로그인 후 이용할 수 있습니다.</div>
-                                </div>
+                <h2>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>객실 정보</span>
+                        <!-- 후기와 평점 표시 -->
+                        <span class="review-rating">
+                                후기:
+                                <i class="bi bi-star-fill" style="color: gold;"></i> <!-- 별 아이콘 -->
+                                <span th:text="${accommodation.averageRating}" class="average-rating">1.0</span>/5.0
+                                (<span th:text="${#lists.size(accommodation.reviews)}" class="review-count">리뷰 개수</span>)
+                            </span>
+                    </div>
+                </h2>
+
+
+                <!-- 객실이 있는 경우 -->
+                <div th:if="${availableRooms != null and #lists.size(availableRooms) > 0}">
+                    <div th:each="room : ${availableRooms}">
+                        <!-- 객실 카드 -->
+                        <div class="room-card">
+                            <img th:src="@{${room.roomImgUrl}}" class="room-img" alt="객실 이미지">
+                            <div class="room-details">
+                                <h3 th:text="${room.roomNm}">객실 이름</h3>
+                                <p><strong>타입:</strong> <span th:text="${room.roomType}">객실 타입</span></p>
+                                <p><strong>최대 수용 인원:</strong> <span th:text="${room.maxOccupancy}">최대 수용 인원</span>
+                                </p>
+                                <p><strong>면적:</strong> <span th:text="${room.roomArea}">객실 면적</span>㎡</p>
+                                <p><strong>가격:</strong> <span th:text="${room.getPriceAsLong()}">가격</span>원</p>
+                                <p><strong>편의시설:</strong> <span th:text="${room.amenities}">편의시설</span></p>
+                                <p><strong>흡연 가능 여부:</strong> <span
+                                        th:text="${room.smokingYn ? '예' : '아니오'}">흡연 가능 여부</span>
+                                </p>
+                                <p><strong>조식 포함 여부:</strong> <span th:text="${room.breakfastInclYn ? '예' : '아니오'}">조식 포함 여부</span>
+                                </p>
+                                <p><strong>체크인 시간:</strong> <span th:text="${room.checkInTime}">체크인 시간</span></p>
+                                <p><strong>체크아웃 시간:</strong> <span th:text="${room.checkOutTime}">체크아웃 시간</span></p>
+                                <p><strong>객실 소개:</strong> <span th:text="${room.roomIntr}">객실 소개</span></p>
+                                <!-- 예약하기 버튼 -->
+                                <p><strong>예약하기:</strong>
+                                    <button class="reservation-button" th:data-id="${room.id}">
+                                        <i class="bi bi-calendar-check"></i> 예약하기
+                                    </button>
+                                </p>
+                                <!-- 로그인 메시지 -->
+                                <div class="login-message">로그인 후 이용할 수 있습니다.</div>
                             </div>
                         </div>
                     </div>
-                    <!-- 객실이 없는 경우 -->
-                    <div th:unless="${availableRooms != null and #lists.size(availableRooms) > 0}">
-                        <p>선택하신 날짜에 예약 가능한 객실이 없습니다.</p>
-                    </div>
                 </div>
-
-
-                <!-- 숙소의 상세 정보 -->
-                <div class="details">
-                    <h2>상세 정보</h2>
-                    <p><strong>주소:</strong> <span
-                            th:text="${accommodation.addr1} + ' ' + ${accommodation.addr2}">주소</span></p>
-                    <p><strong>전화번호:</strong> <span th:text="${accommodation.tel}">전화번호</span></p>
-                    <!-- 지도 링크 -->
-                    <p><strong>지도 보기:</strong>
-                        <a th:href="'https://www.google.com/maps/search/?api=1&query=' + ${accommodation.mapy} + ',' + ${accommodation.mapx}"
-                           target="_blank" class="map-button">
-                            <i class="bi bi-map"></i> View on Google Maps
-                        </a>
-                    </p>
+                <!-- 객실이 없는 경우 -->
+                <div th:unless="${availableRooms != null and #lists.size(availableRooms) > 0}">
+                    <p>선택하신 날짜에 예약 가능한 객실이 없습니다.</p>
                 </div>
             </div>
+
+
+            <!-- 숙소의 상세 정보 -->
+            <div class="details">
+                <h2>상세 정보</h2>
+                <p><strong>주소:</strong> <span
+                        th:text="${accommodation.addr1} + ' ' + ${accommodation.addr2}">주소</span></p>
+                <p><strong>전화번호:</strong> <span th:text="${accommodation.tel}">전화번호</span></p>
+                <!-- 지도 링크 -->
+                <p><strong>지도 보기:</strong>
+                    <a th:href="'https://www.google.com/maps/search/?api=1&query=' + ${accommodation.mapy} + ',' + ${accommodation.mapx}"
+                       target="_blank" class="map-button">
+                        <i class="bi bi-map"></i> View on Google Maps
+                    </a>
+                </p>
+            </div>
         </div>
-    </section>
+        </div>
+</section>
 </div>
 
 <!-- jQuery, Popper.js, and Bootstrap JS -->
