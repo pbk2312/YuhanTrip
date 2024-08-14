@@ -247,18 +247,131 @@
             background-color: #0056b3; /* 버튼 호버 배경색 */
         }
 
+        .info-container {
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        /* 리뷰 섹션 */
+        .reviews-section {
+            position: relative;
+            font-family: Arial, sans-serif;
+            margin-top: 20px;
+        }
+
+        .review-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
 
         .review-rating {
-            font-size: 1.5rem; /* 전체 후기 및 평점 글씨 크기 */
+            display: flex;
+            align-items: center;
         }
 
-        .review-rating .average-rating {
-            font-size: 1.8rem; /* 평점 숫자의 크기 */
+        .average-rating {
+            font-size: 1.2em;
+            color: #333;
+            margin-right: 5px;
         }
 
-        .review-rating .review-count {
-            font-size: 1.2rem; /* 리뷰 개수의 크기 */
+        .review-count {
+            font-size: 1em;
+            color: #555;
         }
+
+        .review-card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            margin-right: 15px;
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .review-author-info {
+            font-weight: bold;
+        }
+
+        .review-rating {
+            font-size: 1.2em;
+            color: #ffcc00; /* 별점 색상 */
+        }
+
+        .review-content-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .review-content {
+            margin: 10px 0;
+        }
+
+        .review-images img {
+            max-width: 100px;
+            max-height: 100px;
+            margin-right: 5px;
+            border-radius: 4px;
+        }
+
+        .slider-container {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .slider-wrapper {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .reviews-list {
+            display: flex;
+            flex-wrap: nowrap;
+            margin: 0;
+            padding: 0;
+        }
+
+        .review-item {
+            flex: 0 0 auto;
+        }
+
+        .slider-prev, .slider-next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .slider-prev {
+            left: 0;
+        }
+
+        .slider-next {
+            right: 0;
+        }
+
     </style>
 </head>
 <body>
@@ -337,18 +450,64 @@
 
             <!-- 상세 정보 섹션 -->
             <div class="info-container">
-                <!-- 객실 정보 섹션 -->
-                <div class="details">
-                <h2>
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>객실 정보</span>
+                <!-- 리뷰 섹션 -->
+                <div class="reviews-section">
+                        <h2>후기</h2>
+                    <div class="review-summary">
+        <span class="review-rating">
+            <i class="bi bi-star-fill" style="color: gold;"></i> <!-- 별 아이콘 -->
+            <span th:text="${accommodation.averageRating}" class="average-rating">1.0</span>/5.0
+            (<span th:text="${#lists.size(accommodation.reviews)}" class="review-count">리뷰 개수</span>)
+        </span>
                         <!-- 후기와 평점 표시 -->
-                        <span class="review-rating">
-                                후기:
-                                <i class="bi bi-star-fill" style="color: gold;"></i> <!-- 별 아이콘 -->
-                                <span th:text="${accommodation.averageRating}" class="average-rating">1.0</span>/5.0
-                                (<span th:text="${#lists.size(accommodation.reviews)}" class="review-count">리뷰 개수</span>)
+                    </div>
+                    <!-- 리뷰 리스트 출력 -->
+                    <div class="slider-container">
+                        <button class="slider-prev">&#10094;</button>
+                        <div class="slider-wrapper">
+                            <div class="reviews-list">
+                                <div th:each="review : ${reviews}" class="review-item">
+                                    <div class="review-card">
+                                        <div class="review-header">
+                                            <!-- 작성자 이름 및 날짜 -->
+                                            <div class="review-author-info">
+                                <span class="review-author"
+                                      th:text="${review.member.getName()}">작성자 이름</span>
+                                                <br/>
+                                                <span class="review-date"
+                                                      th:text="${review.reviewDate}">2023-08-14</span>
+                                            </div>
+                                            <!-- 별점 표시 -->
+                                            <span class="review-rating">
+                                <i class="bi bi-star-fill"></i>
+                                <span th:text="${review.rating}">5</span>/5.0
                             </span>
+                                        </div>
+                                        <!-- 리뷰 내용 및 이미지 -->
+                                        <div class="review-content-wrapper">
+                                            <div class="review-content" th:text="${review.content}">리뷰 내용이 여기에 표시됩니다.</div>
+                                            <!-- 리뷰 이미지들 표시 -->
+                                            <div class="review-images">
+                                                <div th:each="image : ${review.images}">
+                                                    <img th:src="@{${image.imageUrl}}" alt="리뷰 이미지">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="slider-next">&#10095;</button>
+                    </div>
+                </div>
+
+
+
+                <!-- 객실 정보 섹션 -->
+            <div class="details">
+                <h2>
+                    <div>
+                        <span>객실 정보</span>
                     </div>
                 </h2>
 
@@ -409,7 +568,7 @@
                 </p>
             </div>
         </div>
-        </div>
+</div>
 </section>
 </div>
 
@@ -420,6 +579,34 @@
 <!-- Core theme JS-->
 <script src="js/scripts.js"></script>
 <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const prevButton = document.querySelector('.slider-prev');
+        const nextButton = document.querySelector('.slider-next');
+        const sliderWrapper = document.querySelector('.slider-wrapper');
+        const reviewItems = document.querySelectorAll('.review-item');
+        let currentIndex = 0;
+
+        function updateSlider() {
+            const itemWidth = reviewItems[0].offsetWidth + 15; // 아이템 너비 + 마진
+            const newTransformValue = -currentIndex * itemWidth;
+            sliderWrapper.style.transform = `translateX(${newTransformValue}px)`;
+        }
+
+        prevButton.addEventListener('click', () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateSlider();
+            }
+        });
+
+        nextButton.addEventListener('click', () => {
+            if (currentIndex < reviewItems.length - 1) {
+                currentIndex++;
+                updateSlider();
+            }
+        });
+    });
+
     document.addEventListener('DOMContentLoaded', () => {
         const accessToken = localStorage.getItem('accessToken');
         const authButton = document.getElementById('authButton');

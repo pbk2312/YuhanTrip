@@ -133,9 +133,17 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
-
     public Page<Review> getReviewsByMemberWithPagination(Long memberId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return reviewRepository.findByMemberId(memberId, pageable);
+    }
+
+    public Page<Review> getReviewsByAccommodation(Long accommodationId,int page,int size){
+        Pageable pageable = PageRequest.of(page,size);
+        return reviewRepository.findByAccommodationId(accommodationId,pageable);
+    }
+
+    public List<Review> getReviewsByAccommodation(Long accommodationId){
+        return reviewRepository.findByAccommodationId(accommodationId);
     }
 }
