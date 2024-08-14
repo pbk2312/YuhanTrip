@@ -24,6 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -146,4 +147,10 @@ public class ReviewService {
     public List<Review> getReviewsByAccommodation(Long accommodationId){
         return reviewRepository.findByAccommodationId(accommodationId);
     }
+
+    public Review findReviewById(Long id) {
+        Optional<Review> review = reviewRepository.findById(id);
+        return review.orElse(null); // Review가 없을 경우 null 반환
+    }
 }
+

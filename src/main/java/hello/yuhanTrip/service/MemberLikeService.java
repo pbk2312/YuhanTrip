@@ -13,15 +13,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 @Log4j2
 public class MemberLikeService {
 
-    private final MemberService memberService;
     private final AccommodationService accommodationService;
     private final MemberLikeRepository memberLikeRepository;
 

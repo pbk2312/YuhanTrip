@@ -1,7 +1,6 @@
 package hello.yuhanTrip.dto;
 
 
-import hello.yuhanTrip.domain.MemberRole;
 import lombok.*;
 
 

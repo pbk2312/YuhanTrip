@@ -210,30 +210,29 @@
             font-size: 0.875rem;
         }
 
-        .login-message.show {
-            display: block;
-        }
 
         /* Flexbox for horizontal form layout */
         .form-horizontal {
             display: flex;
-            flex-wrap: wrap;
-            gap: 20px; /* 요소 간 간격 */
+            flex-wrap: wrap; /* 폼 요소가 줄 바꿈 되도록 설정 */
+            gap: 20px; /* 요소 간의 간격 */
             align-items: center; /* 세로 중앙 정렬 */
-            background: rgba(255, 255, 255, 0.8); /* 배경색 */
-            padding: 20px; /* 패딩 추가 */
+            background: rgba(240, 240, 240, 0.8); /* 연한 회색 배경색 (80% 불투명도) */
+            padding: 20px; /* 내부 여백 */
             border-radius: 15px; /* 둥근 모서리 */
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 박스 그림자 */
-            margin: 20px; /* 외부 간격 */
+            margin: 20px; /* 외부 여백 */
         }
 
+        /* 폼 그룹 스타일 */
         .form-horizontal .form-group {
             flex: 1; /* 모든 폼 그룹을 동일한 공간으로 설정 */
-            min-width: 150px; /* 각 항목의 최소 너비 */
+            min-width: 200px; /* 각 항목의 최소 너비, 필요에 따라 조정 가능 */
         }
 
+        /* 버튼 스타일 */
         .form-horizontal button {
-            flex: 0 0 auto; /* 버튼의 크기를 고정 */
+            flex: 0 0 auto; /* 버튼 크기 고정 */
             margin-left: auto; /* 버튼을 오른쪽으로 정렬 */
             background-color: #007bff; /* 버튼 배경색 */
             color: white; /* 버튼 텍스트 색상 */
@@ -241,10 +240,12 @@
             border: none; /* 버튼 테두리 제거 */
             border-radius: 5px; /* 버튼 모서리 둥글게 */
             cursor: pointer; /* 마우스 포인터 변경 */
+            transition: background-color 0.3s ease; /* 배경색 변화 효과 */
         }
 
+        /* 버튼 호버 스타일 */
         .form-horizontal button:hover {
-            background-color: #0056b3; /* 버튼 호버 배경색 */
+            background-color: #0056b3; /* 호버 시 배경색 변경 */
         }
 
         .info-container {
@@ -253,29 +254,42 @@
             padding: 20px;
         }
 
-        /* 리뷰 섹션 */
+
+        /* 리뷰 섹션 스타일 */
         .reviews-section {
-            position: relative;
             font-family: Arial, sans-serif;
             margin-top: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         .review-summary {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            font-size: 1.2em;
-            font-weight: bold;
+        }
+
+        .review-details i {
+            margin-right: 8px; /* 별 아이콘과 평점 사이의 간격 조절 */
+        }
+
+        .average-rating {
+            margin-right: 3px; /* 평점과 "/5.0" 사이의 간격 조절 */
+        }
+
+        .review-count {
+            margin-left: 1px; /* 리뷰 개수 앞의 괄호와의 간격 조절 */
         }
 
         .review-rating {
             display: flex;
             align-items: center;
+            color: #ffcc00; /* 별점 색상 */
         }
 
         .average-rating {
-            font-size: 1.2em;
+            font-size: 1.5em;
             color: #333;
             margin-right: 5px;
         }
@@ -283,51 +297,11 @@
         .review-count {
             font-size: 1em;
             color: #555;
+            margin-left: 7px; /* 숫자와 괄호 사이의 간격 조정 */
+            margin-right: 0; /* 괄호 뒤의 여백 없앰 */
+            line-height: 1; /* 텍스트 높이를 줄여서 타이트하게 보이도록 설정 */
         }
 
-        .review-card {
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 15px;
-            margin-right: 15px;
-            width: 300px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .review-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .review-author-info {
-            font-weight: bold;
-        }
-
-        .review-rating {
-            font-size: 1.2em;
-            color: #ffcc00; /* 별점 색상 */
-        }
-
-        .review-content-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .review-content {
-            margin: 10px 0;
-        }
-
-        .review-images img {
-            max-width: 100px;
-            max-height: 100px;
-            margin-right: 5px;
-            border-radius: 4px;
-        }
 
         .slider-container {
             position: relative;
@@ -342,13 +316,59 @@
 
         .reviews-list {
             display: flex;
-            flex-wrap: nowrap;
             margin: 0;
             padding: 0;
+            flex-direction: row; /* 가로로 배치 */
+            overflow-x: auto; /* 가로 스크롤 가능 */
         }
 
         .review-item {
             flex: 0 0 auto;
+            width: 300px;
+            margin-right: 15px;
+        }
+
+        .review-card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .review-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* 이 속성으로 '후기'와 '평점, 갯수' 사이에 간격을 줄 수 있습니다. */
+        }
+
+        .review-author-info {
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .review-content-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .review-content {
+            font-size: 1rem;
+            color: #555;
+            margin: 10px 0;
+        }
+
+        .review-images {
+            display: flex; /* 이미지를 가로로 배치 */
+            gap: 5px; /* 이미지 간격 조절 */
+        }
+
+        .review-images img {
+            max-width: 100px;
+            max-height: 100px;
+            border-radius: 4px;
         }
 
         .slider-prev, .slider-next {
@@ -362,6 +382,8 @@
             font-size: 18px;
             cursor: pointer;
             z-index: 10;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         .slider-prev {
@@ -371,6 +393,7 @@
         .slider-next {
             right: 0;
         }
+
 
     </style>
 </head>
@@ -425,42 +448,22 @@
                 </div>
             </div>
 
-            <form action="/accommodation/info" method="get" class="mb-4 form-horizontal">
-                <input type="hidden" id="id" name="id" th:value="${accommodation.getId()}">
-                <!-- 체크인 날짜 필드 -->
-                <div class="form-group">
-                    <label for="checkin">체크인 날짜</label>
-                    <input type="date" id="checkin" name="checkin" class="form-control" th:value="${checkin}">
-                </div>
-
-                <div class="form-group">
-                    <label for="checkout">체크아웃 날짜</label>
-                    <input type="date" id="checkout" name="checkout" class="form-control" th:value="${checkout}">
-                </div>
-
-                <div class="form-group">
-                    <label for="numGuests">숙박 인원수</label>
-                    <input type="number" id="numGuests" name="numGuests" class="form-control" min="1" max="10"
-                           th:value="${numGuests != null ? numGuests : 1}">
-                </div>
-                <!-- 검색 버튼 -->
-                <button type="submit" class="btn btn-primary mt-2">검색</button>
-            </form>
 
 
             <!-- 상세 정보 섹션 -->
             <div class="info-container">
                 <!-- 리뷰 섹션 -->
                 <div class="reviews-section">
+                    <div class="review-header">
                         <h2>후기</h2>
-                    <div class="review-summary">
-        <span class="review-rating">
-            <i class="bi bi-star-fill" style="color: gold;"></i> <!-- 별 아이콘 -->
-            <span th:text="${accommodation.averageRating}" class="average-rating">1.0</span>/5.0
-            (<span th:text="${#lists.size(accommodation.reviews)}" class="review-count">리뷰 개수</span>)
-        </span>
-                        <!-- 후기와 평점 표시 -->
+                        <div class="review-summary">
+                            <i class="bi bi-star-fill" style="color: gold;"></i> <!-- 별 아이콘 -->
+                            <span th:text="${accommodation.averageRating}" class="average-rating">1.0</span>/5.0
+                            (<span th:text="${#lists.size(accommodation.reviews)}" class="review-count">리뷰 개수</span>)
+                        </div>
                     </div>
+
+
                     <!-- 리뷰 리스트 출력 -->
                     <div class="slider-container">
                         <button class="slider-prev">&#10094;</button>
@@ -469,23 +472,32 @@
                                 <div th:each="review : ${reviews}" class="review-item">
                                     <div class="review-card">
                                         <div class="review-header">
-                                            <!-- 작성자 이름 및 날짜 -->
+                                            <!-- 작성자 이름 및 날짜 및 객실 이름 -->
                                             <div class="review-author-info">
-                                <span class="review-author"
-                                      th:text="${review.member.getName()}">작성자 이름</span>
+                            <span class="review-author"
+                                  th:text="${review.member.getNickname()}">작성자</span>
                                                 <br/>
-                                                <span class="review-date"
-                                                      th:text="${review.reviewDate}">2023-08-14</span>
+                                                <span class="review-details">
+                                <span class="review-date"
+                                      th:text="${review.reviewDate}">2023-08-14</span>
+                                <span class="review-room"
+                                      th:text="${review.reservation.getRoom().getRoomNm()}">객실 이름</span>
+                            </span>
                                             </div>
                                             <!-- 별점 표시 -->
                                             <span class="review-rating">
+                            <span th:each="star : ${#numbers.sequence(1, review.rating)}">
                                 <i class="bi bi-star-fill"></i>
-                                <span th:text="${review.rating}">5</span>/5.0
                             </span>
+                            <span th:each="emptyStar : ${#numbers.sequence(review.rating + 1, 5)}">
+                                <i class="bi bi-star"></i>
+                            </span>
+                        </span>
                                         </div>
                                         <!-- 리뷰 내용 및 이미지 -->
                                         <div class="review-content-wrapper">
-                                            <div class="review-content" th:text="${review.content}">리뷰 내용이 여기에 표시됩니다.</div>
+                                            <div class="review-content" th:text="${review.content}">리뷰 내용이 여기에 표시됩니다.
+                                            </div>
                                             <!-- 리뷰 이미지들 표시 -->
                                             <div class="review-images">
                                                 <div th:each="image : ${review.images}">
@@ -501,75 +513,96 @@
                     </div>
                 </div>
 
+                <form action="/accommodation/info" method="get" class="mb-4 form-horizontal">
+                    <input type="hidden" id="id" name="id" th:value="${accommodation.getId()}">
+                    <!-- 체크인 날짜 필드 -->
+                    <div class="form-group">
+                        <label for="checkin">체크인 날짜</label>
+                        <input type="date" id="checkin" name="checkin" class="form-control" th:value="${checkin}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="checkout">체크아웃 날짜</label>
+                        <input type="date" id="checkout" name="checkout" class="form-control" th:value="${checkout}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="numGuests">숙박 인원수</label>
+                        <input type="number" id="numGuests" name="numGuests" class="form-control" min="1" max="10"
+                               th:value="${numGuests != null ? numGuests : 1}">
+                    </div>
+                    <!-- 검색 버튼 -->
+                    <button type="submit" class="btn btn-primary mt-2">검색</button>
+                </form>
 
 
                 <!-- 객실 정보 섹션 -->
-            <div class="details">
-                <h2>
-                    <div>
-                        <span>객실 정보</span>
-                    </div>
-                </h2>
+                <div class="details">
+                    <h2>
+                        <div>
+                            <span>객실 정보</span>
+                        </div>
+                    </h2>
 
 
-                <!-- 객실이 있는 경우 -->
-                <div th:if="${availableRooms != null and #lists.size(availableRooms) > 0}">
-                    <div th:each="room : ${availableRooms}">
-                        <!-- 객실 카드 -->
-                        <div class="room-card">
-                            <img th:src="@{${room.roomImgUrl}}" class="room-img" alt="객실 이미지">
-                            <div class="room-details">
-                                <h3 th:text="${room.roomNm}">객실 이름</h3>
-                                <p><strong>타입:</strong> <span th:text="${room.roomType}">객실 타입</span></p>
-                                <p><strong>최대 수용 인원:</strong> <span th:text="${room.maxOccupancy}">최대 수용 인원</span>
-                                </p>
-                                <p><strong>면적:</strong> <span th:text="${room.roomArea}">객실 면적</span>㎡</p>
-                                <p><strong>가격:</strong> <span th:text="${room.getPriceAsLong()}">가격</span>원</p>
-                                <p><strong>편의시설:</strong> <span th:text="${room.amenities}">편의시설</span></p>
-                                <p><strong>흡연 가능 여부:</strong> <span
-                                        th:text="${room.smokingYn ? '예' : '아니오'}">흡연 가능 여부</span>
-                                </p>
-                                <p><strong>조식 포함 여부:</strong> <span th:text="${room.breakfastInclYn ? '예' : '아니오'}">조식 포함 여부</span>
-                                </p>
-                                <p><strong>체크인 시간:</strong> <span th:text="${room.checkInTime}">체크인 시간</span></p>
-                                <p><strong>체크아웃 시간:</strong> <span th:text="${room.checkOutTime}">체크아웃 시간</span></p>
-                                <p><strong>객실 소개:</strong> <span th:text="${room.roomIntr}">객실 소개</span></p>
-                                <!-- 예약하기 버튼 -->
-                                <p><strong>예약하기:</strong>
-                                    <button class="reservation-button" th:data-id="${room.id}">
-                                        <i class="bi bi-calendar-check"></i> 예약하기
-                                    </button>
-                                </p>
-                                <!-- 로그인 메시지 -->
-                                <div class="login-message">로그인 후 이용할 수 있습니다.</div>
+                    <!-- 객실이 있는 경우 -->
+                    <div th:if="${availableRooms != null and #lists.size(availableRooms) > 0}">
+                        <div th:each="room : ${availableRooms}">
+                            <!-- 객실 카드 -->
+                            <div class="room-card">
+                                <img th:src="@{${room.roomImgUrl}}" class="room-img" alt="객실 이미지">
+                                <div class="room-details">
+                                    <h3 th:text="${room.roomNm}">객실 이름</h3>
+                                    <p><strong>타입:</strong> <span th:text="${room.roomType}">객실 타입</span></p>
+                                    <p><strong>최대 수용 인원:</strong> <span th:text="${room.maxOccupancy}">최대 수용 인원</span>
+                                    </p>
+                                    <p><strong>면적:</strong> <span th:text="${room.roomArea}">객실 면적</span>㎡</p>
+                                    <p><strong>가격:</strong> <span th:text="${room.getPriceAsLong()}">가격</span>원</p>
+                                    <p><strong>편의시설:</strong> <span th:text="${room.amenities}">편의시설</span></p>
+                                    <p><strong>흡연 가능 여부:</strong> <span
+                                            th:text="${room.smokingYn ? '예' : '아니오'}">흡연 가능 여부</span>
+                                    </p>
+                                    <p><strong>조식 포함 여부:</strong> <span th:text="${room.breakfastInclYn ? '예' : '아니오'}">조식 포함 여부</span>
+                                    </p>
+                                    <p><strong>체크인 시간:</strong> <span th:text="${room.checkInTime}">체크인 시간</span></p>
+                                    <p><strong>체크아웃 시간:</strong> <span th:text="${room.checkOutTime}">체크아웃 시간</span></p>
+                                    <p><strong>객실 소개:</strong> <span th:text="${room.roomIntr}">객실 소개</span></p>
+                                    <!-- 예약하기 버튼 -->
+                                    <p><strong>예약하기:</strong>
+                                        <button class="reservation-button" th:data-id="${room.id}">
+                                            <i class="bi bi-calendar-check"></i> 예약하기
+                                        </button>
+                                    </p>
+                                    <!-- 로그인 메시지 -->
+                                    <div class="login-message">로그인 후 이용할 수 있습니다.</div>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <!-- 객실이 없는 경우 -->
+                    <div th:unless="${availableRooms != null and #lists.size(availableRooms) > 0}">
+                        <p>선택하신 날짜에 예약 가능한 객실이 없습니다.</p>
+                    </div>
                 </div>
-                <!-- 객실이 없는 경우 -->
-                <div th:unless="${availableRooms != null and #lists.size(availableRooms) > 0}">
-                    <p>선택하신 날짜에 예약 가능한 객실이 없습니다.</p>
-                </div>
-            </div>
 
 
-            <!-- 숙소의 상세 정보 -->
-            <div class="details">
-                <h2>상세 정보</h2>
-                <p><strong>주소:</strong> <span
-                        th:text="${accommodation.addr1} + ' ' + ${accommodation.addr2}">주소</span></p>
-                <p><strong>전화번호:</strong> <span th:text="${accommodation.tel}">전화번호</span></p>
-                <!-- 지도 링크 -->
-                <p><strong>지도 보기:</strong>
-                    <a th:href="'https://www.google.com/maps/search/?api=1&query=' + ${accommodation.mapy} + ',' + ${accommodation.mapx}"
-                       target="_blank" class="map-button">
-                        <i class="bi bi-map"></i> View on Google Maps
-                    </a>
-                </p>
+                <!-- 숙소의 상세 정보 -->
+                <div class="details">
+                    <h2>상세 정보</h2>
+                    <p><strong>주소:</strong> <span
+                            th:text="${accommodation.addr1} + ' ' + ${accommodation.addr2}">주소</span></p>
+                    <p><strong>전화번호:</strong> <span th:text="${accommodation.tel}">전화번호</span></p>
+                    <!-- 지도 링크 -->
+                    <p><strong>지도 보기:</strong>
+                        <a th:href="'https://www.google.com/maps/search/?api=1&query=' + ${accommodation.mapy} + ',' + ${accommodation.mapx}"
+                           target="_blank" class="map-button">
+                            <i class="bi bi-map"></i> View on Google Maps
+                        </a>
+                    </p>
+                </div>
             </div>
         </div>
-</div>
-</section>
+    </section>
 </div>
 
 <!-- jQuery, Popper.js, and Bootstrap JS -->
