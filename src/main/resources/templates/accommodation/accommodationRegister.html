@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>숙소 등록</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+<h1>숙소 등록</h1>
+<form th:action="@{/accommodations/register}" method="post" enctype="multipart/form-data">
+
+    <!-- 주소 -->
+    <label for="addr1">주소:</label>
+    <input type="text" id="addr1" name="addr1" th:value="${accommodationRegisterDTO.addr1}" required /><br />
+
+    <!-- 상세 주소 -->
+    <label for="addr2">상세 주소:</label>
+    <input type="text" id="addr2" name="addr2" th:value="${accommodationRegisterDTO.addr2}" /><br />
+
+    <!-- 지도 X 좌표 -->
+    <label for="mapx">지도 X 좌표:</label>
+    <input type="text" id="mapx" name="mapx" th:value="${accommodationRegisterDTO.mapx}" required /><br />
+
+    <!-- 지도 Y 좌표 -->
+    <label for="mapy">지도 Y 좌표:</label>
+    <input type="text" id="mapy" name="mapy" th:value="${accommodationRegisterDTO.mapy}" required /><br />
+
+    <!-- 전화번호 -->
+    <label for="tel">전화번호:</label>
+    <input type="text" id="tel" name="tel" th:value="${accommodationRegisterDTO.tel}" required /><br />
+
+    <!-- 숙소 이름 -->
+    <label for="title">숙소 이름:</label>
+    <input type="text" id="title" name="title" th:value="${accommodationRegisterDTO.title}" required /><br />
+
+    <!-- 시군구 코드 -->
+    <label for="sigungucode">시군구 코드:</label>
+    <input type="text" id="sigungucode" name="sigungucode" th:value="${accommodationRegisterDTO.sigungucode}" /><br />
+
+    <!-- 이미지 업로드 -->
+    <label for="images">이미지 업로드:</label>
+    <input type="file" id="images" name="images" multiple /><br />
+
+    <h2>객실 정보</h2>
+    <div id="rooms-container">
+        <div class="room">
+            <h3>객실 1</h3>
+            <label for="roomNo">객실 번호:</label>
+            <input type="text" id="roomNo" name="rooms[0].roomNo" th:value="${roomDTO.roomNo}" required /><br />
+
+            <label for="roomNm">객실명:</label>
+            <input type="text" id="roomNm" name="rooms[0].roomNm" th:value="${roomDTO.roomNm}" required /><br />
+
+            <label for="roomType">객실 타입:</label>
+            <input type="text" id="roomType" name="rooms[0].roomType" th:value="${roomDTO.roomType}" /><br />
+
+            <label for="maxOccupancy">최대 수용 인원:</label>
+            <input type="number" id="maxOccupancy" name="rooms[0].maxOccupancy" th:value="${roomDTO.maxOccupancy}" required /><br />
+
+            <label for="roomArea">객실 면적:</label>
+            <input type="text" id="roomArea" name="rooms[0].roomArea" th:value="${roomDTO.roomArea}" /><br />
+
+            <label for="price">가격:</label>
+            <input type="text" id="price" name="rooms[0].price" th:value="${roomDTO.price}" required /><br />
+
+            <label for="amenities">편의시설:</label>
+            <input type="text" id="amenities" name="rooms[0].amenities" th:value="${roomDTO.amenities}" /><br />
+
+            <label for="roomIntr">객실 소개:</label>
+            <textarea id="roomIntr" name="rooms[0].roomIntr" th:text="${roomDTO.roomIntr}"></textarea><br />
+
+            <label for="roomImg">객실 이미지:</label>
+            <input type="file" id="roomImg" name="rooms[0].roomImg" /><br />
+
+            <label for="smokingYn">흡연 가능 여부:</label>
+            <input type="checkbox" id="smokingYn" name="rooms[0].smokingYn" th:checked="${roomDTO.smokingYn}" /><br />
+
+            <label for="breakfastInclYn">조식 포함 여부:</label>
+            <input type="checkbox" id="breakfastInclYn" name="rooms[0].breakfastInclYn" th:checked="${roomDTO.breakfastInclYn}" /><br />
+
+            <label for="checkInTime">체크인 시간:</label>
+            <input type="text" id="checkInTime" name="rooms[0].checkInTime" th:value="${roomDTO.checkInTime}" /><br />
+
+            <label for="checkOutTime">체크아웃 시간:</label>
+            <input type="text" id="checkOutTime" name="rooms[0].checkOutTime" th:value="${roomDTO.checkOutTime}" /><br />
+        </div>
+    </div>
+
+    <button type="button" onclick="addRoom()">객실 추가</button><br /><br />
+
+    <button type="submit">숙소 등록</button>
+</form>
+
+<script>
+    function addRoom() {
+        const roomsContainer = document.getElementById('rooms-container');
+        const roomCount = roomsContainer.getElementsByClassName('room').length;
+        const newRoomIndex = roomCount;
+
+        const roomDiv = document.createElement('div');
+        roomDiv.className = 'room';
+        roomDiv.innerHTML = `
+            <h3>객실 ${newRoomIndex + 1}</h3>
+            <label for="roomNo">객실 번호:</label>
+            <input type="text" id="roomNo" name="rooms[${newRoomIndex}].roomNo" required /><br />
+            <label for="roomNm">객실명:</label>
+            <input type="text" id="roomNm" name="rooms[${newRoomIndex}].roomNm" required /><br />
+            <label for="roomType">객실 타입:</label>
+            <input type="text" id="roomType" name="rooms[${newRoomIndex}].roomType" /><br />
+            <label for="maxOccupancy">최대 수용 인원:</label>
+            <input type="number" id="maxOccupancy" name="rooms[${newRoomIndex}].maxOccupancy" required /><br />
+            <label for="roomArea">객실 면적:</label>
+            <input type="text" id="roomArea" name="rooms[${newRoomIndex}].roomArea" /><br />
+            <label for="price">가격:</label>
+            <input type="text" id="price" name="rooms[${newRoomIndex}].price" required /><br />
+            <label for="amenities">편의시설:</label>
+            <input type="text" id="amenities" name="rooms[${newRoomIndex}].amenities" /><br />
+            <label for="roomIntr">객실 소개:</label>
+            <textarea id="roomIntr" name="rooms[${newRoomIndex}].roomIntr"></textarea><br />
+            <label for="roomImg">객실 이미지:</label>
+            <input type="file" id="roomImg" name="rooms[${newRoomIndex}].roomImg" /><br />
+            <label for="smokingYn">흡연 가능 여부:</label>
+            <input type="checkbox" id="smokingYn" name="rooms[${newRoomIndex}].smokingYn" /><br />
+            <label for="breakfastInclYn">조식 포함 여부:</label>
+            <input type="checkbox" id="breakfastInclYn" name="rooms[${newRoomIndex}].breakfastInclYn" /><br />
+            <label for="checkInTime">체크인 시간:</label>
+            <input type="text" id="checkInTime" name="rooms[${newRoomIndex}].checkInTime" /><br />
+            <label for="checkOutTime">체크아웃 시간:</label>
+            <input type="text" id="checkOutTime" name="rooms[${newRoomIndex}].checkOutTime" /><br />
+        `;
+
+        roomsContainer.appendChild(roomDiv);
+    }
+</script>
+
+</body>
+</html>

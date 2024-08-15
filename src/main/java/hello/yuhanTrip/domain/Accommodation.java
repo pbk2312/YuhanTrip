@@ -46,6 +46,10 @@ public class Accommodation {
     private List<Room> rooms;      // 객실 리스트
 
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;  // 숙소를 등록한 멤버(호스트)
+
     @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberLike> memberLikes; // 추가된 부분
 

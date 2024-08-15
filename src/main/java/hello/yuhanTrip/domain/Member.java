@@ -36,6 +36,10 @@ public class Member {
     private String address;
     private LocalDate dateOfBirth;  // 생일 필드를 LocalDate로 수정
 
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Accommodation> accommodations; // 멤버가 등록한 숙소 리스트
+
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reservation> reservations;
 

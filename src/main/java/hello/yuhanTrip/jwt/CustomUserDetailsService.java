@@ -3,6 +3,7 @@ package hello.yuhanTrip.jwt;
 import hello.yuhanTrip.domain.Member;
 import hello.yuhanTrip.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -15,6 +16,7 @@ import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
+@Log4j2
 public class CustomUserDetailsService implements UserDetailsService {
 
 
@@ -29,12 +31,15 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     private UserDetails createUserDetails(Member member) {
-        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(member.getMemberRole().toString());
+        String role = member.getMemberRole().toString();
+        log.info("사용자 권한: " + role);
+        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(role);
 
         return new User(
-                member.getEmail(), // ID로 사용자의 이메일을 사용합니다.
+                member.getEmail(),
                 member.getPassword(),
-                Collections.singletonList(grantedAuthority) // 단일 권한을 포함하는 리스트로 변경합니다.
+                Collections.singletonList(grantedAuthority)
         );
     }
+
 }

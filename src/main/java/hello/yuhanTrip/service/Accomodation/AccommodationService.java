@@ -2,12 +2,13 @@ package hello.yuhanTrip.service.Accomodation;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import hello.yuhanTrip.domain.Accommodation;
-import hello.yuhanTrip.domain.Review;
-import hello.yuhanTrip.domain.Room;
+import hello.yuhanTrip.domain.*;
+import hello.yuhanTrip.dto.AccommodationRegisterDTO;
 import hello.yuhanTrip.repository.AccommodationRepository;
+import hello.yuhanTrip.repository.MemberRepository;
 import hello.yuhanTrip.repository.ReviewRepository;
 import hello.yuhanTrip.repository.RoomRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -19,7 +20,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -29,6 +33,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Log4j2
+@RequiredArgsConstructor
 public class AccommodationService {
 
     @Value("${service.key}")
@@ -39,7 +44,12 @@ public class AccommodationService {
     private final AccommodationRepository accommodationRepository;
     private final RoomRepository roomReposiotry;
 
-    private final ReviewRepository reviewRepository; // ReviewRepository 주입
+    private final ReviewRepository reviewRepository;
+    private final MemberRepository memberRepository;
+
+
+    @Value("${upload.dir}")
+    private String uploadDir;
 
     private static final String[] IMAGE_URLS = {
             "http://localhost:8080/villa-1737168_1280.jpg",
@@ -47,14 +57,7 @@ public class AccommodationService {
     };
 
 
-    public AccommodationService(RestTemplate restTemplate, ObjectMapper objectMapper,
-                                AccommodationRepository accommodationRepository, RoomRepository roomReposiotry, ReviewRepository reviewRepository) {
-        this.restTemplate = restTemplate;
-        this.objectMapper = objectMapper;
-        this.accommodationRepository = accommodationRepository;
-        this.roomReposiotry = roomReposiotry;
-        this.reviewRepository = reviewRepository;
-    }
+
 
 
     @Transactional
@@ -305,6 +308,55 @@ public class AccommodationService {
 
         // 저장
         accommodationRepository.save(accommodation);
+
     }
+
+
+
+    public Accommodation registerAccommodation(Long memberId, AccommodationRegisterDTO dto) throws IOException {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found"));
+
+        if (member.getMemberRole() != MemberRole.ROLE_HOST) {
+            throw new IllegalStateException("Only HOST members can register accommodations");
+        }
+
+        Accommodation accommodation = new Accommodation();
+        accommodation.setAddr1(dto.getAddr1());
+        accommodation.setAddr2(dto.getAddr2());
+        accommodation.setFirstimage(null); // 처음엔 이미지 경로를 null로 설정
+        accommodation.setFirstimage2(null);
+        accommodation.setMapx(dto.getMapx());
+        accommodation.setMapy(dto.getMapy());
+        accommodation.setTel(dto.getTel());
+        accommodation.setTitle(dto.getTitle());
+        accommodation.setSigungucode(dto.getSigungucode());
+        accommodation.setMember(member);
+
+        // 이미지를 저장하고 경로를 설정
+        if (dto.getImages() != null && !dto.getImages().isEmpty()) {
+            for (MultipartFile image : dto.getImages()) {
+                String imagePath = saveImage(image);
+                accommodation.setFirstimage(imagePath); // 첫 번째 이미지를 대표 이미지로 설정
+                // 필요에 따라 추가 이미지를 더 저장할 수 있음
+            }
+        }
+
+        return accommodationRepository.save(accommodation);
+    }
+
+    private String saveImage(MultipartFile image) throws IOException {
+        String originalFilename = image.getOriginalFilename();
+        String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        String storedFilename = UUID.randomUUID().toString() + extension;
+        String imagePath = uploadDir + storedFilename;
+
+        File file = new File(imagePath);
+        image.transferTo(file);
+
+        return imagePath;
+    }
+
+
 
 }

@@ -1,6 +1,8 @@
 package hello.yuhanTrip.controller;
 
 import hello.yuhanTrip.domain.*;
+import hello.yuhanTrip.dto.AccommodationRegisterDTO;
+import hello.yuhanTrip.dto.RoomDTO;
 import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.service.Accomodation.AccommodationService;
 import hello.yuhanTrip.service.MemberLikeService;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -259,6 +262,47 @@ public class AccommodationController {
             return "error"; // 오류 페이지로 리다이렉트
         }
     }
+
+
+    @GetMapping("/registerForm")
+    public String accommodationRegister(
+            Model model,
+            @CookieValue(value = "accessToken", required = false) String accessToken
+    ){
+
+
+        UserDetails userDetails = validateAndGetUserDetails(accessToken);
+
+        AccommodationRegisterDTO accommodationRegisterDTO = new AccommodationRegisterDTO();
+        RoomDTO roomDTO = new RoomDTO();
+
+        model.addAttribute("accommodationRegisterDTO",accommodationRegisterDTO);
+        model.addAttribute("roomDTO",roomDTO);
+
+        return "/accommodation/accommodationRegister";
+
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<Accommodation> registerAccommodation(
+            @CookieValue(value = "accessToken", required = false) String accessToken,
+            @ModelAttribute AccommodationRegisterDTO dto) throws IOException {
+        UserDetails userDetails = validateAndGetUserDetails(accessToken);
+        Member member = memberService.findByEmail(userDetails.getUsername());
+        Accommodation savedAccommodation = accommodationService.registerAccommodation(member.getId(), dto);
+        return ResponseEntity.ok(savedAccommodation);
+    }
+
+
+    private UserDetails validateAndGetUserDetails(String accessToken) {
+        if (accessToken == null || !tokenProvider.validate(accessToken)) {
+            return null; // 인증 오류 시 null 반환
+        }
+
+        Authentication authentication = tokenProvider.getAuthentication(accessToken);
+        return (UserDetails) authentication.getPrincipal(); // 인증 성공 시 UserDetails 반환
+    }
+
 
 
 }

@@ -1,8 +1,8 @@
 package hello.yuhanTrip.domain;
 
 public enum MemberRole {
-    ADMIN,
-    MEMBER,
-    HOST
+    ROLE_ADMIN,
+    ROLE_MEMBER,
+    ROLE_HOST
 
 }

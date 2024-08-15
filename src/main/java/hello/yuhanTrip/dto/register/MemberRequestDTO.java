@@ -66,7 +66,7 @@ public class MemberRequestDTO {
                 .phoneNumber(phoneNumber)  // 추가된 필드 반영
                 .address(address)  // 추가된 필드 반영
                 .dateOfBirth(dateOfBirth)  // 추가된 필드 반영
-                .memberRole(MemberRole.MEMBER)  // role도 DTO에서 직접 설정하도록 변경
+                .memberRole(MemberRole.ROLE_MEMBER)  // role도 DTO에서 직접 설정하도록 변경
                 .build();
     }
 
