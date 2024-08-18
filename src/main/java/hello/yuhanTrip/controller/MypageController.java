@@ -1,5 +1,6 @@
 package hello.yuhanTrip.controller;
 
+import hello.yuhanTrip.domain.Accommodation;
 import hello.yuhanTrip.domain.Member;
 import hello.yuhanTrip.dto.MypageMemberDTO;
 import hello.yuhanTrip.jwt.TokenProvider;
@@ -16,6 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -164,6 +166,25 @@ public class MypageController {
         }
     }
 
+    @GetMapping("/memberAccommodations")
+    public String getAccommodationsByMembers(
+            @CookieValue(value = "accessToken", required = false) String accessToken,
+            Model model
+    ) {
+        ResponseEntity<Void> validationResponse = validateAccessToken(accessToken);
+        if (validationResponse != null) {
+            return "redirect:/member/login";
+        }
+
+
+        UserDetails userDetails = getUserDetails(accessToken);
+        Member member = findMemberByEmail(userDetails.getUsername());
+
+        List<Accommodation> accommodations = memberService.getAccommodationsByMemberId(member.getId());
+        model.addAttribute("accommodations", accommodations);
+
+        return "/mypage/accommodationByMember";
+    }
 
 
     // 인증 토큰 유효성 검증 메소드

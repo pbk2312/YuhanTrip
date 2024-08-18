@@ -1,9 +1,6 @@
 package hello.yuhanTrip.service;
 
-import hello.yuhanTrip.domain.EmailCertification;
-import hello.yuhanTrip.domain.Member;
-import hello.yuhanTrip.domain.RefreshToken;
-import hello.yuhanTrip.domain.ResetToken;
+import hello.yuhanTrip.domain.*;
 import hello.yuhanTrip.dto.LoginDTO;
 import hello.yuhanTrip.dto.LogoutDTO;
 import hello.yuhanTrip.dto.WithdrawalMembershipDTO;
@@ -26,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Random;
 
 @Service
@@ -191,6 +189,13 @@ public class MemberService {
                 member.getDateOfBirth(),
                 member.getAddress()
         );
+    }
+
+    @Transactional(readOnly = true)
+    public List<Accommodation> getAccommodationsByMemberId(Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found with id: " + memberId));
+        return member.getAccommodations();
     }
 
 

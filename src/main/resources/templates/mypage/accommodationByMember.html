@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+  <meta name="description" content="회원 숙소 내역 페이지"/>
+  <meta name="author" content=""/>
+  <title>회원 숙소 내역</title>
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico"/>
+  <!-- Bootstrap icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet"/>
+  <!-- Core theme CSS (includes Bootstrap) -->
+  <link href="../css/homestyles.css" rel="stylesheet"/>
+  <style>
+    /* Global Styles */
+    body {
+      background: url('/los-angeles-2289637_640.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: #333;
+    }
+    /* Header Styles */
+    header {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 15px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    }
+    /* Navbar Styles */
+    .navbar {
+      background: rgba(255, 255, 255, 0.9);
+      border-bottom: 1px solid #ddd;
+    }
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .navbar-nav .nav-link {
+      color: #007bff;
+      font-weight: 500;
+    }
+    .navbar-nav .nav-link.active {
+      color: #0056b3;
+    }
+    /* Info Section */
+    .info {
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 1200px;
+    }
+    .info p {
+      margin: 0 0 10px 0;
+      line-height: 1.6;
+    }
+    .info .btn {
+      margin-top: 10px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+    /* Accommodation Container and Items */
+    .accommodation-container {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .accommodation-item {
+      flex: 1 1 calc(33.333% - 20px);
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.9);
+      min-width: 250px;
+      position: relative;
+    }
+    .accommodation-actions {
+      text-align: right;
+      margin-top: 10px;
+    }
+    .accommodation-item.completed {
+      background-color: #f8f9fa;
+      border-left: 5px solid #28a745;
+    }
+    .accommodation-item.completed::before {
+      content: '숙소 등록 완료';
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #28a745;
+      color: #fff;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-weight: bold;
+      font-size: 14px;
+      z-index: 2;
+    }
+    /* Pagination */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .pagination .page-item {
+      margin: 0 5px;
+    }
+    .pagination .page-link {
+      border-radius: 20px;
+      font-weight: 600;
+    }
+    .pagination .page-item.active .page-link {
+      background-color: #007bff;
+      color: white;
+    }
+    /* No Accommodations Notice */
+    .no-accommodations {
+      text-align: center;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.9);
+      margin: 20px auto;
+      max-width: 800px;
+      color: #ff6f61;
+    }
+    .no-accommodations h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-light">
+  <div class="container px-4 px-lg-5">
+    <a class="navbar-brand" href="#!">YuhanTrip</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+        <li class="nav-item"><a class="nav-link active" aria-current="page" href="/home/homepage">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
+             data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li><a class="dropdown-item" href="/accommodation/accommodations">All Products</a></li>
+            <li><hr class="dropdown-divider"/></li>
+            <li><a class="dropdown-item" href="#!">Popular Items</a></li>
+            <li><a class="dropdown-item" href="#!">New Arrivals</a></li>
+          </ul>
+        </li>
+      </ul>
+      <div id="authButtons" class="d-flex">
+        <button id="authButton" class="btn btn-outline-dark me-2" type="button"></button>
+        <!-- Removed delete account button -->
+        <button id="mypageButton" class="btn btn-outline-primary" type="button" style="display: none;">
+          마이페이지
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<div class="container">
+  <div class="info">
+    <div class="reservation-header">
+      <h1 class="mb-4">회원 숙소 내역</h1>
+    </div>
+
+    <!-- 숙소 내역이 있는 경우 -->
+    <div class="accommodation-container" th:if="${not #lists.isEmpty(accommodations)}">
+      <div th:each="accommodation : ${accommodations}" class="accommodation-item">
+        <!-- 숙소 정보 -->
+        <p><strong>숙소 제목:</strong> <span th:text="${accommodation.title}">숙소 제목</span></p>
+        <p><strong>주소:</strong> <span th:text="${accommodation.addr1} + ' ' + ${accommodation.addr2}">주소</span></p>
+        <p><strong>전화번호:</strong> <span th:text="${accommodation.tel}">전화번호</span></p>
+        <p><strong>설명:</strong> <span th:text="${accommodation.contentid}">설명</span></p>
+        <p><strong>첫 이미지:</strong> <img th:src="${accommodation.firstimage}" alt="첫 이미지" style="max-width: 100%; height: auto;"/></p>
+
+        <!-- 객실 정보 -->
+        <div th:if="${not #lists.isEmpty(accommodation.rooms)}">
+          <h4 class="mt-4">객실 정보</h4>
+          <ul>
+            <li th:each="room : ${accommodation.rooms}">
+              <p><strong>객실명:</strong> <span th:text="${room.roomNm}">객실명</span></p>
+              <p><strong>객실 타입:</strong> <span th:text="${room.roomType}">객실 타입</span></p>
+              <p><strong>최대 수용 인원:</strong> <span th:text="${room.maxOccupancy}">최대 수용 인원</span></p>
+              <p><strong>객실 면적:</strong> <span th:text="${room.roomArea}">객실 면적</span></p>
+              <p><strong>가격:</strong> <span th:text="${room.price}">가격</span></p>
+              <p><strong>편의시설:</strong> <span th:text="${room.amenities}">편의시설</span></p>
+              <p><strong>객실 소개:</strong> <span th:text="${room.roomIntr}">객실 소개</span></p>
+            </li>
+          </ul>
+        </div>
+        <!-- Actions -->
+        <div class="accommodation-actions">
+          <a th:href="@{/accommodationUpdate(accommodationId=${accommodation.id})}" class="btn btn-primary update-button">숙소 수정</a>
+          <a th:href="@{/accommodationCancelPage(accommodationId=${accommodation.id})}" class="btn btn-danger cancel-button">숙소 취소</a>
+        </div>
+      </div>
+    </div>
+  </div>
+    </div>
+
+    <!-- 숙소 내역이 없는 경우 -->
+    <div class="no-accommodations" th:if="${#lists.isEmpty(accommodations)}">
+      <h2>숙소 내역이 없습니다.</h2>
+      <p>아직 등록하신 숙소가 없으신가요? <a href="/home/homepage">홈으로 돌아가기</a></p>
+    </div>
+
+
+
+<!-- jQuery, Popper.js, and Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+<!-- Core theme JS -->
+<script src="js/scripts.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const accessToken = localStorage.getItem('accessToken');
+    const authButton = document.getElementById('authButton');
+    const mypageButton = document.getElementById('mypageButton');
+
+    if (accessToken) {
+      if (isTokenExpired(accessToken)) {
+        deleteAccessToken();
+        logout();
+      } else {
+        authButton.textContent = 'Logout';
+        authButton.onclick = confirmLogout;
+        mypageButton.style.display = 'block';
+        mypageButton.onclick = () => {
+          window.location.href = '/mypage/check';
+        };
+      }
+    } else {
+      authButton.textContent = 'Login';
+      authButton.onclick = () => window.location.href = '/member/login';
+      if (window.location.pathname === '/member/withdrawalMembership') {
+        window.location.href = '/member/login';
+      }
+    }
+  });
+
+  function isTokenExpired(token) {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const currentTime = Math.floor(Date.now() / 1000);
+    return payload.exp < currentTime;
+  }
+
+  function confirmLogout() {
+    if (confirm("로그아웃 하시겠습니까?")) {
+      logout();
+    }
+  }
+
+  function logout() {
+    fetch('/member/logout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({})
+    })
+            .then(response => {
+              if (response.ok) {
+                deleteAccessToken();
+                document.getElementById('authButton').textContent = 'Login';
+                document.getElementById('mypageButton').style.display = 'none';
+                window.location.href = '/home/homepage';
+              } else {
+                console.error('로그아웃 요청 실패');
+              }
+            })
+            .catch(error => console.error('로그아웃 요청 중 오류 발생:', error));
+  }
+
+  function deleteAccessToken() {
+    localStorage.removeItem('accessToken');
+  }
+</script>
+</body>
+</html>

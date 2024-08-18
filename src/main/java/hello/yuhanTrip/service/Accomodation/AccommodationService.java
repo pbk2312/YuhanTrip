@@ -1,9 +1,11 @@
 package hello.yuhanTrip.service.Accomodation;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hello.yuhanTrip.domain.*;
 import hello.yuhanTrip.dto.AccommodationRegisterDTO;
+import hello.yuhanTrip.dto.RoomDTO;
 import hello.yuhanTrip.repository.AccommodationRepository;
 import hello.yuhanTrip.repository.MemberRepository;
 import hello.yuhanTrip.repository.ReviewRepository;
@@ -313,6 +315,8 @@ public class AccommodationService {
 
 
 
+
+    @JsonIgnore
     public Accommodation registerAccommodation(Long memberId, AccommodationRegisterDTO dto) throws IOException {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found"));
@@ -333,17 +337,55 @@ public class AccommodationService {
         accommodation.setSigungucode(dto.getSigungucode());
         accommodation.setMember(member);
 
-        // 이미지를 저장하고 경로를 설정
+        // 이미지 저장
+        List<String> imagePaths = new ArrayList<>();
         if (dto.getImages() != null && !dto.getImages().isEmpty()) {
             for (MultipartFile image : dto.getImages()) {
                 String imagePath = saveImage(image);
-                accommodation.setFirstimage(imagePath); // 첫 번째 이미지를 대표 이미지로 설정
-                // 필요에 따라 추가 이미지를 더 저장할 수 있음
+                imagePaths.add(imagePath);
+            }
+        }
+        if (!imagePaths.isEmpty()) {
+            accommodation.setFirstimage(imagePaths.get(0)); // 첫 번째 이미지를 대표 이미지로 설정
+            if (imagePaths.size() > 1) {
+                accommodation.setFirstimage2(imagePaths.get(1)); // 두 번째 이미지를 추가 이미지로 설정
+            }
+        }
+
+
+        log.info("객실정보 저장 시도....");
+
+        // 객실 정보 저장
+        if (dto.getRooms() != null && !dto.getRooms().isEmpty()) {
+            for (RoomDTO roomDTO : dto.getRooms()) {
+                Room room = new Room();
+                room.setRoomNo(roomDTO.getRoomNo());
+                room.setRoomNm(roomDTO.getRoomNm());
+                room.setRoomType(roomDTO.getRoomType());
+                room.setMaxOccupancy(roomDTO.getMaxOccupancy());
+                room.setRoomArea(roomDTO.getRoomArea());
+                room.setPrice(roomDTO.getPrice());
+                room.setAmenities(roomDTO.getAmenities());
+                room.setRoomIntr(roomDTO.getRoomIntr());
+
+                // 객실 이미지 저장
+                if (roomDTO.getRoomImg() != null && !roomDTO.getRoomImg().isEmpty()) {
+                    String roomImagePath = saveImage(roomDTO.getRoomImg());
+                    room.setRoomImgUrl(roomImagePath);
+                }
+
+                room.setSmokingYn(roomDTO.getSmokingYn());
+                room.setBreakfastInclYn(roomDTO.getBreakfastInclYn());
+                room.setCheckInTime(roomDTO.getCheckInTime());
+                room.setCheckOutTime(roomDTO.getCheckOutTime());
+                room.setAccommodation(accommodation); // 객실과 숙소 연관 설정
+                accommodation.getRooms().add(room); // 숙소에 객실 추가
             }
         }
 
         return accommodationRepository.save(accommodation);
     }
+
 
     private String saveImage(MultipartFile image) throws IOException {
         String originalFilename = image.getOriginalFilename();

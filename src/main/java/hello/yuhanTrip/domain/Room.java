@@ -1,5 +1,6 @@
 package hello.yuhanTrip.domain;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,6 +33,7 @@ public class Room {
 
     @ManyToOne
     @JoinColumn(name = "accommodation_id")
+    @JsonManagedReference
     private Accommodation accommodation; // Accommodation과의 연관관계
 
 

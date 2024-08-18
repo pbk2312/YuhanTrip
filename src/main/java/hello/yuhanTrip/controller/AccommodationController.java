@@ -284,13 +284,14 @@ public class AccommodationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Accommodation> registerAccommodation(
+    public ResponseEntity<String> registerAccommodation(
             @CookieValue(value = "accessToken", required = false) String accessToken,
             @ModelAttribute AccommodationRegisterDTO dto) throws IOException {
         UserDetails userDetails = validateAndGetUserDetails(accessToken);
         Member member = memberService.findByEmail(userDetails.getUsername());
-        Accommodation savedAccommodation = accommodationService.registerAccommodation(member.getId(), dto);
-        return ResponseEntity.ok(savedAccommodation);
+        accommodationService.registerAccommodation(member.getId(), dto);
+        log.info("숙소 저장 성공");
+        return ResponseEntity.ok("숙소 저장 성공");
     }
 
 

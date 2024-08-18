@@ -59,6 +59,7 @@ public class SecurityConfig {
                         .requestMatchers("/submitReview/**").authenticated()
                         .requestMatchers("/myReviews").authenticated()
                         .requestMatchers("/accommodation/registerForm").hasRole("HOST")
+                        .requestMatchers("/mypage/accommodationByMember").hasRole("HOST")
                         .anyRequest().permitAll()
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))

@@ -1,136 +1,261 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ko">
 <head>
-    <title>숙소 등록</title>
-    <meta charset="UTF-8">
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <title>Yuhan Trip - 숙소 등록</title>
+    <!-- Favicon-->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico"/>
+    <!-- Bootstrap icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet"/>
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="../css/homestyles.css" rel="stylesheet">
+    <style>
+        /* 기본 설정 */
+        body {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/los-angeles-2289637_640.jpg') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            color: #fff;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        /* 네비게이션바 */
+        .navbar {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .navbar-nav .nav-link {
+            color: #007bff;
+            font-weight: 500;
+            padding: 10px;
+        }
+
+        /* 폼 스타일 */
+        form {
+            background-color: rgba(255, 255, 255, 0.85);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 600px;
+            margin: 20px auto;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        form input[type="text"], form input[type="number"], form input[type="time"], form textarea, form select, form input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        form label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+            color: #333;
+        }
+
+        /* 객실 섹션 스타일 */
+        #rooms-container .room {
+            background-color: #f7f7f7;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #rooms-container h3 {
+            font-size: 1.2rem;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+
+        /* 버튼 스타일 */
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            width: 100%;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* 모바일 대응성 */
+        @media (max-width: 768px) {
+            form {
+                padding: 15px;
+                width: 90%;
+            }
+
+            .navbar {
+                padding: 15px;
+            }
+
+            .navbar-brand {
+                font-size: 1.4rem;
+            }
+
+            #rooms-container .room {
+                padding: 10px;
+            }
+        }
+
+    </style>
 </head>
 <body>
-<h1>숙소 등록</h1>
-<form th:action="@{/accommodations/register}" method="post" enctype="multipart/form-data">
+<!-- Navigation-->
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container px-4 px-lg-5">
+        <a class="navbar-brand" href="/home/homepage">YuhanTrip</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                <li class="nav-item"><a class="nav-link active" aria-current="page" href="/home/homepage">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="/accommodation/accommodations">All Products</a></li>
+                        <li>
+                            <hr class="dropdown-divider"/>
+                        </li>
+                        <li><a class="dropdown-item" href="#!">Popular Items</a></li>
+                        <li><a class="dropdown-item" href="#!">New Arrivals</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
 
-    <!-- 주소 -->
+<!-- Main Content-->
+<form th:action="@{/accommodation/register}" method="post" enctype="multipart/form-data">
+    <h2 class="text-center">숙소 등록</h2>
     <label for="addr1">주소:</label>
-    <input type="text" id="addr1" name="addr1" th:value="${accommodationRegisterDTO.addr1}" required /><br />
+    <input type="text" id="addr1" name="addr1" th:value="${accommodationRegisterDTO.addr1}" required/>
 
-    <!-- 상세 주소 -->
     <label for="addr2">상세 주소:</label>
-    <input type="text" id="addr2" name="addr2" th:value="${accommodationRegisterDTO.addr2}" /><br />
+    <input type="text" id="addr2" name="addr2" th:value="${accommodationRegisterDTO.addr2}"/>
 
-    <!-- 지도 X 좌표 -->
-    <label for="mapx">지도 X 좌표:</label>
-    <input type="text" id="mapx" name="mapx" th:value="${accommodationRegisterDTO.mapx}" required /><br />
-
-    <!-- 지도 Y 좌표 -->
-    <label for="mapy">지도 Y 좌표:</label>
-    <input type="text" id="mapy" name="mapy" th:value="${accommodationRegisterDTO.mapy}" required /><br />
-
-    <!-- 전화번호 -->
     <label for="tel">전화번호:</label>
-    <input type="text" id="tel" name="tel" th:value="${accommodationRegisterDTO.tel}" required /><br />
+    <input type="text" id="tel" name="tel" th:value="${accommodationRegisterDTO.tel}" required/>
 
-    <!-- 숙소 이름 -->
     <label for="title">숙소 이름:</label>
-    <input type="text" id="title" name="title" th:value="${accommodationRegisterDTO.title}" required /><br />
+    <input type="text" id="title" name="title" th:value="${accommodationRegisterDTO.title}" required/>
 
-    <!-- 시군구 코드 -->
-    <label for="sigungucode">시군구 코드:</label>
-    <input type="text" id="sigungucode" name="sigungucode" th:value="${accommodationRegisterDTO.sigungucode}" /><br />
+    <label for="sigungucode">지역:</label>
+    <select id="sigungucode" name="sigungucode" required>
+        <option value="">지역을 선택하세요</option>
+        <!-- Add options dynamically -->
+    </select>
 
-    <!-- 이미지 업로드 -->
     <label for="images">이미지 업로드:</label>
-    <input type="file" id="images" name="images" multiple /><br />
+    <input type="file" id="images" name="images" multiple/>
 
     <h2>객실 정보</h2>
     <div id="rooms-container">
-        <div class="room">
+        <div class="room" data-index="0">
             <h3>객실 1</h3>
-            <label for="roomNo">객실 번호:</label>
-            <input type="text" id="roomNo" name="rooms[0].roomNo" th:value="${roomDTO.roomNo}" required /><br />
-
-            <label for="roomNm">객실명:</label>
-            <input type="text" id="roomNm" name="rooms[0].roomNm" th:value="${roomDTO.roomNm}" required /><br />
-
-            <label for="roomType">객실 타입:</label>
-            <input type="text" id="roomType" name="rooms[0].roomType" th:value="${roomDTO.roomType}" /><br />
-
-            <label for="maxOccupancy">최대 수용 인원:</label>
-            <input type="number" id="maxOccupancy" name="rooms[0].maxOccupancy" th:value="${roomDTO.maxOccupancy}" required /><br />
-
-            <label for="roomArea">객실 면적:</label>
-            <input type="text" id="roomArea" name="rooms[0].roomArea" th:value="${roomDTO.roomArea}" /><br />
-
-            <label for="price">가격:</label>
-            <input type="text" id="price" name="rooms[0].price" th:value="${roomDTO.price}" required /><br />
-
-            <label for="amenities">편의시설:</label>
-            <input type="text" id="amenities" name="rooms[0].amenities" th:value="${roomDTO.amenities}" /><br />
-
-            <label for="roomIntr">객실 소개:</label>
-            <textarea id="roomIntr" name="rooms[0].roomIntr" th:text="${roomDTO.roomIntr}"></textarea><br />
-
-            <label for="roomImg">객실 이미지:</label>
-            <input type="file" id="roomImg" name="rooms[0].roomImg" /><br />
-
-            <label for="smokingYn">흡연 가능 여부:</label>
-            <input type="checkbox" id="smokingYn" name="rooms[0].smokingYn" th:checked="${roomDTO.smokingYn}" /><br />
-
-            <label for="breakfastInclYn">조식 포함 여부:</label>
-            <input type="checkbox" id="breakfastInclYn" name="rooms[0].breakfastInclYn" th:checked="${roomDTO.breakfastInclYn}" /><br />
-
-            <label for="checkInTime">체크인 시간:</label>
-            <input type="text" id="checkInTime" name="rooms[0].checkInTime" th:value="${roomDTO.checkInTime}" /><br />
-
-            <label for="checkOutTime">체크아웃 시간:</label>
-            <input type="text" id="checkOutTime" name="rooms[0].checkOutTime" th:value="${roomDTO.checkOutTime}" /><br />
+            <label for="roomNm0">객실명:</label>
+            <input type="text" id="roomNm0" name="rooms[0].roomNm" required/>
+            <label for="roomType0">객실 타입:</label>
+            <input type="text" id="roomType0" name="rooms[0].roomType"/>
+            <label for="maxOccupancy0">최대 수용 인원:</label>
+            <input type="number" id="maxOccupancy0" name="rooms[0].maxOccupancy" required/>
+            <label for="roomArea0">객실 면적:</label>
+            <input type="text" id="roomArea0" name="rooms[0].roomArea"/>
+            <label for="price0">가격:</label>
+            <input type="text" id="price0" name="rooms[0].price" required/>
+            <label for="amenities0">편의시설:</label>
+            <input type="text" id="amenities0" name="rooms[0].amenities"/>
+            <label for="roomIntr0">객실 소개:</label>
+            <textarea id="roomIntr0" name="rooms[0].roomIntr"></textarea>
+            <label for="roomImg0">객실 이미지:</label>
+            <input type="file" id="roomImg0" name="rooms[0].roomImg"/>
+            <label for="smokingYn0">흡연 가능 여부:</label>
+            <input type="checkbox" id="smokingYn0" name="rooms[0].smokingYn"/>
+            <label for="checkinTime0">체크인 시간:</label>
+            <input type="time" id="checkinTime0" name="rooms[0].checkinTime" required/>
+            <label for="checkoutTime0">체크아웃 시간:</label>
+            <input type="time" id="checkoutTime0" name="rooms[0].checkoutTime" required/>
         </div>
     </div>
-
-    <button type="button" onclick="addRoom()">객실 추가</button><br /><br />
-
-    <button type="submit">숙소 등록</button>
+    <button type="button" id="add-room-btn">객실 추가</button>
+    <button type="submit">등록</button>
 </form>
 
+<!-- Footer -->
+<footer class="py-5 bg-light">
+    <div class="container">
+        <p class="m-0 text-center text-muted">YuhanTrip &copy; 2023</p>
+    </div>
+</footer>
+<!-- Bootstrap core JS-->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Core theme JS-->
+<script src="../js/scripts.js"></script>
 <script>
-    function addRoom() {
-        const roomsContainer = document.getElementById('rooms-container');
-        const roomCount = roomsContainer.getElementsByClassName('room').length;
-        const newRoomIndex = roomCount;
-
-        const roomDiv = document.createElement('div');
-        roomDiv.className = 'room';
-        roomDiv.innerHTML = `
-            <h3>객실 ${newRoomIndex + 1}</h3>
-            <label for="roomNo">객실 번호:</label>
-            <input type="text" id="roomNo" name="rooms[${newRoomIndex}].roomNo" required /><br />
-            <label for="roomNm">객실명:</label>
-            <input type="text" id="roomNm" name="rooms[${newRoomIndex}].roomNm" required /><br />
-            <label for="roomType">객실 타입:</label>
-            <input type="text" id="roomType" name="rooms[${newRoomIndex}].roomType" /><br />
-            <label for="maxOccupancy">최대 수용 인원:</label>
-            <input type="number" id="maxOccupancy" name="rooms[${newRoomIndex}].maxOccupancy" required /><br />
-            <label for="roomArea">객실 면적:</label>
-            <input type="text" id="roomArea" name="rooms[${newRoomIndex}].roomArea" /><br />
-            <label for="price">가격:</label>
-            <input type="text" id="price" name="rooms[${newRoomIndex}].price" required /><br />
-            <label for="amenities">편의시설:</label>
-            <input type="text" id="amenities" name="rooms[${newRoomIndex}].amenities" /><br />
-            <label for="roomIntr">객실 소개:</label>
-            <textarea id="roomIntr" name="rooms[${newRoomIndex}].roomIntr"></textarea><br />
-            <label for="roomImg">객실 이미지:</label>
-            <input type="file" id="roomImg" name="rooms[${newRoomIndex}].roomImg" /><br />
-            <label for="smokingYn">흡연 가능 여부:</label>
-            <input type="checkbox" id="smokingYn" name="rooms[${newRoomIndex}].smokingYn" /><br />
-            <label for="breakfastInclYn">조식 포함 여부:</label>
-            <input type="checkbox" id="breakfastInclYn" name="rooms[${newRoomIndex}].breakfastInclYn" /><br />
-            <label for="checkInTime">체크인 시간:</label>
-            <input type="text" id="checkInTime" name="rooms[${newRoomIndex}].checkInTime" /><br />
-            <label for="checkOutTime">체크아웃 시간:</label>
-            <input type="text" id="checkOutTime" name="rooms[${newRoomIndex}].checkOutTime" /><br />
+    document.getElementById("add-room-btn").addEventListener("click", function () {
+        var container = document.getElementById("rooms-container");
+        var index = container.children.length;
+        var roomTemplate = `
+            <div class="room" data-index="${index}">
+                <h3>객실 ${index + 1}</h3>
+                <label for="roomNm${index}">객실명:</label>
+                <input type="text" id="roomNm${index}" name="rooms[${index}].roomNm" required/>
+                <label for="roomType${index}">객실 타입:</label>
+                <input type="text" id="roomType${index}" name="rooms[${index}].roomType"/>
+                <label for="maxOccupancy${index}">최대 수용 인원:</label>
+                <input type="number" id="maxOccupancy${index}" name="rooms[${index}].maxOccupancy" required/>
+                <label for="roomArea${index}">객실 면적:</label>
+                <input type="text" id="roomArea${index}" name="rooms[${index}].roomArea"/>
+                <label for="price${index}">가격:</label>
+                <input type="text" id="price${index}" name="rooms[${index}].price" required/>
+                <label for="amenities${index}">편의시설:</label>
+                <input type="text" id="amenities${index}" name="rooms[${index}].amenities"/>
+                <label for="roomIntr${index}">객실 소개:</label>
+                <textarea id="roomIntr${index}" name="rooms[${index}].roomIntr"></textarea>
+                <label for="roomImg${index}">객실 이미지:</label>
+                <input type="file" id="roomImg${index}" name="rooms[${index}].roomImg"/>
+                <label for="smokingYn${index}">흡연 가능 여부:</label>
+                <input type="checkbox" id="smokingYn${index}" name="rooms[${index}].smokingYn"/>
+                <label for="checkinTime${index}">체크인 시간:</label>
+                <input type="time" id="checkinTime${index}" name="rooms[${index}].checkinTime" required/>
+                <label for="checkoutTime${index}">체크아웃 시간:</label>
+                <input type="time" id="checkoutTime${index}" name="rooms[${index}].checkoutTime" required/>
+            </div>
         `;
-
-        roomsContainer.appendChild(roomDiv);
-    }
+        container.insertAdjacentHTML('beforeend', roomTemplate);
+    });
 </script>
-
 </body>
 </html>
