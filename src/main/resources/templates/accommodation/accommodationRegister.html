@@ -175,40 +175,73 @@
     <label for="sigungucode">지역:</label>
     <select id="sigungucode" name="sigungucode" required>
         <option value="">지역을 선택하세요</option>
-        <!-- Add options dynamically -->
+        <option value="1" th:selected="${accommodationRegisterDTO.sigungucode == 1}">서울</option>
+        <option value="2" th:selected="${accommodationRegisterDTO.sigungucode == 2}">인천</option>
+        <option value="3" th:selected="${accommodationRegisterDTO.sigungucode == 3}">대전</option>
+        <option value="4" th:selected="${accommodationRegisterDTO.sigungucode == 4}">대구</option>
+        <option value="5" th:selected="${accommodationRegisterDTO.sigungucode == 5}">광주</option>
+        <option value="6" th:selected="${accommodationRegisterDTO.sigungucode == 6}">부산</option>
+        <option value="7" th:selected="${accommodationRegisterDTO.sigungucode == 7}">울산</option>
+        <option value="8" th:selected="${accommodationRegisterDTO.sigungucode == 8}">세종</option>
+        <option value="31" th:selected="${accommodationRegisterDTO.sigungucode == 31}">경기</option>
+        <option value="32" th:selected="${accommodationRegisterDTO.sigungucode == 32}">강원</option>
+        <option value="33" th:selected="${accommodationRegisterDTO.sigungucode == 33}">충북</option>
+        <option value="34" th:selected="${accommodationRegisterDTO.sigungucode == 34}">충남</option>
+        <option value="35" th:selected="${accommodationRegisterDTO.sigungucode == 35}">경북</option>
+        <option value="36" th:selected="${accommodationRegisterDTO.sigungucode == 36}">경남</option>
+        <option value="37" th:selected="${accommodationRegisterDTO.sigungucode == 37}">전북</option>
+        <option value="38" th:selected="${accommodationRegisterDTO.sigungucode == 38}">전남</option>
+        <option value="39" th:selected="${accommodationRegisterDTO.sigungucode == 39}">제주</option>
     </select>
+
 
     <label for="images">이미지 업로드:</label>
     <input type="file" id="images" name="images" multiple/>
+
 
     <h2>객실 정보</h2>
     <div id="rooms-container">
         <div class="room" data-index="0">
             <h3>객실 1</h3>
+
             <label for="roomNm0">객실명:</label>
             <input type="text" id="roomNm0" name="rooms[0].roomNm" required/>
+
             <label for="roomType0">객실 타입:</label>
             <input type="text" id="roomType0" name="rooms[0].roomType"/>
+
             <label for="maxOccupancy0">최대 수용 인원:</label>
             <input type="number" id="maxOccupancy0" name="rooms[0].maxOccupancy" required/>
+
             <label for="roomArea0">객실 면적:</label>
             <input type="text" id="roomArea0" name="rooms[0].roomArea"/>
+
             <label for="price0">가격:</label>
             <input type="text" id="price0" name="rooms[0].price" required/>
+
             <label for="amenities0">편의시설:</label>
             <input type="text" id="amenities0" name="rooms[0].amenities"/>
+
             <label for="roomIntr0">객실 소개:</label>
             <textarea id="roomIntr0" name="rooms[0].roomIntr"></textarea>
+
             <label for="roomImg0">객실 이미지:</label>
             <input type="file" id="roomImg0" name="rooms[0].roomImg"/>
+
             <label for="smokingYn0">흡연 가능 여부:</label>
             <input type="checkbox" id="smokingYn0" name="rooms[0].smokingYn"/>
-            <label for="checkinTime0">체크인 시간:</label>
-            <input type="time" id="checkinTime0" name="rooms[0].checkinTime" required/>
-            <label for="checkoutTime0">체크아웃 시간:</label>
-            <input type="time" id="checkoutTime0" name="rooms[0].checkoutTime" required/>
+
+            <label for="breakfastInclYn0">조식 포함 여부:</label>
+            <input type="checkbox" id="breakfastInclYn0" name="rooms[0].breakfastInclYn"/>
+
+            <label for="checkInTime0">체크인 시간:</label>
+            <input type="time" id="checkInTime0" name="rooms[0].checkInTime" required/>
+
+            <label for="checkOutTime0">체크아웃 시간:</label>
+            <input type="time" id="checkOutTime0" name="rooms[0].checkOutTime" required/>
         </div>
     </div>
+
     <button type="button" id="add-room-btn">객실 추가</button>
     <button type="submit">등록</button>
 </form>

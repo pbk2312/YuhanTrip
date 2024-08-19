@@ -29,6 +29,9 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -99,6 +102,7 @@ public class AccommodationService {
                     roomReposiotry.saveAll(rooms);
                     accommodation.setRooms(rooms); // 숙소에 객실 리스트 설정
                     accommodation.setAverageRating(0.0);
+                    accommodation.setStatus(AccommodationApplyStatus.APPROVED);
                 } catch (Exception e) {
                     log.error("객실 정보를 저장하는 중 오류가 발생했습니다.", e);
                     throw new RuntimeException("객실 저장 중 오류 발생", e); // 예외 던져 트랜잭션 롤백 유도
@@ -119,8 +123,12 @@ public class AccommodationService {
 
     public Page<Accommodation> getAccommodations(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return accommodationRepository.findAll(pageable);
+        return accommodationRepository.findAllByStatus(
+                AccommodationApplyStatus.APPROVED,
+                pageable
+        );
     }
+
 
     // 지역 코드를 기반으로 숙소를 페이지네이션하여 조회
     public Page<Accommodation> getAccommodationsByAreaCode(String areaCode, int page, int size) {
@@ -129,10 +137,19 @@ public class AccommodationService {
     }
 
 
-    // 해당 날짜에 예약이 가능한 숙소들 보여주기
+
+    // 해당 날짜에 예약이 가능한 승인된 숙소들 보여주기
     public Page<Accommodation> getAvailableAccommodations(String areaCode, LocalDate checkInDate, LocalDate checkOutDate, int numGuests, int page, int size) {
-        return accommodationRepository.findAvailableAccommodations(areaCode, checkInDate, checkOutDate, numGuests, PageRequest.of(page, size));
+        return accommodationRepository.findAvailableAccommodations(
+                AccommodationApplyStatus.APPROVED, // 추가된 상태 필터
+                areaCode,
+                checkInDate,
+                checkOutDate,
+                numGuests,
+                PageRequest.of(page, size)
+        );
     }
+
 
 
     public List<Room> getAvailableRoomsByAccommodation(Long accommodationId, LocalDate checkInDate, LocalDate checkOutDate) {
@@ -316,26 +333,31 @@ public class AccommodationService {
 
 
 
+
+
     @JsonIgnore
     public Accommodation registerAccommodation(Long memberId, AccommodationRegisterDTO dto) throws IOException {
+        // 멤버 조회
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found"));
 
+        // 호스트 권한 확인
         if (member.getMemberRole() != MemberRole.ROLE_HOST) {
             throw new IllegalStateException("Only HOST members can register accommodations");
         }
 
+        // Accommodation 객체 생성 및 기본 정보 설정
         Accommodation accommodation = new Accommodation();
         accommodation.setAddr1(dto.getAddr1());
         accommodation.setAddr2(dto.getAddr2());
         accommodation.setFirstimage(null); // 처음엔 이미지 경로를 null로 설정
         accommodation.setFirstimage2(null);
-        accommodation.setMapx(dto.getMapx());
-        accommodation.setMapy(dto.getMapy());
         accommodation.setTel(dto.getTel());
         accommodation.setTitle(dto.getTitle());
         accommodation.setSigungucode(dto.getSigungucode());
         accommodation.setMember(member);
+        accommodation.setStatus(AccommodationApplyStatus.PENDING);
+        accommodation.setAreacode(dto.getSigungucode());
 
         // 이미지 저장
         List<String> imagePaths = new ArrayList<>();
@@ -351,7 +373,6 @@ public class AccommodationService {
                 accommodation.setFirstimage2(imagePaths.get(1)); // 두 번째 이미지를 추가 이미지로 설정
             }
         }
-
 
         log.info("객실정보 저장 시도....");
 
@@ -387,16 +408,36 @@ public class AccommodationService {
     }
 
 
+
+
     private String saveImage(MultipartFile image) throws IOException {
-        String originalFilename = image.getOriginalFilename();
-        String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-        String storedFilename = UUID.randomUUID().toString() + extension;
-        String imagePath = uploadDir + storedFilename;
 
-        File file = new File(imagePath);
-        image.transferTo(file);
+        // 이미지 저장 디렉토리 설정
+        Path uploadPath = Paths.get(uploadDir);
+        log.info("업로드 디렉토리: {}", uploadPath);
 
-        return imagePath;
+        try {
+            // 디렉토리 존재 여부 확인 및 생성
+            if (!Files.exists(uploadPath)) {
+                log.info("디렉토리가 존재하지 않으므로 생성합니다.");
+                Files.createDirectories(uploadPath);
+            }
+
+            // 파일 이름 생성
+            String fileName = UUID.randomUUID().toString() + "_" + image.getOriginalFilename();
+            Path filePath = uploadPath.resolve(fileName);
+            log.info("파일 경로: {}", filePath);
+
+            // 파일 저장
+            Files.write(filePath, image.getBytes());
+            log.info("파일이 성공적으로 저장되었습니다: {}", fileName);
+
+            // 저장된 이미지의 URL 반환
+            return "/upload/" + fileName;
+        } catch (IOException e) {
+            log.error("파일 저장 오류: {}", e.getMessage(), e);
+            throw new IOException("이미지 저장 중 오류가 발생했습니다.", e);
+        }
     }
 
 

@@ -2,8 +2,14 @@ package hello.yuhanTrip.controller;
 
 import hello.yuhanTrip.domain.Accommodation;
 import hello.yuhanTrip.domain.Member;
+import hello.yuhanTrip.domain.Reservation;
+import hello.yuhanTrip.domain.Room;
+import hello.yuhanTrip.dto.AccommodationRegisterDTO;
 import hello.yuhanTrip.dto.MypageMemberDTO;
+import hello.yuhanTrip.dto.RoomDTO;
 import hello.yuhanTrip.jwt.TokenProvider;
+import hello.yuhanTrip.service.Accomodation.AccommodationService;
+import hello.yuhanTrip.service.Accomodation.ReservationService;
 import hello.yuhanTrip.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -17,7 +23,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -28,6 +37,8 @@ public class MypageController {
     private final TokenProvider tokenProvider;
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
+    private final ReservationService reservationService;
+    private final AccommodationService accommodationService;
 
     @GetMapping("/check")
     public String mypageCheck(
@@ -185,6 +196,49 @@ public class MypageController {
 
         return "/mypage/accommodationByMember";
     }
+
+    @GetMapping("/reservationSituation")
+    public String reservationAccommodationByMember(
+            @CookieValue(value = "accessToken", required = false) String accessToken,
+            Model model
+    ){
+        ResponseEntity<Void> validationResponse = validateAccessToken(accessToken);
+        if (validationResponse != null) {
+            return "redirect:/member/login";
+        }
+
+
+        UserDetails userDetails = getUserDetails(accessToken);
+        Member member = findMemberByEmail(userDetails.getUsername());
+
+
+        // 1. 멤버가 등록한 숙소 목록을 가져옴
+        List<Accommodation> accommodations = memberService.getAccommodationsByMemberId(member.getId());
+
+        // 2. 숙소별 룸과 해당 룸의 예약 정보를 조회
+        Map<Accommodation, Map<Room, List<Reservation>>> reservationInfo = new HashMap<>();
+
+        for (Accommodation accommodation : accommodations) {
+            Map<Room, List<Reservation>> roomReservations = new HashMap<>();
+            for (Room room : accommodation.getRooms()) {
+                List<Reservation> reservations = reservationService.getReservationsByRoomId(room.getId());
+                roomReservations.put(room, reservations);
+            }
+            reservationInfo.put(accommodation, roomReservations);
+        }
+
+        // 3. 뷰에 사용할 모델에 데이터를 추가
+        model.addAttribute("reservationInfo", reservationInfo);
+
+        return "/mypage/reservationSituation"; // reservationSituation.html로 이동
+
+
+
+
+    }
+
+
+
 
 
     // 인증 토큰 유효성 검증 메소드

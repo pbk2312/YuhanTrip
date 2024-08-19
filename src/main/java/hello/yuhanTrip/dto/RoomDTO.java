@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
@@ -17,7 +18,7 @@ public class RoomDTO {
     private BigDecimal price;       // 객실 1박 가격
     private String amenities;       // 편의시설
     private String roomIntr;        // 객실 소개
-    private MultipartFile roomImg;  // 객실 이미지 파일
+    private MultipartFile roomImg;
     private Boolean smokingYn;      // 흡연 가능 여부
     private Boolean breakfastInclYn; // 조식 포함 여부
     private String checkInTime;     // 체크인 시간

@@ -45,6 +45,9 @@ public class Accommodation {
     private String sigungucode;
     private double averageRating;
 
+    @Enumerated(EnumType.STRING)
+    private AccommodationApplyStatus status;
+
     @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Room> rooms = new ArrayList<>();

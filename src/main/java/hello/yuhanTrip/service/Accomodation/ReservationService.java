@@ -70,6 +70,11 @@ public class ReservationService {
         reservationRepository.delete(reservation);
     }
 
+    public List<Reservation> getReservationsByRoomId(Long roomId) {
+        return reservationRepository.findByRoomId(roomId);
+    }
+
+
 
     public Reservation updateReservation(ReservationUpdateDTO reservationDTO, String username) {
 

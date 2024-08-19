@@ -11,8 +11,6 @@ import java.util.List;
 public class AccommodationRegisterDTO {
     private String addr1;          // 주소
     private String addr2;          // 상세 주소
-    private String mapx;           // 지도 X 좌표
-    private String mapy;           // 지도 Y 좌표
     private String tel;            // 전화번호
     private String title;          // 숙소 이름
     private String sigungucode;    // 시군구 코드

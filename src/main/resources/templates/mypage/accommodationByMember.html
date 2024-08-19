@@ -18,21 +18,25 @@
       background: url('/los-angeles-2289637_640.jpg') no-repeat center center fixed;
       background-size: cover;
       color: #333;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
     }
+
     /* Header Styles */
     header {
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, 0.75);
       padding: 15px 0;
       border-bottom: 1px solid rgba(255, 255, 255, 0.5);
     }
+
     /* Navbar Styles */
     .navbar {
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.85);
       border-bottom: 1px solid #ddd;
     }
     .navbar-brand {
       font-size: 1.5rem;
       font-weight: bold;
+      color: #0056b3;
     }
     .navbar-nav .nav-link {
       color: #007bff;
@@ -41,50 +45,59 @@
     .navbar-nav .nav-link.active {
       color: #0056b3;
     }
+
     /* Info Section */
     .info {
       background-color: rgba(255, 255, 255, 0.9);
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      padding: 20px;
-      margin: 20px auto;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      padding: 30px;
+      margin: 30px auto;
       max-width: 1200px;
     }
-    .info p {
-      margin: 0 0 10px 0;
-      line-height: 1.6;
+    .info h1 {
+      margin-bottom: 30px;
+      font-size: 2.5rem;
+      text-align: center;
+      color: #333;
     }
-    .info .btn {
-      margin-top: 10px;
-      border-radius: 20px;
-      font-weight: 600;
-    }
+
     /* Accommodation Container and Items */
     .accommodation-container {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
       gap: 20px;
     }
+
     .accommodation-item {
-      flex: 1 1 calc(33.333% - 20px);
-      padding: 15px;
-      border: 1px solid #ddd;
+      padding: 20px;
       border-radius: 8px;
-      background: rgba(255, 255, 255, 0.9);
-      min-width: 250px;
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
       position: relative;
     }
-    .accommodation-actions {
-      text-align: right;
-      margin-top: 10px;
+
+    .accommodation-item.pending {
+      border-left: 5px solid #ffc107;
     }
-    .accommodation-item.completed {
-      background-color: #f8f9fa;
+    .accommodation-item.pending::before {
+      content: '승인 대기 중';
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #ffc107;
+      color: #fff;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .accommodation-item.approved {
       border-left: 5px solid #28a745;
     }
-    .accommodation-item.completed::before {
-      content: '숙소 등록 완료';
+    .accommodation-item.approved::before {
+      content: '신청 승인됨';
       position: absolute;
       top: 10px;
       right: 10px;
@@ -94,40 +107,122 @@
       border-radius: 5px;
       font-weight: bold;
       font-size: 14px;
-      z-index: 2;
     }
-    /* Pagination */
-    .pagination {
-      display: flex;
-      justify-content: center;
+
+    .accommodation-item.rejected {
+      border-left: 5px solid #dc3545;
+    }
+    .accommodation-item.rejected::before {
+      content: '신청 거부됨';
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #dc3545;
+      color: #fff;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .accommodation-item.canceled {
+      border-left: 5px solid #6c757d;
+    }
+    .accommodation-item.canceled::before {
+      content: '신청 취소됨';
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #6c757d;
+      color: #fff;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    /* Room Info Grid */
+    .room-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
       margin-top: 20px;
     }
-    .pagination .page-item {
-      margin: 0 5px;
+    .room-info p {
+      margin: 0;
+      color: #555;
     }
-    .pagination .page-link {
-      border-radius: 20px;
-      font-weight: 600;
+
+    /* Actions */
+    .accommodation-actions {
+      text-align: right;
+      margin-top: 20px;
     }
-    .pagination .page-item.active .page-link {
+    .update-button {
       background-color: #007bff;
-      color: white;
+      border: none;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
     }
+    .update-button:hover {
+      background-color: #0056b3;
+    }
+    .cancel-button {
+      background-color: #dc3545;
+      border: none;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+    .cancel-button:hover {
+      background-color: #c82333;
+    }
+
     /* No Accommodations Notice */
     .no-accommodations {
       text-align: center;
-      padding: 20px;
+      padding: 30px;
       border: 1px solid #ddd;
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.9);
-      margin: 20px auto;
+      margin: 30px auto;
       max-width: 800px;
       color: #ff6f61;
     }
     .no-accommodations h2 {
       margin: 0;
-      font-size: 20px;
+      font-size: 24px;
     }
+
+    /* 숙소 등록 버튼 스타일 */
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    .action-buttons .btn-info {
+      background-color: #17a2b8;
+      border: none;
+      color: #fff;
+      padding: 12px 25px;
+      border-radius: 30px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .action-buttons .btn-info:hover {
+      background-color: #138496;
+      transform: scale(1.05);
+    }
+
+    .action-buttons .btn-info:focus {
+      box-shadow: 0 0 0 3px rgba(23, 162, 184, 0.5);
+    }
+
   </style>
 </head>
 <body>
@@ -156,7 +251,6 @@
       </ul>
       <div id="authButtons" class="d-flex">
         <button id="authButton" class="btn btn-outline-dark me-2" type="button"></button>
-        <!-- Removed delete account button -->
         <button id="mypageButton" class="btn btn-outline-primary" type="button" style="display: none;">
           마이페이지
         </button>
@@ -166,27 +260,32 @@
 </nav>
 
 <!-- Main Content -->
+
+<div class="action-buttons">
+  <button class="btn btn-info" onclick="location.href='/accommodation/registerForm'">숙소 등록</button>
+</div>
+
 <div class="container">
   <div class="info">
-    <div class="reservation-header">
-      <h1 class="mb-4">회원 숙소 내역</h1>
-    </div>
+    <h1>회원 숙소 내역</h1>
 
-    <!-- 숙소 내역이 있는 경우 -->
     <div class="accommodation-container" th:if="${not #lists.isEmpty(accommodations)}">
-      <div th:each="accommodation : ${accommodations}" class="accommodation-item">
+      <div th:each="accommodation : ${accommodations}"
+           class="accommodation-item"
+           th:classappend="${accommodation.getStatus() != null ? accommodation.getStatus().name().toLowerCase() : 'default-class'}">
         <!-- 숙소 정보 -->
         <p><strong>숙소 제목:</strong> <span th:text="${accommodation.title}">숙소 제목</span></p>
         <p><strong>주소:</strong> <span th:text="${accommodation.addr1} + ' ' + ${accommodation.addr2}">주소</span></p>
         <p><strong>전화번호:</strong> <span th:text="${accommodation.tel}">전화번호</span></p>
-        <p><strong>설명:</strong> <span th:text="${accommodation.contentid}">설명</span></p>
-        <p><strong>첫 이미지:</strong> <img th:src="${accommodation.firstimage}" alt="첫 이미지" style="max-width: 100%; height: auto;"/></p>
+        <p><strong>대표 사진</strong>
+          <img th:src="@{${accommodation.getFirstimage()}}" alt="이미지" style="max-width: 100%; height: auto; width: 100%;">
+        </p>
 
         <!-- 객실 정보 -->
         <div th:if="${not #lists.isEmpty(accommodation.rooms)}">
           <h4 class="mt-4">객실 정보</h4>
-          <ul>
-            <li th:each="room : ${accommodation.rooms}">
+          <div class="room-info">
+            <div th:each="room : ${accommodation.rooms}">
               <p><strong>객실명:</strong> <span th:text="${room.roomNm}">객실명</span></p>
               <p><strong>객실 타입:</strong> <span th:text="${room.roomType}">객실 타입</span></p>
               <p><strong>최대 수용 인원:</strong> <span th:text="${room.maxOccupancy}">최대 수용 인원</span></p>
@@ -194,9 +293,13 @@
               <p><strong>가격:</strong> <span th:text="${room.price}">가격</span></p>
               <p><strong>편의시설:</strong> <span th:text="${room.amenities}">편의시설</span></p>
               <p><strong>객실 소개:</strong> <span th:text="${room.roomIntr}">객실 소개</span></p>
-            </li>
-          </ul>
+              <p><strong>객실 사진</strong>
+                <img th:src="@{${room.getRoomImgUrl()}}" alt="사진" style="max-width: 100%; height: auto;">
+              </p>
+            </div>
+          </div>
         </div>
+
         <!-- Actions -->
         <div class="accommodation-actions">
           <a th:href="@{/accommodationUpdate(accommodationId=${accommodation.id})}" class="btn btn-primary update-button">숙소 수정</a>
@@ -204,16 +307,15 @@
         </div>
       </div>
     </div>
+
   </div>
-    </div>
+</div>
 
-    <!-- 숙소 내역이 없는 경우 -->
-    <div class="no-accommodations" th:if="${#lists.isEmpty(accommodations)}">
-      <h2>숙소 내역이 없습니다.</h2>
-      <p>아직 등록하신 숙소가 없으신가요? <a href="/home/homepage">홈으로 돌아가기</a></p>
-    </div>
-
-
+<!-- 숙소 내역이 없는 경우 -->
+<div class="no-accommodations" th:if="${#lists.isEmpty(accommodations)}">
+  <h2>숙소 내역이 없습니다.</h2>
+  <p>아직 등록하신 숙소가 없으신가요? <a href="/home/homepage">홈으로 돌아가기</a></p>
+</div>
 
 <!-- jQuery, Popper.js, and Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
