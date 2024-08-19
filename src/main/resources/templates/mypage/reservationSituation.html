@@ -20,6 +20,7 @@
       margin: 0;
       padding: 0;
       color: #333;
+      font-family: Arial, sans-serif;
     }
 
     .navbar {
@@ -81,11 +82,28 @@
       border-radius: 5px;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
       margin-bottom: 10px;
+      position: relative;
     }
 
     .reservation-details p {
       margin: 10px 0;
       font-size: 0.9rem;
+    }
+
+    .cancel-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .cancel-btn:hover {
+      background-color: #c82333;
     }
   </style>
 </head>
@@ -121,35 +139,40 @@
 <div id="main-content">
   <!-- 숙소 목록을 순회 -->
   <div class="accommodation" th:each="accommodationEntry : ${reservationInfo}">
-    <!-- 숙소 이름 -->
-    <div class="accommodation-title" th:text="${accommodationEntry.key.title}">숙소 이름</div>
+    <!-- 예약이 있는 경우에만 숙소와 방 정보 표시 -->
+    <div th:if="${accommodationEntry.value.size() > 0}">
+      <!-- 숙소 이름 -->
+      <div class="accommodation-title" th:text="${accommodationEntry.key.title}">숙소 이름</div>
 
-    <!-- 방 목록을 순회 -->
-    <div th:each="roomEntry, iterStat : ${accommodationEntry.value}">
-      <!-- 방 이름 (첫 번째 방일 때만 표시) -->
-      <div th:if="${roomEntry.value.size() > 0}" class="room">
-        <div class="room-title" th:text="${roomEntry.key.roomNm}">방 이름</div>
+      <!-- 방 목록을 순회 -->
+      <div th:each="roomEntry : ${accommodationEntry.value}">
+        <div th:if="${roomEntry.value.size() > 0}" class="room">
+          <!-- 방 이름 -->
+          <div class="room-title" th:text="${roomEntry.key.roomNm}">방 이름</div>
 
-        <!-- 예약 목록을 순회 -->
-        <div th:each="reservation : ${roomEntry.value}" class="reservation-details">
-          <!-- 예약자 이름 -->
-          <p>예약자 이름: <span th:text="${reservation.name}">이름</span></p>
-          <!-- 체크인 날짜 -->
-          <p>체크인 날짜: <span th:text="${reservation.checkInDate}">체크인 날짜</span></p>
-          <!-- 체크아웃 날짜 -->
-          <p>체크아웃 날짜: <span th:text="${reservation.checkOutDate}">체크아웃 날짜</span></p>
-          <!-- 예약 상태 -->
-          <p>예약 상태: <span th:text="${reservation.reservationStatus}">예약 상태</span></p>
-          <!-- 예약 번호 -->
-          <p>예약 번호: <span th:text="${reservation.reservationUid}">예약 번호</span></p>
-          <!-- 특이 사항 -->
-          <p>특이 요청 사항: <span th:text="${reservation.specialRequests}">특이 요청 사항</span></p>
-          <!-- 전화번호 -->
-          <p>전화번호: <span th:text="${reservation.phoneNumber}">전화번호</span></p>
-          <!-- 주소 -->
-          <p>주소: <span th:text="${reservation.addr}">주소</span></p>
-          <!-- 게스트 수 -->
-          <p>게스트 수: <span th:text="${reservation.numberOfGuests}">게스트 수</span></p>
+          <!-- 예약 목록을 순회 -->
+          <div th:each="reservation : ${roomEntry.value}" class="reservation-details">
+            <!-- 예약자 이름 -->
+            <p>예약자 이름: <span th:text="${reservation.name}">이름</span></p>
+            <!-- 체크인 날짜 -->
+            <p>체크인 날짜: <span th:text="${reservation.checkInDate}">체크인 날짜</span></p>
+            <!-- 체크아웃 날짜 -->
+            <p>체크아웃 날짜: <span th:text="${reservation.checkOutDate}">체크아웃 날짜</span></p>
+            <!-- 예약 상태 -->
+            <p>예약 상태: <span th:text="${reservation.reservationStatus}">예약 상태</span></p>
+            <!-- 예약 번호 -->
+            <p>예약 번호: <span th:text="${reservation.reservationUid}">예약 번호</span></p>
+            <!-- 특이 사항 -->
+            <p>특이 요청 사항: <span th:text="${reservation.specialRequests}">특이 요청 사항</span></p>
+            <!-- 전화번호 -->
+            <p>전화번호: <span th:text="${reservation.phoneNumber}">전화번호</span></p>
+            <!-- 주소 -->
+            <p>주소: <span th:text="${reservation.addr}">주소</span></p>
+            <!-- 게스트 수 -->
+            <p>게스트 수: <span th:text="${reservation.numberOfGuests}">게스트 수</span></p>
+            <!-- 예약 취소 버튼 -->
+            <button class="cancel-btn" onclick="cancelReservation('${reservation.reservationId}')">예약 취소</button>
+          </div>
         </div>
       </div>
     </div>
@@ -162,5 +185,26 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
 <!-- Core theme JS -->
 <script src="js/scripts.js"></script>
+<script>
+  function cancelReservation(reservationId) {
+    if (confirm("정말로 이 예약을 취소하시겠습니까?")) {
+      // reservationUid 대신 reservationId를 사용합니다.
+      $.ajax({
+        url: '/mypage/cancelReservation',
+        type: 'POST',
+        data: { reservationId: reservationId },
+        success: function(response) {
+          alert("예약이 성공적으로 취소되었습니다.");
+          // 페이지를 새로고침하거나 예약 항목을 제거합니다.
+          location.reload();
+        },
+        error: function(error) {
+          alert("예약 취소에 실패했습니다. 다시 시도해 주세요.");
+        }
+      });
+    }
+  }
+</script>
+
 </body>
 </html>

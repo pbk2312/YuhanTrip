@@ -238,6 +238,43 @@ public class MypageController {
     }
 
 
+    @PostMapping("/cancelReservation")
+    public ResponseEntity<String> cancelReservation(
+            @CookieValue(value = "accessToken", required = false) String accessToken,
+            @RequestParam("reservationId") Long reservationId
+    ) {
+        // 1. 토큰 유효성 검증
+        ResponseEntity<Void> validationResponse = validateAccessToken(accessToken);
+        if (validationResponse != null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("로그인이 필요합니다.");  // 상태 코드와 함께 메시지를 반환
+        }
+
+        // 2. 사용자 정보 가져오기
+        UserDetails userDetails = getUserDetails(accessToken);
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("유효하지 않은 사용자입니다.");
+        }
+
+        // 3. 회원 정보 확인
+        Member member = findMemberByEmail(userDetails.getUsername());
+        if (member == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("회원 정보를 찾을 수 없습니다.");
+        }
+
+        // 4. 예약 취소 처리
+        try {
+            reservationService.cancelReservation(reservationId);
+            return ResponseEntity.ok("예약이 성공적으로 취소되었습니다.");
+        } catch (Exception e) {
+            log.error("예약 취소 중 오류 발생: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("예약 취소 중 오류가 발생했습니다.");
+        }
+    }
+
 
 
 

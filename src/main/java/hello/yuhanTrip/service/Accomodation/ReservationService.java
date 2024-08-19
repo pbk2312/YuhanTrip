@@ -1,12 +1,12 @@
 package hello.yuhanTrip.service.Accomodation;
 
-import hello.yuhanTrip.domain.Member;
-import hello.yuhanTrip.domain.Reservation;
-import hello.yuhanTrip.domain.ReservationStatus;
-import hello.yuhanTrip.domain.Room;
+import hello.yuhanTrip.domain.*;
 import hello.yuhanTrip.dto.ReservationDTO;
 import hello.yuhanTrip.dto.ReservationUpdateDTO;
+import hello.yuhanTrip.dto.payment.PaymentDTO;
+import hello.yuhanTrip.repository.PaymentRepository;
 import hello.yuhanTrip.repository.ReservationRepository;
+import hello.yuhanTrip.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -25,6 +25,8 @@ import java.util.List;
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
+    private final PaymentService paymentService;
+    private final PaymentRepository paymentRepository;
 
     @Transactional
     public void reservationRegister(Reservation reservation) {
@@ -75,7 +77,6 @@ public class ReservationService {
     }
 
 
-
     public Reservation updateReservation(ReservationUpdateDTO reservationDTO, String username) {
 
         log.info("예약 수정...");
@@ -123,5 +124,12 @@ public class ReservationService {
         return reservationRepository.findByMember(member, ReservationStatus.CANCELLED, pageable);
     }
 
+    @Transactional
+    public void cancelReservation(Long reservationId){
+        Reservation reservation = findReservation(reservationId);
+        Payment payment = paymentService.findPayment(reservation.getPayment().getPaymentUid());
+        paymentRepository.delete(payment);
+        removeReservation(reservation.getReservationUid());
+    }
 }
 
