@@ -152,6 +152,7 @@ public class AccommodationService {
 
 
 
+
     public List<Room> getAvailableRoomsByAccommodation(Long accommodationId, LocalDate checkInDate, LocalDate checkOutDate) {
         List<ReservationStatus> excludedStatuses = Arrays.asList(
                 ReservationStatus.CANCELLED,
@@ -165,6 +166,32 @@ public class AccommodationService {
                 excludedStatuses
         );
     }
+    // 해당 날짜에 예약 가능한 숙소를 평균 평점으로 정렬하여 반환
+    public Page<Accommodation> getAvailableAccommodationsSortedByRating(String areaCode, LocalDate checkInDate, LocalDate checkOutDate, int numGuests, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return accommodationRepository.findAvailableAccommodationsSortedByRating(
+                AccommodationApplyStatus.APPROVED,
+                areaCode,
+                checkInDate,
+                checkOutDate,
+                numGuests,
+                pageable
+        );
+    }
+
+    // 해당 날짜에 예약 가능한 숙소를 리뷰 개수로 정렬하여 반환
+    public Page<Accommodation> getAvailableAccommodationsSortedByReviewCount(String areaCode, LocalDate checkInDate, LocalDate checkOutDate, int numGuests, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return accommodationRepository.findAvailableAccommodationsSortedByReviewCount(
+                AccommodationApplyStatus.APPROVED,
+                areaCode,
+                checkInDate,
+                checkOutDate,
+                numGuests,
+                pageable
+        );
+    }
+
 
 
 
@@ -315,6 +342,8 @@ public class AccommodationService {
         return room;
     }
 
+
+
     public double calculateAverageRating(Long accommodationId) {
         List<Review> reviews = reviewRepository.findByAccommodationId(accommodationId);
         if (reviews.isEmpty()) {
@@ -324,6 +353,10 @@ public class AccommodationService {
                 .mapToInt(Review::getRating)
                 .average()
                 .orElse(0);
+    }
+
+    public int countReviews(Long accommodationId) {
+        return reviewRepository.countByAccommodationId(accommodationId);
     }
 
     @Transactional
@@ -340,7 +373,6 @@ public class AccommodationService {
         accommodationRepository.save(accommodation);
 
     }
-
 
 
 

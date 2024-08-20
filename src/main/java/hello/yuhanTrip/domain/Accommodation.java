@@ -43,6 +43,8 @@ public class Accommodation {
     private String title;
     private String booktour;
     private String sigungucode;
+
+    private int reviewCount;
     private double averageRating;
 
     @Enumerated(EnumType.STRING)

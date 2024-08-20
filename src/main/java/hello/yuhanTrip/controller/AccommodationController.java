@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Controller
@@ -40,6 +39,8 @@ public class AccommodationController {
 
 
 
+
+
     @GetMapping("/accommodations")
     public String listAccommodations(Model model,
                                      @RequestParam(required = false) String region,
@@ -47,11 +48,13 @@ public class AccommodationController {
                                      @RequestParam(value = "checkout", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkout,
                                      @RequestParam(value = "numGuests", required = false) Integer numGuests,
                                      @RequestParam(defaultValue = "0") int page,
-                                     @RequestParam(defaultValue = "12") int size) {
+                                     @RequestParam(defaultValue = "12") int size,
+                                     @RequestParam(value = "sort", required = false) String sort) {
 
-        log.info("숙소 리스트를 조회합니다.... 페이지: {}, 사이즈: {}, 지역: {}, 체크인 날짜: {}, 체크아웃 날짜: {}, 숙박 인원 수: {}", page, size, region, checkin, checkout, numGuests);
+        log.info("숙소 리스트를 조회합니다.... 페이지: {}, 사이즈: {}, 지역: {}, 체크인 날짜: {}, 체크아웃 날짜: {}, 숙박 인원 수: {}, 정렬 기준: {}", page, size, region, checkin, checkout, numGuests, sort);
 
         page = Math.max(page, 0);
+        size = Math.max(size, 1);
 
         Page<Accommodation> accommodationsPage;
 
@@ -63,8 +66,7 @@ public class AccommodationController {
             }
 
             if (checkin != null && checkout != null && numGuests != null) {
-                accommodationsPage = accommodationService.getAvailableAccommodations(
-                        String.valueOf(areaCode), checkin, checkout, numGuests, page, size);
+                accommodationsPage = getSortedAccommodations(sort, String.valueOf(areaCode), checkin, checkout, numGuests, page, size);
             } else {
                 accommodationsPage = accommodationService.getAccommodationsByAreaCode(String.valueOf(areaCode), page, size);
             }
@@ -72,18 +74,20 @@ public class AccommodationController {
             model.addAttribute("region", region);
         } else {
             if (checkin != null && checkout != null && numGuests != null) {
-                accommodationsPage = accommodationService.getAvailableAccommodations(
-                        null, checkin, checkout, numGuests, page, size);
+                accommodationsPage = getSortedAccommodations(sort, null, checkin, checkout, numGuests, page, size);
             } else {
                 accommodationsPage = accommodationService.getAccommodations(page, size);
             }
         }
 
-        // 평균 평점 계산
+        // 평균 평점 및 리뷰 개수 계산
         List<Accommodation> accommodations = accommodationsPage.getContent();
         for (Accommodation accommodation : accommodations) {
             double averageRating = accommodationService.calculateAverageRating(accommodation.getId());
-            accommodationService.updateAverageRating(accommodation.getId(),averageRating);
+            accommodationService.updateAverageRating(accommodation.getId(), averageRating);
+            int reviewCount = accommodationService.countReviews(accommodation.getId());
+            accommodation.setAverageRating(averageRating);  // 평균 평점을 숙소 객체에 설정
+            accommodation.setReviewCount(reviewCount);  // 리뷰 개수를 숙소 객체에 설정
         }
 
         int totalPages = accommodationsPage.getTotalPages();
@@ -108,6 +112,16 @@ public class AccommodationController {
         return "/accommodation/accommodations";
     }
 
+    private Page<Accommodation> getSortedAccommodations(String sort, String areaCode, LocalDate checkin, LocalDate checkout, int numGuests, int page, int size) {
+        if ("rating".equals(sort)) {
+            return accommodationService.getAvailableAccommodationsSortedByRating(areaCode, checkin, checkout, numGuests, page, size);
+        } else if ("reviewCount".equals(sort)) {
+            return accommodationService.getAvailableAccommodationsSortedByReviewCount(areaCode, checkin, checkout, numGuests, page, size);
+        } else {
+            return accommodationService.getAvailableAccommodations(areaCode, checkin, checkout, numGuests, page, size);
+        }
+    }
+
 
     @GetMapping("/byregion")
     public String listAccommodationsByRegion(Model model,
@@ -116,9 +130,10 @@ public class AccommodationController {
                                              @RequestParam(value = "checkout", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkout,
                                              @RequestParam(value = "numGuests", required = false) Integer numGuests,
                                              @RequestParam(defaultValue = "0") int page,
-                                             @RequestParam(defaultValue = "12") int size) {
+                                             @RequestParam(defaultValue = "12") int size,
+                                             @RequestParam(value = "sort", required = false) String sort) {
 
-        log.info("지역 코드로 숙소 리스트를 조회합니다. 지역: {}, 페이지: {}, 사이즈: {}, 체크인 날짜: {}, 체크아웃 날짜: {}, 숙박 인원 수: {}", region, page, size, checkin, checkout, numGuests);
+        log.info("지역 코드로 숙소 리스트를 조회합니다. 지역: {}, 페이지: {}, 사이즈: {}, 체크인 날짜: {}, 체크아웃 날짜: {}, 숙박 인원 수: {}, 정렬 기준: {}", region, page, size, checkin, checkout, numGuests, sort);
 
         page = Math.max(page, 0);
         size = Math.max(size, 1);
@@ -133,18 +148,15 @@ public class AccommodationController {
             }
 
             if (checkin != null && checkout != null && numGuests != null) {
-                accommodationsPage = accommodationService.getAvailableAccommodations(
-                        String.valueOf(areaCode), checkin, checkout, numGuests, page, size);
+                accommodationsPage = getSortedAccommodations(sort, String.valueOf(areaCode), checkin, checkout, numGuests, page, size);
             } else {
-                accommodationsPage = accommodationService.getAccommodationsByAreaCode(
-                        String.valueOf(areaCode), page, size);
+                accommodationsPage = accommodationService.getAccommodationsByAreaCode(String.valueOf(areaCode), page, size);
             }
 
             model.addAttribute("region", region);
         } else {
             if (checkin != null && checkout != null && numGuests != null) {
-                accommodationsPage = accommodationService.getAvailableAccommodations(
-                        null, checkin, checkout, numGuests, page, size);
+                accommodationsPage = getSortedAccommodations(sort, null, checkin, checkout, numGuests, page, size);
             } else {
                 accommodationsPage = accommodationService.getAccommodations(page, size);
             }
@@ -155,7 +167,9 @@ public class AccommodationController {
         for (Accommodation accommodation : accommodations) {
             double averageRating = accommodationService.calculateAverageRating(accommodation.getId());
             accommodationService.updateAverageRating(accommodation.getId(), averageRating);
+            int reviewCount = accommodationService.countReviews(accommodation.getId());
             accommodation.setAverageRating(averageRating);  // 평균 평점을 숙소 객체에 설정
+            accommodation.setReviewCount(reviewCount);  // 리뷰 개수를 숙소 객체에 설정
         }
 
         int totalPages = accommodationsPage.getTotalPages();
@@ -180,6 +194,10 @@ public class AccommodationController {
 
         return "/accommodation/accommodations";
     }
+
+
+
+
 
     @GetMapping("/info")
     public String getAccommodationInfo(
