@@ -12,6 +12,7 @@ import hello.yuhanTrip.service.Accomodation.AccommodationService;
 import hello.yuhanTrip.service.Accomodation.ReservationService;
 import hello.yuhanTrip.service.MemberService;
 import hello.yuhanTrip.service.ReviewService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -49,6 +50,7 @@ public class ReviewController {
             Model model
     ) {
         try {
+
             // 로그인한 사용자의 정보를 가져옴
             Member member = getUserDetails(accessToken);
             Reservation reservation = reservationService.findReservation(reservationId);
@@ -141,9 +143,12 @@ public class ReviewController {
             @RequestParam(defaultValue = "2") int size, // 한 페이지당 2개의 리뷰를 보여줌
             Model model
     ) {
+
         try {
             Member member = getUserDetails(accessToken);
             Page<Review> reviewsPage = reviewService.getReviewsByMemberWithPagination(member.getId(), page, size);
+
+
 
             model.addAttribute("reviews", reviewsPage.getContent());
             model.addAttribute("member", member);

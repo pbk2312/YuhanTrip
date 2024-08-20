@@ -1,5 +1,6 @@
 package hello.yuhanTrip.repository;
 
+import hello.yuhanTrip.domain.ReservationStatus;
 import hello.yuhanTrip.domain.Room;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,9 +16,14 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
     @Query("SELECT r FROM Room r WHERE r.accommodation.id = :accommodationId AND r.id NOT IN (" +
             "SELECT r.id FROM Reservation res " +
             "WHERE res.room.id = r.id " +
-            "AND (res.checkInDate < :checkOutDate AND res.checkOutDate > :checkInDate))")
-    List<Room> findAvailableRoomsByAccommodation(@Param("accommodationId") Long accommodationId,
-                                                 @Param("checkInDate") LocalDate checkInDate,
-                                                 @Param("checkOutDate") LocalDate checkOutDate);
+            "AND (res.checkInDate < :checkOutDate AND res.checkOutDate > :checkInDate) " +
+            "AND res.reservationStatus NOT IN :excludedStatuses)")
+    List<Room> findAvailableRoomsByAccommodation(
+            @Param("accommodationId") Long accommodationId,
+            @Param("checkInDate") LocalDate checkInDate,
+            @Param("checkOutDate") LocalDate checkOutDate,
+            @Param("excludedStatuses") List<ReservationStatus> excludedStatuses
+    );
+
 
 }

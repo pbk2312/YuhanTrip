@@ -210,7 +210,7 @@ public class ReservationController {
             }
         });
 
-        // 5. RESERVED 상태와 COMPLETED 상태의 예약을 나누어 필터링
+        // 5. RESERVED, COMPLETED, REJECTED 상태의 예약을 나누어 필터링
         List<Reservation> reservedReservations = reservationPage.getContent().stream()
                 .filter(reservation -> reservation.getReservationStatus() == ReservationStatus.RESERVED)
                 .collect(Collectors.toList());
@@ -219,10 +219,15 @@ public class ReservationController {
                 .filter(reservation -> reservation.getReservationStatus() == ReservationStatus.COMPLETED)
                 .collect(Collectors.toList());
 
-        // 6. 두 리스트를 합쳐서 RESERVED 상태가 먼저 나오게 설정
+        List<Reservation> rejectedReservations = reservationPage.getContent().stream()
+                .filter(reservation -> reservation.getReservationStatus() == ReservationStatus.REJECTED)
+                .collect(Collectors.toList());
+
+        // 6. 세 가지 상태의 예약을 정렬하여 모델에 추가
         List<Reservation> sortedReservations = new ArrayList<>();
         sortedReservations.addAll(reservedReservations);
         sortedReservations.addAll(completedReservations);
+        sortedReservations.addAll(rejectedReservations);
 
         // 7. 모델에 정렬된 예약 리스트 추가
         model.addAttribute("reservations", sortedReservations);
@@ -231,6 +236,7 @@ public class ReservationController {
 
         return "/reservation/reservationConfirms";
     }
+
 
 
     @GetMapping("/reservationUpdate")

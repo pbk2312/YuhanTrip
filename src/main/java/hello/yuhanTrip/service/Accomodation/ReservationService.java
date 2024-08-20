@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -51,7 +52,18 @@ public class ReservationService {
     }
 
     public boolean isDateOverlapping(Long roomId, LocalDate checkInDate, LocalDate checkOutDate) {
-        List<Reservation> overlappingReservations = reservationRepository.findOverlappingReservations(roomId, checkInDate, checkOutDate);
+        List<ReservationStatus> excludedStatuses = Arrays.asList(
+                ReservationStatus.CANCELLED,
+                ReservationStatus.REJECTED
+        );
+
+        List<Reservation> overlappingReservations = reservationRepository.findOverlappingReservations(
+                roomId,
+                checkInDate,
+                checkOutDate,
+                excludedStatuses
+        );
+
         boolean isOverlapping = !overlappingReservations.isEmpty();
 
         if (isOverlapping) {
@@ -138,7 +150,7 @@ public class ReservationService {
             }
 
             // 상태 변경
-            reservation.setReservationStatus(ReservationStatus.CANCELLED);
+            reservation.setReservationStatus(ReservationStatus.REJECTED);
             payment.setStatus(PaymentStatus.CANCELLED);
 
             // 변경 사항 저장

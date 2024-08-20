@@ -125,6 +125,14 @@
             }
         }
 
+        .alert {
+            color: #d9534f;
+            background-color: #f9d6d5;
+            border: 1px solid #d9534f;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
@@ -160,6 +168,9 @@
 <!-- Main Content-->
 <form th:action="@{/accommodation/register}" method="post" enctype="multipart/form-data">
     <h2 class="text-center">숙소 등록</h2>
+    <div class="alert">
+        숙소를 등록하면 수정, 삭제는 문의를 주셔야 합니다.
+    </div>
     <label for="addr1">주소:</label>
     <input type="text" id="addr1" name="addr1" th:value="${accommodationRegisterDTO.addr1}" required/>
 
@@ -194,10 +205,8 @@
         <option value="39" th:selected="${accommodationRegisterDTO.sigungucode == 39}">제주</option>
     </select>
 
-
     <label for="images">이미지 업로드:</label>
     <input type="file" id="images" name="images" multiple/>
-
 
     <h2>객실 정보</h2>
     <div id="rooms-container">

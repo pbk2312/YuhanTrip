@@ -12,6 +12,7 @@ import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.service.Accomodation.AccommodationService;
 import hello.yuhanTrip.service.Accomodation.ReservationService;
 import hello.yuhanTrip.service.MemberService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -53,13 +54,16 @@ public class MypageController {
         UserDetails userDetails = getUserDetails(accessToken);
         log.info("마이페이지 접근 유저 : {} ", userDetails.getUsername());
 
+
+
         return "/mypage/mypageCheck";
     }
 
     @PostMapping("/checkPassword")
     public ResponseEntity<Void> checkPassword(
             @RequestParam("password") String password,
-            @CookieValue(value = "accessToken", required = false) String accessToken
+            @CookieValue(value = "accessToken", required = false) String accessToken,
+            HttpSession session
     ) {
 
         ResponseEntity<Void> validationResponse = validateAccessToken(accessToken);
@@ -72,12 +76,17 @@ public class MypageController {
 
         validatePassword(password, member.getPassword());
 
+        // 비밀번호가 일치하면 세션에 상태 저장
+        session.setAttribute("passwordChecked", true);
+
+
         return ResponseEntity.ok().build(); // 비밀번호가 일치하면 OK 응답 반환
     }
 
     @GetMapping("/memberInfo")
     public String memberInfo(
             @CookieValue(value = "accessToken", required = false) String accessToken,
+            HttpSession session,
             Model model
     ) {
         ResponseEntity<Void> validationResponse = validateAccessToken(accessToken);
@@ -86,6 +95,10 @@ public class MypageController {
         }
 
 
+        // 세션에서 비밀번호 확인 상태 확인
+        if (session.getAttribute("passwordChecked") == null) {
+            return "redirect:/mypage/check";
+        }
         UserDetails userDetails = getUserDetails(accessToken);
         Member member = findMemberByEmail(userDetails.getUsername());
 
@@ -109,12 +122,18 @@ public class MypageController {
     @GetMapping("/editMemberInfo")
     public String geteditMemberInfo(
             @CookieValue(value = "accessToken", required = false) String accessToken,
+            HttpSession session,
             Model model
     ) {
 
         ResponseEntity<Void> validationResponse = validateAccessToken(accessToken);
         if (validationResponse != null) {
             return "redirect:/member/login";
+        }
+
+        // 세션에서 비밀번호 확인 상태 확인
+        if (session.getAttribute("passwordChecked") == null) {
+            return "redirect:/mypage/check";
         }
 
 
@@ -182,6 +201,7 @@ public class MypageController {
     @GetMapping("/memberAccommodations")
     public String getAccommodationsByMembers(
             @CookieValue(value = "accessToken", required = false) String accessToken,
+            HttpSession session,
             Model model
     ) {
         ResponseEntity<Void> validationResponse = validateAccessToken(accessToken);
@@ -189,6 +209,10 @@ public class MypageController {
             return "redirect:/member/login";
         }
 
+        // 세션에서 비밀번호 확인 상태 확인
+        if (session.getAttribute("passwordChecked") == null) {
+            return "redirect:/mypage/check";
+        }
 
         UserDetails userDetails = getUserDetails(accessToken);
         Member member = findMemberByEmail(userDetails.getUsername());
@@ -203,6 +227,7 @@ public class MypageController {
     public String reservationAccommodationByMember(
             @CookieValue(value = "accessToken", required = false) String accessToken,
             @RequestParam(value = "accommodationId", required = false) Long accommodationId,
+            HttpSession session,
             Model model
     ) {
         // Access Token 유효성 검사
@@ -211,13 +236,17 @@ public class MypageController {
             return "redirect:/member/login";
         }
 
+        // 세션에서 비밀번호 확인 상태 확인
+        if (session.getAttribute("passwordChecked") == null) {
+            return "redirect:/mypage/check";
+        }
         // UserDetails 및 Member 정보 가져오기
         UserDetails userDetails = getUserDetails(accessToken);
         Member member = findMemberByEmail(userDetails.getUsername());
 
         // 숙소 ID가 제공되지 않았을 경우 처리
         if (accommodationId == null) {
-            return "redirect:/mypage/accommodations"; // 숙소 목록 페이지로 리다이렉트
+            return "redirect:/mypage/memberAccommodations"; // 숙소 목록 페이지로 리다이렉트
         }
 
         // 숙소 정보 가져오기
@@ -228,7 +257,7 @@ public class MypageController {
 
         // member와 member1이 동일한지 비교하여 다르면 접근 차단
         if (!member.equals(member1)) {
-            return "redirect:/mypage/accommodations"; // 다른 숙소 페이지로 리다이렉트
+            return "redirect:/mypage/memberAccommodations"; // 다른 숙소 페이지로 리다이렉트
         }
 
         // 동일할 경우, 룸 목록 및 각 룸의 예약 내역 조회
@@ -278,7 +307,7 @@ public class MypageController {
 
         // 4. 예약 취소 처리
         try {
-            log.info("예약 취소 요청 - reservationUid: {}", reservationUid);
+            log.info("예약 거절 요청 - reservationUid: {}", reservationUid);
             boolean isCancelled = reservationService.cancelReservation(reservationUid);
 
             if (isCancelled) {

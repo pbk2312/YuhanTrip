@@ -24,13 +24,17 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("UPDATE Reservation r SET r.reservationStatus = :status WHERE r.id = :id")
     void updateReservationStatus(@Param("id") Long id, @Param("status") ReservationStatus status);
 
+
     @Query("SELECT r FROM Reservation r WHERE r.room.id = :roomId AND " +
-            "(r.checkInDate <= :checkOutDate AND r.checkOutDate >= :checkInDate)")
+            "(r.checkInDate <= :checkOutDate AND r.checkOutDate >= :checkInDate) AND " +
+            "r.reservationStatus NOT IN :excludedStatuses")
     List<Reservation> findOverlappingReservations(
             @Param("roomId") Long roomId,
             @Param("checkInDate") LocalDate checkInDate,
-            @Param("checkOutDate") LocalDate checkOutDate
+            @Param("checkOutDate") LocalDate checkOutDate,
+            @Param("excludedStatuses") List<ReservationStatus> excludedStatuses
     );
+
 
     @Query("select o from Reservation o" +
             " left join fetch o.payment p" +

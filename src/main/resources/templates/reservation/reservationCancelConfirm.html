@@ -127,6 +127,13 @@
             justify-content: center;
             margin-top: 20px;
         }
+
+        .no-reservation {
+            text-align: center;
+            font-size: 18px;
+            color: #ff0000; /* 빨간색으로 경고 메시지 강조 */
+            margin: 20px;
+        }
     </style>
 </head>
 <body>
@@ -172,7 +179,7 @@
             <h1 class="mb-4">예약 취소 내역</h1>
             <a href="/reservationConfirm" class="btn btn-secondary cancel-view-button">예약 내역 보기</a>
         </div>
-        <div class="reservation-container">
+        <div class="reservation-container" th:if="${#lists.size(cancelReservations) > 0}">
             <div th:each="reservation : ${cancelReservations}" class="reservation-item">
                 <p><strong>예약 번호:</strong> <span th:text="${reservation.reservationUid}">예약 번호</span></p>
                 <p><strong>숙소 이름:</strong> <span
@@ -185,8 +192,9 @@
                 <p><strong>투숙 인원:</strong> <span th:text="${reservation.getNumberOfGuests()}">투숙 인원</span> 명</p>
             </div>
         </div>
+        <p class="no-reservation" th:if="${#lists.size(cancelReservations) == 0}">예약 취소 내역이 없습니다</p>
 
-        <nav aria-label="Page navigation">
+        <nav aria-label="Page navigation" th:if="${#lists.size(cancelReservations) > 0}">
             <ul class="pagination">
                 <!-- Previous Page Link -->
                 <li class="page-item" th:if="${currentPage > 0}">

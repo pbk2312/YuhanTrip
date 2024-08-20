@@ -159,6 +159,13 @@
             background-color: #ccc;
             cursor: not-allowed;
         }
+
+        .no-reviews {
+            text-align: center;
+            font-size: 18px;
+            color: #ff0000; /* 빨간색으로 경고 메시지 강조 */
+            margin: 20px 0;
+        }
     </style>
 </head>
 <body>
@@ -196,53 +203,59 @@
     <div class="review-list">
         <h1 th:text="${member.name} + '님의 리뷰 목록'">리뷰 목록</h1>
         <div>
-            <!-- 리뷰 리스트를 순회하며 각 리뷰를 표시 -->
-            <div class="review-item" th:each="review : ${reviews}">
-                <!-- 예약 정보 섹션 -->
-                <div class="reservation-info">
-                    <h4>숙박 정보</h4>
-                    <p>숙소 이름: <strong th:text="${review.accommodation.title}"></strong></p>
-                    <p>예약일: <span th:text="${review.reservation.reservationDate}"></span></p>
-                    <p>체크인 날짜: <span th:text="${review.reservation.checkInDate}"></span></p>
-                    <p>체크아웃 날짜: <span th:text="${review.reservation.checkOutDate}"></span></p>
-                    <p>방 이름: <span th:text="${review.reservation.room.roomNm}"></span></p>
-                    <p>숙박 인원: <span th:text="${review.reservation.numberOfGuests}"></span>명</p>
-                </div>
+            <!-- 리뷰 리스트가 있는 경우 -->
+            <div th:if="${#lists.size(reviews) > 0}">
+                <div class="review-item" th:each="review : ${reviews}">
+                    <!-- 예약 정보 섹션 -->
+                    <div class="reservation-info">
+                        <h4>숙박 정보</h4>
+                        <p>숙소 이름: <strong th:text="${review.accommodation.title}"></strong></p>
+                        <p>예약일: <span th:text="${review.reservation.reservationDate}"></span></p>
+                        <p>체크인 날짜: <span th:text="${review.reservation.checkInDate}"></span></p>
+                        <p>체크아웃 날짜: <span th:text="${review.reservation.checkOutDate}"></span></p>
+                        <p>방 이름: <span th:text="${review.reservation.room.roomNm}"></span></p>
+                        <p>숙박 인원: <span th:text="${review.reservation.numberOfGuests}"></span>명</p>
+                    </div>
 
-                <!-- 리뷰 내용 섹션 -->
-                <div class="review-content">
-                    <p class="rating">평점: <span th:text="${review.rating} + '점'"></span></p>
-                    <p class="review-text" th:text="${review.content}"></p>
-                    <p class="review-date" th:text="${review.reviewDate}"></p>
+                    <!-- 리뷰 내용 섹션 -->
+                    <div class="review-content">
+                        <p class="rating">평점: <span th:text="${review.rating} + '점'"></span></p>
+                        <p class="review-text" th:text="${review.content}"></p>
+                        <p class="review-date" th:text="${review.reviewDate}"></p>
+                    </div>
+                </div>
+                <div class="pagination">
+                    <ul class="pagination">
+                        <!-- Previous Page Link -->
+                        <li th:classappend="${currentPage == 0} ? 'disabled'">
+                            <a th:href="@{/myReviews(page=${currentPage > 0 ? currentPage - 1 : 0})}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+
+                        <!-- Page Number Links -->
+                        <li th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+                            th:classappend="${pageNum == currentPage} ? 'active'">
+                            <a th:href="@{/myReviews(page=${pageNum})}" th:text="${pageNum + 1}">1</a>
+                        </li>
+
+                        <!-- Next Page Link -->
+                        <li th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                            <a th:href="@{/myReviews(page=${currentPage < totalPages - 1 ? currentPage + 1 : totalPages - 1})}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
                 </div>
             </div>
-        </div>
-        <div class="pagination">
-            <ul class="pagination">
-                <!-- Previous Page Link -->
-                <li th:classappend="${currentPage == 0} ? 'disabled'">
-                    <a th:href="@{/myReviews(page=${currentPage > 0 ? currentPage - 1 : 0})}" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
 
-                <!-- Page Number Links -->
-                <li th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
-                    th:classappend="${pageNum == currentPage} ? 'active'">
-                    <a th:href="@{/myReviews(page=${pageNum})}" th:text="${pageNum + 1}">1</a>
-                </li>
-
-                <!-- Next Page Link -->
-                <li th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                    <a th:href="@{/myReviews(page=${currentPage < totalPages - 1 ? currentPage + 1 : totalPages - 1})}" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-            </ul>
+            <!-- 리뷰 리스트가 없는 경우 -->
+            <div th:if="${#lists.size(reviews) == 0}" class="no-reviews">
+                리뷰 내역이 없습니다.
+            </div>
         </div>
     </div>
 </div>
-
 
 <!-- jQuery, Popper.js, and Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

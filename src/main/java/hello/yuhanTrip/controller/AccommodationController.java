@@ -38,7 +38,6 @@ public class AccommodationController {
     private final MemberLikeService memberLikeService;
     private final ReviewService reviewService;
 
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 
     @GetMapping("/accommodations")
@@ -121,68 +120,65 @@ public class AccommodationController {
 
         log.info("지역 코드로 숙소 리스트를 조회합니다. 지역: {}, 페이지: {}, 사이즈: {}, 체크인 날짜: {}, 체크아웃 날짜: {}, 숙박 인원 수: {}", region, page, size, checkin, checkout, numGuests);
 
-        // 페이지 번호와 사이즈 검증
         page = Math.max(page, 0);
         size = Math.max(size, 1);
 
         Page<Accommodation> accommodationsPage;
 
         if (region != null && !region.isEmpty()) {
-            // 지역 코드가 제공된 경우
             Integer areaCode = RegionCode.getCodeByRegion(region);
             if (areaCode == null) {
                 log.error("잘못된 지역 이름: {}", region);
-                return "error"; // 잘못된 지역 이름 처리
+                return "error";
             }
 
             if (checkin != null && checkout != null && numGuests != null) {
-                // 체크인, 체크아웃, 숙박 인원 수가 모두 제공된 경우
                 accommodationsPage = accommodationService.getAvailableAccommodations(
                         String.valueOf(areaCode), checkin, checkout, numGuests, page, size);
             } else {
-                // 필터링 없이 전체 숙소 조회
                 accommodationsPage = accommodationService.getAccommodationsByAreaCode(
                         String.valueOf(areaCode), page, size);
             }
 
             model.addAttribute("region", region);
         } else {
-            // 지역 코드가 제공되지 않은 경우
             if (checkin != null && checkout != null && numGuests != null) {
-                // 체크인, 체크아웃, 숙박 인원 수가 모두 제공된 경우
                 accommodationsPage = accommodationService.getAvailableAccommodations(
                         null, checkin, checkout, numGuests, page, size);
             } else {
-                // 필터링 없이 전체 숙소 조회
                 accommodationsPage = accommodationService.getAccommodations(page, size);
             }
+        }
+
+        // 평균 평점 계산
+        List<Accommodation> accommodations = accommodationsPage.getContent();
+        for (Accommodation accommodation : accommodations) {
+            double averageRating = accommodationService.calculateAverageRating(accommodation.getId());
+            accommodationService.updateAverageRating(accommodation.getId(), averageRating);
+            accommodation.setAverageRating(averageRating);  // 평균 평점을 숙소 객체에 설정
         }
 
         int totalPages = accommodationsPage.getTotalPages();
         int currentPage = page;
 
-        // 페이지 번호 범위 계산
         int startPage = Math.max(0, currentPage - 5);
         int endPage = Math.min(totalPages - 1, currentPage + 5);
 
-        // 날짜를 포맷팅하여 문자열로 변환
-        String checkinFormatted = checkin != null ? checkin.format(formatter) : null;
-        String checkoutFormatted = checkout != null ? checkout.format(formatter) : null;
-
-        model.addAttribute("accommodations", accommodationsPage.getContent());
+        model.addAttribute("accommodations", accommodations);
         model.addAttribute("currentPage", currentPage);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
         model.addAttribute("pageSize", size);
+
         model.addAttribute("region", region);
-        model.addAttribute("checkin", checkinFormatted);
-        model.addAttribute("checkout", checkoutFormatted);
+        model.addAttribute("checkin", checkin);
+        model.addAttribute("checkout", checkout);
         model.addAttribute("numGuests", numGuests);
 
         log.info("현재 페이지: {}, 전체 페이지: {}, 시작 페이지: {}, 끝 페이지: {}", currentPage, totalPages, startPage, endPage);
 
-        return "/accommodation/accommodations"; // 뷰 이름
+        return "/accommodation/accommodations";
     }
 
     @GetMapping("/info")
@@ -203,6 +199,11 @@ public class AccommodationController {
                 accommodationService.getAvailableRoomsByAccommodation(id, checkInDate, checkOutDate);
 
         List<Review> reviews = reviewService.getReviewsByAccommodation(id);
+
+        // 평균 평점 계산
+        double averageRating = accommodationService.calculateAverageRating(id);
+        accommodationService.updateAverageRating(id, averageRating);
+        accommodation.setAverageRating(averageRating);  // 평균 평점을 숙소 객체에 설정
 
         model.addAttribute("availableRooms", availableRooms);
         model.addAttribute("checkin", checkInDate);

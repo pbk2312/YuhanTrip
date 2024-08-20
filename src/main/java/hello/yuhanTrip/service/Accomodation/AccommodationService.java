@@ -153,8 +153,19 @@ public class AccommodationService {
 
 
     public List<Room> getAvailableRoomsByAccommodation(Long accommodationId, LocalDate checkInDate, LocalDate checkOutDate) {
-        return roomReposiotry.findAvailableRoomsByAccommodation(accommodationId, checkInDate, checkOutDate);
+        List<ReservationStatus> excludedStatuses = Arrays.asList(
+                ReservationStatus.CANCELLED,
+                ReservationStatus.REJECTED
+        );
+
+        return roomReposiotry.findAvailableRoomsByAccommodation(
+                accommodationId,
+                checkInDate,
+                checkOutDate,
+                excludedStatuses
+        );
     }
+
 
 
     public boolean isDatabaseEmpty() {

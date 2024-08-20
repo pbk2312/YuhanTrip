@@ -243,6 +243,40 @@
             font-size: 20px;
         }
 
+        /* Rejected Reservation Item */
+        .reservation-item.rejected {
+            background-color: #f8d7da;
+            position: relative;
+            border-left: 5px solid #dc3545;
+        }
+
+        .reservation-item.rejected::before {
+            content: '예약 거절';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #dc3545;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 14px;
+            z-index: 2;
+        }
+
+        /* Hide Elements for Rejected Reservations */
+        .reservation-item.rejected .update-button,
+        .reservation-item.rejected .cancel-button {
+            display: none;
+        }
+
+        /* 전화번호 표시 스타일 */
+        .reservation-item.rejected .contact-info {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -303,6 +337,13 @@
                 <p><strong>체크아웃 날짜:</strong> <span th:text="${reservation.checkOutDate}">체크아웃 날짜</span></p>
                 <p><strong>결제 금액:</strong> <span th:text="${reservation.getPayment().price}">결제 금액</span> 원</p>
                 <p><strong>투숙 인원:</strong> <span th:text="${reservation.getNumberOfGuests()}">투숙 인원</span> 명</p>
+
+                <!-- 전화번호가 있는 경우만 표시 -->
+                <div class="contact-info" th:if="${reservation.reservationStatus == T(hello.yuhanTrip.domain.ReservationStatus).REJECTED}">
+                    <p><strong>숙소 전화번호:</strong> <span th:text="${reservation.room.getAccommodation().getTel()}">전화번호</span></p>
+                    <p>예약이 거절되었습니다. 숙소에 직접 연락하여 추가 정보를 확인해 주세요.</p>
+                </div>
+
                 <div class="reservation-actions">
                     <a th:href="@{/reservationUpdate(reservationId=${reservation.id})}"
                        class="btn btn-primary update-button">예약 수정</a>
@@ -411,10 +452,18 @@
                 }
             } else if (status === 'RESERVED') {
                 item.classList.add('reserved');
+            } else if (status === 'REJECTED') {
+                item.classList.add('rejected');
+
+                // "예약 수정" 및 "예약 취소" 버튼 숨기기
+                if (updateButton) updateButton.style.display = 'none';
+                if (cancelButton) cancelButton.style.display = 'none';
+
+                // "후기 작성" 버튼 숨기기
+                if (reviewButton) reviewButton.style.display = 'none';
             }
         });
     });
-
 
     function isTokenExpired(token) {
         const payload = JSON.parse(atob(token.split('.')[1]));

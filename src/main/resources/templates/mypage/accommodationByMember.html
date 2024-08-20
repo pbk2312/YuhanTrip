@@ -140,6 +140,7 @@
       font-weight: bold;
       font-size: 14px;
     }
+
     /* Room Info Grid */
     .room-info {
       display: grid;
@@ -223,6 +224,27 @@
       box-shadow: 0 0 0 3px rgba(23, 162, 184, 0.5);
     }
 
+    /* 예약 상황 버튼 스타일 */
+    .reservation-button {
+      background-color: #28a745;
+      border: none;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 30px;
+      font-size: 1rem;
+      font-weight: bold;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+      margin-top: 10px;
+    }
+
+    .reservation-button:hover {
+      background-color: #218838;
+      transform: scale(1.05);
+    }
+
+    .reservation-button:focus {
+      box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.5);
+    }
   </style>
 </head>
 <body>
@@ -260,7 +282,6 @@
 </nav>
 
 <!-- Main Content -->
-
 <div class="action-buttons">
   <button class="btn btn-info" onclick="location.href='/accommodation/registerForm'">숙소 등록</button>
 </div>
@@ -300,10 +321,11 @@
           </div>
         </div>
 
-        <!-- Actions -->
-        <div class="accommodation-actions">
-          <a th:href="@{/accommodationUpdate(accommodationId=${accommodation.id})}" class="btn btn-primary update-button">숙소 수정</a>
-          <a th:href="@{/accommodationCancelPage(accommodationId=${accommodation.id})}" class="btn btn-danger cancel-button">숙소 취소</a>
+        <!-- 예약 상황 버튼만 표시 -->
+        <div th:if="${accommodation.getStatus() == T(hello.yuhanTrip.domain.AccommodationApplyStatus).APPROVED}" class="accommodation-actions">
+          <a th:href="@{/mypage/reservationSituation(accommodationId=${accommodation.id})}" class="btn reservation-button">
+            예약 상황
+          </a>
         </div>
       </div>
     </div>
@@ -314,7 +336,6 @@
 <!-- 숙소 내역이 없는 경우 -->
 <div class="no-accommodations" th:if="${#lists.isEmpty(accommodations)}">
   <h2>숙소 내역이 없습니다.</h2>
-  <p>아직 등록하신 숙소가 없으신가요? <a href="/home/homepage">홈으로 돌아가기</a></p>
 </div>
 
 <!-- jQuery, Popper.js, and Bootstrap JS -->
