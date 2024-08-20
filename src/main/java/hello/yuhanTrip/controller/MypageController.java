@@ -5,6 +5,7 @@ import hello.yuhanTrip.domain.Member;
 import hello.yuhanTrip.domain.Reservation;
 import hello.yuhanTrip.domain.Room;
 import hello.yuhanTrip.dto.AccommodationRegisterDTO;
+import hello.yuhanTrip.dto.AccommodationReservationInfoDTO;
 import hello.yuhanTrip.dto.MypageMemberDTO;
 import hello.yuhanTrip.dto.RoomDTO;
 import hello.yuhanTrip.jwt.TokenProvider;
@@ -23,6 +24,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -200,48 +202,58 @@ public class MypageController {
     @GetMapping("/reservationSituation")
     public String reservationAccommodationByMember(
             @CookieValue(value = "accessToken", required = false) String accessToken,
+            @RequestParam(value = "accommodationId", required = false) Long accommodationId,
             Model model
-    ){
+    ) {
+        // Access Token 유효성 검사
         ResponseEntity<Void> validationResponse = validateAccessToken(accessToken);
         if (validationResponse != null) {
             return "redirect:/member/login";
         }
 
-
+        // UserDetails 및 Member 정보 가져오기
         UserDetails userDetails = getUserDetails(accessToken);
         Member member = findMemberByEmail(userDetails.getUsername());
 
-
-        // 1. 멤버가 등록한 숙소 목록을 가져옴
-        List<Accommodation> accommodations = memberService.getAccommodationsByMemberId(member.getId());
-
-        // 2. 숙소별 룸과 해당 룸의 예약 정보를 조회
-        Map<Accommodation, Map<Room, List<Reservation>>> reservationInfo = new HashMap<>();
-
-        for (Accommodation accommodation : accommodations) {
-            Map<Room, List<Reservation>> roomReservations = new HashMap<>();
-            for (Room room : accommodation.getRooms()) {
-                List<Reservation> reservations = reservationService.getReservationsByRoomId(room.getId());
-                roomReservations.put(room, reservations);
-            }
-            reservationInfo.put(accommodation, roomReservations);
+        // 숙소 ID가 제공되지 않았을 경우 처리
+        if (accommodationId == null) {
+            return "redirect:/mypage/accommodations"; // 숙소 목록 페이지로 리다이렉트
         }
 
-        // 3. 뷰에 사용할 모델에 데이터를 추가
-        model.addAttribute("reservationInfo", reservationInfo);
+        // 숙소 정보 가져오기
+        Accommodation accommodation = accommodationService.getAccommodationInfo(accommodationId);
+
+        // 숙소의 호스트(Member) 가져오기
+        Member member1 = accommodation.getMember();
+
+        // member와 member1이 동일한지 비교하여 다르면 접근 차단
+        if (!member.equals(member1)) {
+            return "redirect:/mypage/accommodations"; // 다른 숙소 페이지로 리다이렉트
+        }
+
+        // 동일할 경우, 룸 목록 및 각 룸의 예약 내역 조회
+        List<Room> rooms = accommodation.getRooms();
+        Map<Room, List<Reservation>> roomReservationsMap = new HashMap<>();
+
+        for (Room room : rooms) {
+            List<Reservation> reservations = reservationService.getReservationsByRoomId(room.getId());
+            roomReservationsMap.put(room, reservations);
+        }
+
+        // 모델에 데이터 추가
+        model.addAttribute("accommodation", accommodation);
+        model.addAttribute("roomReservationsMap", roomReservationsMap);
 
         return "/mypage/reservationSituation"; // reservationSituation.html로 이동
-
-
-
-
     }
+
+
 
 
     @PostMapping("/cancelReservation")
     public ResponseEntity<String> cancelReservation(
             @CookieValue(value = "accessToken", required = false) String accessToken,
-            @RequestParam("reservationId") Long reservationId
+            @RequestParam("reservationUid") String reservationUid
     ) {
         // 1. 토큰 유효성 검증
         ResponseEntity<Void> validationResponse = validateAccessToken(accessToken);
@@ -266,16 +278,21 @@ public class MypageController {
 
         // 4. 예약 취소 처리
         try {
-            reservationService.cancelReservation(reservationId);
-            return ResponseEntity.ok("예약이 성공적으로 취소되었습니다.");
+            log.info("예약 취소 요청 - reservationUid: {}", reservationUid);
+            boolean isCancelled = reservationService.cancelReservation(reservationUid);
+
+            if (isCancelled) {
+                return ResponseEntity.ok("예약이 성공적으로 취소되었습니다.");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("예약을 찾을 수 없습니다.");
+            }
         } catch (Exception e) {
             log.error("예약 취소 중 오류 발생: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("예약 취소 중 오류가 발생했습니다.");
         }
     }
-
-
 
 
     // 인증 토큰 유효성 검증 메소드

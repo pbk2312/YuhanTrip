@@ -125,11 +125,31 @@ public class ReservationService {
     }
 
     @Transactional
-    public void cancelReservation(Long reservationId){
-        Reservation reservation = findReservation(reservationId);
-        Payment payment = paymentService.findPayment(reservation.getPayment().getPaymentUid());
-        paymentRepository.delete(payment);
-        removeReservation(reservation.getReservationUid());
+    public boolean cancelReservation(String reservationUid) {
+        try {
+            // 예약 정보 조회
+            Reservation reservation = reservationRepository.findByReservationUid(reservationUid)
+                    .orElseThrow(() -> new RuntimeException("예약 정보가 없다"));
+
+            // 결제 정보 조회
+            Payment payment = paymentService.findPayment(reservation.getPayment().getPaymentUid());
+            if (payment == null) {
+                throw new RuntimeException("결제 정보가 없다");
+            }
+
+            // 상태 변경
+            reservation.setReservationStatus(ReservationStatus.CANCELLED);
+            payment.setStatus(PaymentStatus.CANCELLED);
+
+            // 변경 사항 저장
+            reservationRepository.save(reservation);
+            paymentRepository.save(payment);
+
+            return true;  // 예약이 성공적으로 취소되었음을 나타냄
+        } catch (Exception e) {
+            // 예외 발생 시 로그를 남기고 false 반환
+            log.error("예약 취소 중 오류 발생: ", e);
+            return false;
+        }
     }
 }
-

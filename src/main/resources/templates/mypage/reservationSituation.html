@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
-  <meta name="description" content="Yuhan Trip - Accommodation Reservation"/>
+  <meta name="description" content="Yuhan Trip - Reservation Details"/>
   <meta name="author" content="Your Name"/>
   <title>Yuhan Trip - Reservation Details</title>
   <!-- Favicon -->
@@ -13,7 +13,6 @@
   <!-- Core theme CSS (includes Bootstrap) -->
   <link href="../css/homestyles.css" rel="stylesheet"/>
   <style>
-    /* CSS styles */
     body {
       background: url('/los-angeles-2289637_640.jpg') no-repeat center center fixed;
       background-size: cover;
@@ -52,22 +51,6 @@
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
 
-    .accommodation {
-      margin-bottom: 40px;
-    }
-
-    .accommodation-title {
-      border-bottom: 2px solid #007bff;
-      padding-bottom: 10px;
-      margin-bottom: 15px;
-      color: #0056b3;
-      font-size: 1.8rem;
-    }
-
-    .room {
-      margin-bottom: 30px;
-    }
-
     .room-title {
       border-bottom: 1px solid #ddd;
       padding-bottom: 8px;
@@ -81,7 +64,7 @@
       padding: 15px;
       border-radius: 5px;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      margin-bottom: 10px;
+      margin-bottom: 20px;
       position: relative;
     }
 
@@ -137,44 +120,20 @@
 
 <!-- Main Content -->
 <div id="main-content">
-  <!-- 숙소 목록을 순회 -->
-  <div class="accommodation" th:each="accommodationEntry : ${reservationInfo}">
-    <!-- 예약이 있는 경우에만 숙소와 방 정보 표시 -->
-    <div th:if="${accommodationEntry.value.size() > 0}">
-      <!-- 숙소 이름 -->
-      <div class="accommodation-title" th:text="${accommodationEntry.key.title}">숙소 이름</div>
-
-      <!-- 방 목록을 순회 -->
-      <div th:each="roomEntry : ${accommodationEntry.value}">
-        <div th:if="${roomEntry.value.size() > 0}" class="room">
-          <!-- 방 이름 -->
-          <div class="room-title" th:text="${roomEntry.key.roomNm}">방 이름</div>
-
-          <!-- 예약 목록을 순회 -->
-          <div th:each="reservation : ${roomEntry.value}" class="reservation-details">
-            <!-- 예약자 이름 -->
-            <p>예약자 이름: <span th:text="${reservation.name}">이름</span></p>
-            <!-- 체크인 날짜 -->
-            <p>체크인 날짜: <span th:text="${reservation.checkInDate}">체크인 날짜</span></p>
-            <!-- 체크아웃 날짜 -->
-            <p>체크아웃 날짜: <span th:text="${reservation.checkOutDate}">체크아웃 날짜</span></p>
-            <!-- 예약 상태 -->
-            <p>예약 상태: <span th:text="${reservation.reservationStatus}">예약 상태</span></p>
-            <!-- 예약 번호 -->
-            <p>예약 번호: <span th:text="${reservation.reservationUid}">예약 번호</span></p>
-            <!-- 특이 사항 -->
-            <p>특이 요청 사항: <span th:text="${reservation.specialRequests}">특이 요청 사항</span></p>
-            <!-- 전화번호 -->
-            <p>전화번호: <span th:text="${reservation.phoneNumber}">전화번호</span></p>
-            <!-- 주소 -->
-            <p>주소: <span th:text="${reservation.addr}">주소</span></p>
-            <!-- 게스트 수 -->
-            <p>게스트 수: <span th:text="${reservation.numberOfGuests}">게스트 수</span></p>
-            <!-- 예약 취소 버튼 -->
-            <button class="cancel-btn" onclick="cancelReservation('${reservation.reservationId}')">예약 취소</button>
-          </div>
-        </div>
-      </div>
+  <!-- Iterate over the rooms and reservations -->
+  <div th:each="entry : ${roomReservationsMap}">
+    <div class="room-title" th:text="${entry.key.roomNm}">Room 101</div> <!-- Room Name -->
+    <div th:each="reservation : ${entry.value}" class="reservation-details">
+      <p><strong>예약번호:</strong> <span th:text="${reservation.reservationUid}">123456</span></p>
+      <p><strong>체크인 날짜:</strong> <span th:text="${reservation.checkInDate}">2024-08-25</span></p>
+      <p><strong>체크아웃 날짜:</strong> <span th:text="${reservation.checkOutDate}">2024-08-30</span></p>
+      <p><strong>예약일자:</strong> <span th:text="${reservation.reservationDate}">2024-07-20</span></p>
+      <p><strong>이름:</strong> <span th:text="${reservation.name}">홍길동</span></p>
+      <p><strong>전화번호:</strong> <span th:text="${reservation.phoneNumber}">010-1234-5678</span></p>
+      <p><strong>주소:</strong> <span th:text="${reservation.addr}">서울특별시 강남구</span></p>
+      <p><strong>특별 요청사항:</strong> <span th:text="${reservation.specialRequests}">저층 방으로 부탁드립니다.</span></p>
+      <p><strong>투숙 인원:</strong> <span th:text="${reservation.numberOfGuests}">2명</span></p>
+      <button class="cancel-btn" th:data-reservation-uid="${reservation.reservationUid}" onclick="cancelReservation(this)">예약 취소</button>
     </div>
   </div>
 </div>
@@ -186,25 +145,34 @@
 <!-- Core theme JS -->
 <script src="js/scripts.js"></script>
 <script>
-  function cancelReservation(reservationId) {
+  function cancelReservation(button) {
+    const reservationUid = button.getAttribute('data-reservation-uid');
+
+    // 예약 취소 확인 대화 상자
     if (confirm("정말로 이 예약을 취소하시겠습니까?")) {
-      // reservationUid 대신 reservationId를 사용합니다.
-      $.ajax({
-        url: '/mypage/cancelReservation',
-        type: 'POST',
-        data: { reservationId: reservationId },
-        success: function(response) {
-          alert("예약이 성공적으로 취소되었습니다.");
-          // 페이지를 새로고침하거나 예약 항목을 제거합니다.
-          location.reload();
+      fetch('/mypage/cancelReservation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
         },
-        error: function(error) {
-          alert("예약 취소에 실패했습니다. 다시 시도해 주세요.");
-        }
-      });
+        body: new URLSearchParams({
+          'reservationUid': reservationUid
+        })
+      })
+              .then(response => {
+                if (response.ok) {
+                  alert('예약이 성공적으로 취소되었습니다.');
+                  // 페이지 새로 고침 또는 예약 항목을 업데이트합니다.
+                  location.reload();
+                } else {
+                  alert('예약 취소에 실패했습니다. 다시 시도해 주세요.');
+                }
+              })
+              .catch(error => {
+                console.error('오류 발생:', error);
+              });
     }
   }
 </script>
-
 </body>
 </html>
