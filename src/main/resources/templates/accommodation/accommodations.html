@@ -63,12 +63,20 @@
             padding: 1rem;
         }
 
+        .card-footer {
+            background-color: #f8f9fa;
+            border-top: 1px solid #ddd;
+            padding: 0.75rem 1.25rem;
+        }
+
+        .card-footer .btn {
+            border-radius: 20px; /* 둥근 모서리 */
+        }
 
         .pagination {
             justify-content: center;
         }
 
-        /* Flexbox for horizontal form layout */
         .form-horizontal {
             display: flex;
             flex-wrap: wrap;
@@ -102,71 +110,60 @@
         }
 
 
+        .sort-dropdown button {
+            background-color: #007bff; /* 버튼 배경색 */
+            color: white; /* 버튼 텍스트 색상 */
+            padding: 12px 24px; /* 버튼 패딩 */
+            border: none; /* 버튼 테두리 제거 */
+            border-radius: 8px; /* 버튼 모서리 둥글게 */
+            font-size: 1.1rem; /* 버튼 폰트 크기 */
+            font-weight: bold; /* 버튼 폰트 두껍게 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 버튼 그림자 */
+            transition: background-color 0.3s, transform 0.3s; /* 애니메이션 효과 */
+        }
+
+        .sort-dropdown button:hover {
+            background-color: #0056b3; /* 버튼 호버 배경색 */
+            transform: scale(1.05); /* 버튼 확대 효과 */
+        }
+
+        .sort-dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f8f9fa;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 8px;
+        }
+
+        .sort-dropdown-content a {
+            color: #007bff;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            font-size: 1rem;
+        }
+
+
+
+        .card-footer i.bi-star-fill {
+            color: #ffd700; /* 별 색상 */
+        }
+
+        .card-footer span {
+            margin-left: 5px;
+            font-size: 1rem; /* 평점 폰트 크기 */
+        }
+
+        .accommodation-container {
+            background-color: #ffffff; /* 흰색 배경 */
+            padding: 20px; /* 내부 패딩 */
+            border-radius: 15px; /* 둥근 모서리 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 박스 그림자 */
+        }
     </style>
 </head>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const form = document.querySelector('form');
-        const region = document.getElementById('region');
-        const checkin = document.getElementById('checkin');
-        const checkout = document.getElementById('checkout');
-        const numGuests = document.getElementById('numGuests');
-
-        form.addEventListener('submit', (event) => {
-            // 모든 필드의 기존 오류 메시지 제거
-            removeErrorMessages();
-
-            if (region.value === '') {
-                return; // 지역만 선택한 경우 폼을 제출합니다.
-            }
-
-            let isValid = true;
-
-            if (!checkin.value) {
-                showError(checkin, '체크인 날짜를 입력해주세요.');
-                isValid = false;
-            }
-
-            if (!checkout.value) {
-                showError(checkout, '체크아웃 날짜를 입력해주세요.');
-                isValid = false;
-            }
-
-            if (!numGuests.value) {
-                showError(numGuests, '숙박 인원수를 입력해주세요.');
-                isValid = false;
-            }
-
-            if (!isValid) {
-                event.preventDefault(); // 폼 제출을 막습니다.
-            }
-        });
-
-        function showError(input, message) {
-            const error = document.createElement('div');
-            error.className = 'error-message';
-            error.textContent = message;
-            input.parentNode.appendChild(error);
-            input.classList.add('input-error');
-        }
-
-        function removeErrorMessages() {
-            const errors = document.querySelectorAll('.error-message');
-            errors.forEach(error => error.remove());
-            const inputs = document.querySelectorAll('.input-error');
-            inputs.forEach(input => input.classList.remove('input-error'));
-        }
-    });
-</script>
-<style>
-
-
-    .form-group {
-        position: relative;
-    }
-</style>
-
 
 <body>
 <!-- Navigation-->
@@ -190,7 +187,7 @@
                         <li>
                             <hr class="dropdown-divider"/>
                         </li>
-                        <li><a class="dropdown-item" href="#!">Popular Items</a></li>
+                        <li><a class="dropdown-item" href="/accommodation/accommodations?sort=averageRating">Popular Items</a></li>
                         <li><a class="dropdown-item" href="#!">New Arrivals</a></li>
                     </ul>
                 </li>
@@ -210,8 +207,6 @@
     <section class="py-5">
         <div class="container">
             <!-- 검색 폼 추가 -->
-
-
             <form action="/accommodation/byregion" method="get" class="mb-4 form-horizontal">
                 <div class="form-group">
                     <label for="region">지역 선택</label>
@@ -253,60 +248,55 @@
                            th:value="${numGuests != null ? numGuests : 1}">
                 </div>
 
-
                 <button type="submit" class="btn btn-primary mt-2">검색</button>
             </form>
 
 
 
-
-
-
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-4">
-                <!-- Accommodations cards -->
-                <div class="col" th:each="accommodation : ${accommodations}">
-                    <div class="card">
-                        <a th:href="@{${'/accommodation/info?id=' + accommodation.id +
-            (checkin != null ? '&checkin=' + checkin : '') +
-            (checkout != null ? '&checkout=' + checkout : '') +
-            (numGuests != null ? '&numGuests=' + numGuests : '')}}"
-                           class="text-decoration-none text-dark">
-                            <img th:src="${accommodation.firstimage != '' ? accommodation.firstimage : '/Noimage.png'}"
-                                 class="card-img-top" alt="이미지">
-                            <div class="card-body">
-                                <h5 class="card-title" th:text="${accommodation.title}">숙소 이름</h5>
-                                <p class="card-text" th:text="${accommodation.addr1}">주소</p>
-                            </div>
-                        </a>
-                        <div class="card-footer d-flex align-items-center justify-content-between">
-                            <button class="btn btn-outline-danger btn-sm like-button" th:data-id="${accommodation.id}">
-                                <i class="bi bi-heart"></i>
-                            </button>
-                            <div class="d-flex align-items-center">
-                                <!-- 별 아이콘 -->
-                                <i class="bi bi-star-fill text-warning"></i>
-                                <!-- 평균 평점 표시 -->
-                                <span th:text="${accommodation.averageRating} + '/5.0'">평점</span>
+            <div class="accommodation-container">
+                <div class="container text-center mb-4">
+                    <div class="container text-center mb-4">
+                        <button id="sortByRating" class="btn btn-primary btn-lg">평점순</button>
+                    </div>
+                </div>
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-4">
+                    <!-- Accommodations cards -->
+                    <div class="col" th:each="accommodation : ${accommodations}">
+                        <div class="card">
+                            <a th:href="@{${'/accommodation/info?id=' + accommodation.id +
+                (checkin != null ? '&checkin=' + checkin : '') +
+                (checkout != null ? '&checkout=' + checkout : '') +
+                (numGuests != null ? '&numGuests=' + numGuests : '')}}"
+                               class="text-decoration-none text-dark">
+                                <img th:src="${accommodation.firstimage != '' ? accommodation.firstimage : '/Noimage.png'}"
+                                     class="card-img-top" alt="이미지">
+                                <div class="card-body">
+                                    <h5 class="card-title" th:text="${accommodation.title}">숙소 이름</h5>
+                                    <p class="card-text" th:text="${accommodation.addr1}">주소</p>
+                                </div>
+                            </a>
+                            <div class="card-footer d-flex align-items-center justify-content-between">
+                                <button class="btn btn-outline-danger btn-sm like-button" th:data-id="${accommodation.id}">
+                                    <i class="bi bi-heart"></i>
+                                </button>
+                                <div class="d-flex align-items-center">
+                                    <!-- 별 아이콘 -->
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    <!-- 평균 평점 표시 -->
+                                    <span th:text="${accommodation.averageRating} + '/5.0'">평점</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-
-
             <nav class="mt-4">
                 <ul class="pagination justify-content-center">
                     <!-- Previous button -->
                     <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
                         <a class="page-link page-link-lg"
-                           th:href="@{${'/accommodation/byregion' +
-               (region != null && region != '' ? '?region=' + region : '') +
-               (checkin != null && checkin != '' ? (region != null ? '&' : '?') + 'checkin=' + checkin : '') +
-               (checkout != null && checkout != '' ? (region != null || checkin != null ? '&' : '?') + 'checkout=' + checkout : '') +
-               (numGuests != null && numGuests != '' ? (region != null || checkin != null || checkout != null ? '&' : '?') + 'numGuests=' + numGuests : '') +
-               (currentPage > 0 ? (region != null || checkin != null || checkout != null || numGuests != null ? '&' : '?') + 'page=' + (currentPage - 1) : (region == null && checkin == null && checkout == null && numGuests == null ? '?page=0' : '&page=0')) +
-               '&size=' + pageSize}}">
+                           th:href="@{'/accommodation/byregion'(region=${region}, checkin=${checkin}, checkout=${checkout}, numGuests=${numGuests}, sort=${sort}, page=${currentPage - 1}, size=${pageSize})}">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
@@ -315,13 +305,7 @@
                     <li class="page-item" th:each="i : ${#numbers.sequence(startPage, endPage)}"
                         th:classappend="${i == currentPage} ? 'active'">
                         <a class="page-link page-link-lg"
-                           th:href="@{${'/accommodation/byregion' +
-               (region != null && region != '' ? '?region=' + region : '') +
-               (checkin != null && checkin != '' ? (region != null ? '&' : '?') + 'checkin=' + checkin : '') +
-               (checkout != null && checkout != '' ? (region != null || checkin != null ? '&' : '?') + 'checkout=' + checkout : '') +
-               (numGuests != null && numGuests != '' ? (region != null || checkin != null || checkout != null ? '&' : '?') + 'numGuests=' + numGuests : '') +
-               (i != 0 ? (region != null || checkin != null || checkout != null || numGuests != null ? '&' : '?') + 'page=' + i : (region == null && checkin == null && checkout == null && numGuests == null ? '?page=' + i : '&page=' + i)) +
-               '&size=' + pageSize}}">
+                           th:href="@{'/accommodation/byregion'(region=${region}, checkin=${checkin}, checkout=${checkout}, numGuests=${numGuests}, sort=${sort}, page=${i}, size=${pageSize})}">
                             <span th:text="${i + 1}">1</span>
                         </a>
                     </li>
@@ -329,21 +313,14 @@
                     <!-- Next button -->
                     <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
                         <a class="page-link page-link-lg"
-                           th:href="@{${'/accommodation/byregion' +
-               (region != null && region != '' ? '?region=' + region : '') +
-               (checkin != null && checkin != '' ? (region != null ? '&' : '?') + 'checkin=' + checkin : '') +
-               (checkout != null && checkout != '' ? (region != null || checkin != null ? '&' : '?') + 'checkout=' + checkout : '') +
-               (numGuests != null && numGuests != '' ? (region != null || checkin != null || checkout != null ? '&' : '?') + 'numGuests=' + numGuests : '') +
-               (currentPage + 1 < totalPages ? (region != null || checkin != null || checkout != null || numGuests != null ? '&' : '?') + 'page=' + (currentPage + 1) : (region == null && checkin == null && checkout == null && numGuests == null ? '?page=' + (currentPage + 1) : '&page=' + (currentPage + 1))) +
-               '&size=' + pageSize}}">
+                           th:href="@{'/accommodation/byregion'(region=${region}, checkin=${checkin}, checkout=${checkout}, numGuests=${numGuests}, sort=${sort}, page=${currentPage + 1}, size=${pageSize})}">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
                 </ul>
             </nav>
-
         </div>
-</section>
+    </section>
 </div>
 
 <!-- jQuery, Popper.js, and Bootstrap JS -->
@@ -479,6 +456,19 @@
                     console.error('Error:', error);
                     alert('좋아요 상태 확인에 실패했습니다. 다시 시도해 주세요.');
                 });
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const sortByRatingButton = document.getElementById('sortByRating');
+
+        sortByRatingButton.addEventListener('click', () => {
+            // 현재 URL에서 기존 파라미터 가져오기
+            const url = new URL(window.location.href);
+            url.searchParams.set('sort', 'averageRating'); // sort 파라미터를 averageRating으로 설정
+
+            // URL을 새로고침
+            window.location.href = url.href;
         });
     });
 </script>

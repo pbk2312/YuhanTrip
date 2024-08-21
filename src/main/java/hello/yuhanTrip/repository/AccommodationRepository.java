@@ -21,6 +21,13 @@ public interface AccommodationRepository extends JpaRepository<Accommodation, Lo
     Page<Accommodation> findAllByStatus(@Param("status") AccommodationApplyStatus status, Pageable pageable);
 
 
+    @Query("SELECT a FROM Accommodation a WHERE a.status = :status " +
+            "ORDER BY a.averageRating DESC, a.reviewCount DESC")
+    Page<Accommodation> findAllByStatusWithSorting(
+            @Param("status") AccommodationApplyStatus status,
+            Pageable pageable
+    );
+
 
 
 
@@ -53,7 +60,6 @@ public interface AccommodationRepository extends JpaRepository<Accommodation, Lo
             Pageable pageable
     );
 
-
     @Query("SELECT DISTINCT a FROM Accommodation a " +
             "JOIN a.rooms r " +
             "WHERE a.status = :status " +
@@ -69,8 +75,9 @@ public interface AccommodationRepository extends JpaRepository<Accommodation, Lo
             "    AND res.checkInDate < :checkOutDate " +
             "    AND res.checkOutDate > :checkInDate" +
             "  )" +
-            ") ORDER BY a.averageRating DESC") // 평균 평점으로 정렬
-    Page<Accommodation> findAvailableAccommodationsSortedByRating(
+            ") " +
+            "ORDER BY a.averageRating DESC, a.reviewCount DESC")
+    Page<Accommodation> findAvailableAccommodationsByAverageRating(
             @Param("status") AccommodationApplyStatus status,
             @Param("areaCode") String areaCode,
             @Param("checkInDate") LocalDate checkInDate,
@@ -79,30 +86,6 @@ public interface AccommodationRepository extends JpaRepository<Accommodation, Lo
             Pageable pageable
     );
 
-    @Query("SELECT DISTINCT a FROM Accommodation a " +
-            "JOIN a.rooms r " +
-            "WHERE a.status = :status " +
-            "AND (:areaCode IS NULL OR a.areacode = :areaCode) " +
-            "AND r.maxOccupancy >= :numGuests " +
-            "AND EXISTS (" +
-            "  SELECT 1 FROM Room r2 " +
-            "  WHERE r2.accommodation = a " +
-            "  AND r2.maxOccupancy >= :numGuests " +
-            "  AND NOT EXISTS (" +
-            "    SELECT 1 FROM Reservation res " +
-            "    WHERE res.room = r2 " +
-            "    AND res.checkInDate < :checkOutDate " +
-            "    AND res.checkOutDate > :checkInDate" +
-            "  )" +
-            ") ORDER BY a.reviewCount DESC") // 리뷰 갯수로 정렬
-    Page<Accommodation> findAvailableAccommodationsSortedByReviewCount(
-            @Param("status") AccommodationApplyStatus status,
-            @Param("areaCode") String areaCode,
-            @Param("checkInDate") LocalDate checkInDate,
-            @Param("checkOutDate") LocalDate checkOutDate,
-            @Param("numGuests") int numGuests,
-            Pageable pageable
-    );
 
 
 

@@ -121,77 +121,6 @@ public class AccommodationService {
         }
     }
 
-    public Page<Accommodation> getAccommodations(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return accommodationRepository.findAllByStatus(
-                AccommodationApplyStatus.APPROVED,
-                pageable
-        );
-    }
-
-
-    // 지역 코드를 기반으로 숙소를 페이지네이션하여 조회
-    public Page<Accommodation> getAccommodationsByAreaCode(String areaCode, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return accommodationRepository.findByAreacode(areaCode, pageable);
-    }
-
-
-
-    // 해당 날짜에 예약이 가능한 승인된 숙소들 보여주기
-    public Page<Accommodation> getAvailableAccommodations(String areaCode, LocalDate checkInDate, LocalDate checkOutDate, int numGuests, int page, int size) {
-        return accommodationRepository.findAvailableAccommodations(
-                AccommodationApplyStatus.APPROVED, // 추가된 상태 필터
-                areaCode,
-                checkInDate,
-                checkOutDate,
-                numGuests,
-                PageRequest.of(page, size)
-        );
-    }
-
-
-
-
-    public List<Room> getAvailableRoomsByAccommodation(Long accommodationId, LocalDate checkInDate, LocalDate checkOutDate) {
-        List<ReservationStatus> excludedStatuses = Arrays.asList(
-                ReservationStatus.CANCELLED,
-                ReservationStatus.REJECTED
-        );
-
-        return roomReposiotry.findAvailableRoomsByAccommodation(
-                accommodationId,
-                checkInDate,
-                checkOutDate,
-                excludedStatuses
-        );
-    }
-    // 해당 날짜에 예약 가능한 숙소를 평균 평점으로 정렬하여 반환
-    public Page<Accommodation> getAvailableAccommodationsSortedByRating(String areaCode, LocalDate checkInDate, LocalDate checkOutDate, int numGuests, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return accommodationRepository.findAvailableAccommodationsSortedByRating(
-                AccommodationApplyStatus.APPROVED,
-                areaCode,
-                checkInDate,
-                checkOutDate,
-                numGuests,
-                pageable
-        );
-    }
-
-    // 해당 날짜에 예약 가능한 숙소를 리뷰 개수로 정렬하여 반환
-    public Page<Accommodation> getAvailableAccommodationsSortedByReviewCount(String areaCode, LocalDate checkInDate, LocalDate checkOutDate, int numGuests, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return accommodationRepository.findAvailableAccommodationsSortedByReviewCount(
-                AccommodationApplyStatus.APPROVED,
-                areaCode,
-                checkInDate,
-                checkOutDate,
-                numGuests,
-                pageable
-        );
-    }
-
 
 
 
@@ -451,6 +380,84 @@ public class AccommodationService {
     }
 
 
+    public Page<Accommodation> getAccommodations(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return accommodationRepository.findAllByStatus(
+                AccommodationApplyStatus.APPROVED,
+                pageable
+        );
+    }
+
+
+    // 지역 코드를 기반으로 숙소를 페이지네이션하여 조회
+    public Page<Accommodation> getAccommodationsByAreaCode(String areaCode, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return accommodationRepository.findByAreacode(areaCode, pageable);
+    }
+
+
+
+    // 해당 날짜에 예약이 가능한 승인된 숙소들 보여주기
+    public Page<Accommodation> getAvailableAccommodations(String areaCode, LocalDate checkInDate, LocalDate checkOutDate, int numGuests, int page, int size) {
+        return accommodationRepository.findAvailableAccommodations(
+                AccommodationApplyStatus.APPROVED, // 추가된 상태 필터
+                areaCode,
+                checkInDate,
+                checkOutDate,
+                numGuests,
+                PageRequest.of(page, size)
+        );
+    }
+
+    // 새로운 findAvailableAccommodationsByAverageRating 메서드
+    public Page<Accommodation> getAvailableAccommodationsByAverageRating(
+            String areaCode,
+            LocalDate checkInDate,
+            LocalDate checkOutDate,
+            int numGuests,
+            int page,
+            int size
+    ) {
+        return accommodationRepository.findAvailableAccommodationsByAverageRating(
+                AccommodationApplyStatus.APPROVED, areaCode, checkInDate, checkOutDate, numGuests,PageRequest.of(page, size)
+        );
+    }
+
+
+
+
+
+    /**
+     * 상태에 따라 숙소를 조회하고, 평점과 리뷰 수로 정렬하여 반환합니다.
+     *
+     */
+    public Page<Accommodation> getAvailableAccommodationsSortedByRatingAndReview(
+            Pageable pageable) {
+        return accommodationRepository.findAllByStatusWithSorting(AccommodationApplyStatus.APPROVED, pageable);
+    }
+
+
+
+
+
+
+    public List<Room> getAvailableRoomsByAccommodation(Long accommodationId, LocalDate checkInDate, LocalDate checkOutDate) {
+        List<ReservationStatus> excludedStatuses = Arrays.asList(
+                ReservationStatus.CANCELLED,
+                ReservationStatus.REJECTED
+        );
+
+        return roomReposiotry.findAvailableRoomsByAccommodation(
+                accommodationId,
+                checkInDate,
+                checkOutDate,
+                excludedStatuses
+        );
+    }
+
+
+
+
 
 
     private String saveImage(MultipartFile image) throws IOException {
@@ -482,7 +489,5 @@ public class AccommodationService {
             throw new IOException("이미지 저장 중 오류가 발생했습니다.", e);
         }
     }
-
-
 
 }
