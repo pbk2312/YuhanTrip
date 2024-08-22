@@ -24,6 +24,7 @@
         .navbar {
             background: rgba(255, 255, 255, 0.8);
             border-bottom: 1px solid #ddd;
+            margin-bottom: 0; /* 내비게이션과 아래 콘텐츠 사이의 여백 제거 */
         }
 
         .navbar-brand {
@@ -109,7 +110,6 @@
             background-color: #0056b3; /* 버튼 호버 배경색 */
         }
 
-
         .sort-dropdown button {
             background-color: #007bff; /* 버튼 배경색 */
             color: white; /* 버튼 텍스트 색상 */
@@ -145,8 +145,6 @@
             font-size: 1rem;
         }
 
-
-
         .card-footer i.bi-star-fill {
             color: #ffd700; /* 별 색상 */
         }
@@ -162,6 +160,54 @@
             border-radius: 15px; /* 둥근 모서리 */
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 박스 그림자 */
         }
+
+        .sort-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 0; /* 여백 제거 */
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .sort-tab {
+            flex: 1;
+            padding: 15px 20px;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-decoration: none;
+            color: #007bff;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .sort-tab:hover {
+            background-color: #f8f9fa;
+            color: #0056b3;
+            border-bottom: 3px solid #007bff;
+        }
+
+        .sort-tab.active {
+            color: #0056b3;
+            border-bottom: 3px solid #0056b3;
+            background-color: #f8f9fa;
+        }
+
+        /* 페이지 네비게이션 여백 제거 */
+        nav.mt-4 {
+            margin-top: 0;
+        }
+        ul.pagination {
+            margin-bottom: 0;
+        }
+
+        #main-content {
+            margin-top: -30px; /* 여백을 줄여서 콘텐츠를 위로 이동 */
+        }
+
+
+
     </style>
 </head>
 
@@ -183,11 +229,11 @@
                        role="button"
                        data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="/accommodation/accommodations">All Products</a></li>
+                        <li><a class="dropdown-item" href="/accommodation/byregion">All Products</a></li>
                         <li>
                             <hr class="dropdown-divider"/>
                         </li>
-                        <li><a class="dropdown-item" href="/accommodation/accommodations?sort=averageRating">Popular Items</a></li>
+                        <li><a class="dropdown-item" href="/accommodation/byregion?sort=averageRating">Popular Items</a></li>
                         <li><a class="dropdown-item" href="#!">New Arrivals</a></li>
                     </ul>
                 </li>
@@ -254,11 +300,16 @@
 
 
             <div class="accommodation-container">
-                <div class="container text-center mb-4">
-                    <div class="container text-center mb-4">
-                        <button id="sortByRating" class="btn btn-primary btn-lg">평점순</button>
+                <div id="sort-tabs-container" class="container text-center mb-4">
+                    <div id="sort-tabs" class="sort-tabs">
+                        <a id="sortByRating" href="?sort=averageRating" class="sort-tab">평점순</a>
+                        <a id="sortByPriceDesc" href="?sort=priceDesc" class="sort-tab">높은 가격순</a>
+                        <a id="sortByPriceAsc" href="?sort=priceAsc" class="sort-tab">낮은 가격순</a>
                     </div>
                 </div>
+
+
+
                 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-4">
                     <!-- Accommodations cards -->
                     <div class="col" th:each="accommodation : ${accommodations}">
@@ -268,7 +319,7 @@
                 (checkout != null ? '&checkout=' + checkout : '') +
                 (numGuests != null ? '&numGuests=' + numGuests : '')}}"
                                class="text-decoration-none text-dark">
-                                <img th:src="${accommodation.firstimage != '' ? accommodation.firstimage : '/Noimage.png'}"
+                                <img th:src="${accommodation.firstimage != '' ? accommodation.firstimage : '/hotel-1725150_1280.jpg'}"
                                      class="card-img-top" alt="이미지">
                                 <div class="card-body">
                                     <h5 class="card-title" th:text="${accommodation.title}">숙소 이름</h5>
@@ -289,33 +340,83 @@
                         </div>
                     </div>
                 </div>
+                <!-- 검색 폼 -->
+                <form action="/accommodation/search" method="get" class="mb-4 form-horizontal">
+                    <div class="form-group">
+                        <input type="text" id="title" name="title" class="form-control" placeholder="숙소를 입력하세요">
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary mt-2">검색</button>
+                    </div>
+                </form>
             </div>
 
+
+
+
+
+
+            <!-- 조건에 따라 다른 페이지 네비게이션 표시 -->
             <nav class="mt-4">
                 <ul class="pagination justify-content-center">
-                    <!-- Previous button -->
-                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                        <a class="page-link page-link-lg"
-                           th:href="@{'/accommodation/byregion'(region=${region}, checkin=${checkin}, checkout=${checkout}, numGuests=${numGuests}, sort=${sort}, page=${currentPage - 1}, size=${pageSize})}">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
+                    <!-- 제목 검색일 때의 페이지 네비게이션 -->
+                    <li th:if="${searchType == 'title'}">
+                        <ul class="pagination justify-content-center">
+                            <!-- Previous button -->
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                <a class="page-link page-link-lg"
+                                   th:href="@{'/accommodation/search'(title=${title}, page=${currentPage - 1}, size=${pageSize})}">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+
+                            <!-- Page numbers -->
+                            <li class="page-item" th:each="i : ${#numbers.sequence(startPage, endPage)}"
+                                th:classappend="${i == currentPage} ? 'active'">
+                                <a class="page-link page-link-lg"
+                                   th:href="@{'/accommodation/search'(title=${title}, page=${i}, size=${pageSize})}">
+                                    <span th:text="${i + 1}">1</span>
+                                </a>
+                            </li>
+
+                            <!-- Next button -->
+                            <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
+                                <a class="page-link page-link-lg"
+                                   th:href="@{'/accommodation/search'(title=${title}, page=${currentPage + 1}, size=${pageSize})}">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
                     </li>
 
-                    <!-- Page numbers -->
-                    <li class="page-item" th:each="i : ${#numbers.sequence(startPage, endPage)}"
-                        th:classappend="${i == currentPage} ? 'active'">
-                        <a class="page-link page-link-lg"
-                           th:href="@{'/accommodation/byregion'(region=${region}, checkin=${checkin}, checkout=${checkout}, numGuests=${numGuests}, sort=${sort}, page=${i}, size=${pageSize})}">
-                            <span th:text="${i + 1}">1</span>
-                        </a>
-                    </li>
+                    <!-- 지역 검색일 때의 페이지 네비게이션 -->
+                    <li th:if="${searchType == 'region'}">
+                        <ul class="pagination justify-content-center">
+                            <!-- Previous button -->
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                <a class="page-link page-link-lg"
+                                   th:href="@{'/accommodation/byregion'(region=${region}, checkin=${checkin}, checkout=${checkout}, numGuests=${numGuests}, sort=${sort}, page=${currentPage - 1}, size=${pageSize})}">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
 
-                    <!-- Next button -->
-                    <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
-                        <a class="page-link page-link-lg"
-                           th:href="@{'/accommodation/byregion'(region=${region}, checkin=${checkin}, checkout=${checkout}, numGuests=${numGuests}, sort=${sort}, page=${currentPage + 1}, size=${pageSize})}">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
+                            <!-- Page numbers -->
+                            <li class="page-item" th:each="i : ${#numbers.sequence(startPage, endPage)}"
+                                th:classappend="${i == currentPage} ? 'active'">
+                                <a class="page-link page-link-lg"
+                                   th:href="@{'/accommodation/byregion'(region=${region}, checkin=${checkin}, checkout=${checkout}, numGuests=${numGuests}, sort=${sort}, page=${i}, size=${pageSize})}">
+                                    <span th:text="${i + 1}">1</span>
+                                </a>
+                            </li>
+
+                            <!-- Next button -->
+                            <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
+                                <a class="page-link page-link-lg"
+                                   th:href="@{'/accommodation/byregion'(region=${region}, checkin=${checkin}, checkout=${checkout}, numGuests=${numGuests}, sort=${sort}, page=${currentPage + 1}, size=${pageSize})}">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                 </ul>
             </nav>
@@ -458,18 +559,25 @@
                 });
         });
     });
-
     document.addEventListener('DOMContentLoaded', () => {
-        const sortByRatingButton = document.getElementById('sortByRating');
+        // 현재 URL의 쿼리 파라미터를 확인합니다.
+        const urlParams = new URLSearchParams(window.location.search);
+        const title = urlParams.get('title'); // 'title' 파라미터를 가져옵니다.
 
-        sortByRatingButton.addEventListener('click', () => {
-            // 현재 URL에서 기존 파라미터 가져오기
-            const url = new URL(window.location.href);
-            url.searchParams.set('sort', 'averageRating'); // sort 파라미터를 averageRating으로 설정
+        // 정렬 기준 버튼을 포함하는 요소를 선택합니다.
+        const sortTabsContainer = document.getElementById('sort-tabs-container');
 
-            // URL을 새로고침
-            window.location.href = url.href;
-        });
+        if (title) {
+            // URL에 'title' 파라미터가 있는 경우, 정렬 기준 버튼을 숨깁니다.
+            if (sortTabsContainer) {
+                sortTabsContainer.style.display = 'none';
+            }
+        } else {
+            // 'title' 파라미터가 없으면, 정렬 기준 버튼을 보이게 합니다.
+            if (sortTabsContainer) {
+                sortTabsContainer.style.display = 'block';
+            }
+        }
     });
 </script>
 

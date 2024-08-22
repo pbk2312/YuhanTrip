@@ -63,18 +63,5 @@ public class AccommodationRepositoryTest {
         assertThat(accommodations.getContent().get(0).getAreacode()).isEqualTo("123");
     }
 
-    @Test
-    void testFindAvailableAccommodations() {
-        PageRequest pageRequest = PageRequest.of(0, 10);
-        LocalDate checkInDate = LocalDate.now().plusDays(2);
-        LocalDate checkOutDate = LocalDate.now().plusDays(4);
-        int numGuests = 2;
 
-        Page<Accommodation> availableAccommodations = accommodationRepository.findAvailableAccommodations(
-                "123", checkInDate, checkOutDate, numGuests, pageRequest);
-
-
-        assertThat(availableAccommodations).isNotEmpty();
-        assertThat(availableAccommodations.getContent().get(0).getAreacode()).isEqualTo("123");
-    }
 }

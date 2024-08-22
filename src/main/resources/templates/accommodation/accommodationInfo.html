@@ -414,11 +414,11 @@
                     <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
                        data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="/accommodation/accommodations">All Products</a></li>
+                        <li><a class="dropdown-item" href="/accommodation/byregion">All Products</a></li>
                         <li>
                             <hr class="dropdown-divider"/>
                         </li>
-                        <li><a class="dropdown-item" href="/accommodation/accommodations?sort=averageRating">Popular Items</a></li>
+                        <li><a class="dropdown-item" href="/accommodation/byregion?sort=averageRating">Popular Items</a></li>
                         <li><a class="dropdown-item" href="#!">New Arrivals</a></li>
                     </ul>
                 </li>
@@ -441,7 +441,7 @@
         <div class="container">
             <!-- 숙소의 이미지와 제목 -->
             <div class="card mb-4">
-                <img th:src="${accommodation.firstimage != '' ? accommodation.firstimage : '/Noimage.png'}"
+                <img th:src="${accommodation.firstimage != '' ? accommodation.firstimage : '/hotel-1725150_1280.jpg'}"
                      class="card-img-top" alt="이미지">
                 <div class="card-body">
                     <h1 class="card-title" th:text="${accommodation.title}">숙소 제목</h1>

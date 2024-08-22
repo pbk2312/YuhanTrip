@@ -5,6 +5,7 @@ import hello.yuhanTrip.domain.Member;
 import hello.yuhanTrip.domain.Reservation;
 import hello.yuhanTrip.domain.Review;
 import hello.yuhanTrip.domain.ReviewImage;
+import hello.yuhanTrip.repository.AccommodationRepository;
 import hello.yuhanTrip.repository.ReviewRepository;
 import hello.yuhanTrip.repository.ReviewImageRepository;
 import hello.yuhanTrip.service.Accomodation.AccommodationService;
@@ -35,9 +36,11 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final ReviewImageRepository reviewImageRepository;
+    private final AccommodationRepository accommodationRepository;
     private final AccommodationService accommodationService;
     private final MemberService memberService;
     private final ReservationService reservationService;
+
 
     @Value("${upload.dir}")
     private String uploadDir;  // 주입된 업로드 디렉토리 경로
@@ -92,8 +95,29 @@ public class ReviewService {
             log.warn("이미지가 null이거나 비어 있습니다. 이미지가 저장되지 않습니다.");
         }
 
+        // 숙소의 평균 평점과 리뷰 수 업데이트
+        updateAccommodationRatingsAndReviewCount(accommodation);
+
         log.info("리뷰 추가 완료: reviewId={}", savedReview.getId());
         return savedReview;
+    }
+
+    private void updateAccommodationRatingsAndReviewCount(Accommodation accommodation) {
+        List<Review> reviews = reviewRepository.findByAccommodationId(accommodation.getId());
+        if (reviews.isEmpty()) {
+            accommodation.setAverageRating(0.0);
+            accommodation.setReviewCount(0);
+        } else {
+            double averageRating = reviews.stream()
+                    .mapToInt(Review::getRating)
+                    .average()
+                    .orElse(0.0);
+            int reviewCount = reviews.size();
+
+            accommodation.setAverageRating(averageRating);
+            accommodation.setReviewCount(reviewCount);
+        }
+        accommodationRepository.save(accommodation);
     }
 
 
@@ -139,10 +163,6 @@ public class ReviewService {
         return reviewRepository.findByMemberId(memberId, pageable);
     }
 
-    public Page<Review> getReviewsByAccommodation(Long accommodationId,int page,int size){
-        Pageable pageable = PageRequest.of(page,size);
-        return reviewRepository.findByAccommodationId(accommodationId,pageable);
-    }
 
     public List<Review> getReviewsByAccommodation(Long accommodationId){
         return reviewRepository.findByAccommodationId(accommodationId);

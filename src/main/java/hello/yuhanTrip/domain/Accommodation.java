@@ -45,7 +45,8 @@ public class Accommodation {
     private String sigungucode;
 
     private int reviewCount;
-    private double averageRating;
+    private Double averageRating;
+    private Double averagePrice;
 
     @Enumerated(EnumType.STRING)
     private AccommodationApplyStatus status;
@@ -65,6 +66,7 @@ public class Accommodation {
 
     @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews;  // 추가된 부분
+
 
 
 
