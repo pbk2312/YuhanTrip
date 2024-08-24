@@ -15,21 +15,24 @@
     <style>
         /* CSS styles */
         body {
-            background: url('/los-angeles-2289637_640.jpg') no-repeat center center fixed;
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/los-angeles-2289637_640.jpg') no-repeat center center fixed;
             background-size: cover;
             margin: 0;
             padding: 0;
-            color: #333;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         .navbar {
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.9);
             border-bottom: 1px solid #ddd;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .navbar-brand {
-            font-size: 1.5rem;
+            font-size: 1.75rem;
             font-weight: bold;
+            color: #333;
         }
 
         .navbar-nav .nav-link {
@@ -40,10 +43,79 @@
         .navbar-nav .nav-link.active {
             color: #0056b3;
         }
+
+        /* Card and form styling */
+        .card {
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .card-header {
+            background-color: transparent;
+            border-bottom: none;
+        }
+
+        .card-footer {
+            background-color: transparent;
+            border-top: none;
+        }
+
+        h3 {
+            color: #333;
+            font-weight: bold;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border: none;
+        }
+
+        .form-floating label {
+            color: #666;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        /* Fade-in animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Links */
+        .small {
+            color: #007bff;
+            transition: color 0.3s ease;
+        }
+
+        .small:hover {
+            color: #0056b3;
+        }
     </style>
 </head>
 <body>
-<!-- Navigation-->
 <!-- Navigation-->
 <nav class="navbar navbar-expand-lg navbar-light">
     <div class="container px-4 px-lg-5">
@@ -72,7 +144,6 @@
         </div>
     </div>
 </nav>
-
 
 <!-- Main Content-->
 <div id="main-content">
@@ -106,10 +177,7 @@
             </div>
         </div>
     </div>
-    </main>
 </div>
-
-
 
 <!-- jQuery, Popper.js, and Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -126,12 +194,10 @@
 
     document.getElementById('loginForm').addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
-            event.preventDefault(); // 기본 Enter 키 동작 방지
-            document.getElementById('loginButton').click(); // 로그인 버튼 클릭 이벤트 발생
+            event.preventDefault();
+            document.getElementById('loginButton').click();
         }
     });
-
-
 
     function login(email, password) {
         fetch('/member/login', {
@@ -160,11 +226,6 @@
                 alert('로그인 실패: ' + error.message);
             });
     }
-
-
-
-
 </script>
-
 </body>
 </html>

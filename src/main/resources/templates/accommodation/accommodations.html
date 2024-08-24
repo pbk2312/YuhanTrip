@@ -560,24 +560,20 @@
         });
     });
     document.addEventListener('DOMContentLoaded', () => {
-        // 현재 URL의 쿼리 파라미터를 확인합니다.
+        // 현재 URL의 쿼리 파라미터를 가져옵니다.
         const urlParams = new URLSearchParams(window.location.search);
-        const title = urlParams.get('title'); // 'title' 파라미터를 가져옵니다.
 
         // 정렬 기준 버튼을 포함하는 요소를 선택합니다.
-        const sortTabsContainer = document.getElementById('sort-tabs-container');
+        const sortTabs = document.querySelectorAll('.sort-tab');
 
-        if (title) {
-            // URL에 'title' 파라미터가 있는 경우, 정렬 기준 버튼을 숨깁니다.
-            if (sortTabsContainer) {
-                sortTabsContainer.style.display = 'none';
-            }
-        } else {
-            // 'title' 파라미터가 없으면, 정렬 기준 버튼을 보이게 합니다.
-            if (sortTabsContainer) {
-                sortTabsContainer.style.display = 'block';
-            }
-        }
+        sortTabs.forEach(tab => {
+            // 현재 정렬 기준 버튼의 href 값을 가져옵니다.
+            let href = tab.getAttribute('href');
+
+            // 기존 쿼리 파라미터를 정렬 기준 링크에 추가합니다.
+            urlParams.set('sort', href.split('=')[1]); // 현재 링크에서 sort 값 추출
+            tab.setAttribute('href', '?' + urlParams.toString());
+        });
     });
 </script>
 

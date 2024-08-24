@@ -72,6 +72,7 @@ public class ReservationController {
 
 
         model.addAttribute("reservation", reservationDTO);
+        model.addAttribute("room",room);
         return "/reservation/reservation";
     }
 

@@ -12,203 +12,215 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet"/>
     <!-- Core theme CSS (includes Bootstrap)-->
     <link href="../css/homestyles.css" rel="stylesheet">
-    <style>
-        /* CSS styles */
-        body {
-            background: url('/los-angeles-2289637_640.jpg') no-repeat center center fixed;
-            background-size: cover;
-            margin: 0;
-            padding: 0;
-            color: #333;
-        }
+</head>
+<style>
+    /* General body styles */
+    body {
+        background: url('/los-angeles-2289637_640.jpg') no-repeat center center fixed;
+        background-size: cover;
+        margin: 0;
+        padding: 0;
+        color: #333;
+        font-family: 'Arial', sans-serif;
+        line-height: 1.6;
+    }
 
-        .navbar {
-            background: rgba(255, 255, 255, 0.8);
-            border-bottom: 1px solid #ddd;
-        }
+    .navbar {
+        background: rgba(255, 255, 255, 0.85);
+        border-bottom: 1px solid #ddd;
+        padding: 1rem;
+    }
 
-        .navbar-brand {
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
+    .navbar-brand {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #007bff;
+    }
 
-        .navbar-nav .nav-link {
-            color: #007bff;
-            font-weight: 500;
-        }
+    .navbar-nav .nav-link {
+        color: #007bff;
+        font-weight: 500;
+    }
 
-        .navbar-nav .nav-link.active {
-            color: #0056b3;
-        }
+    .navbar-nav .nav-link.active {
+        color: #0056b3;
+    }
 
-        /* Stylish container for the reservation form */
+    /* Container for the reservation form */
+    .reservation-container {
+        max-width: 1000px;
+        margin: 80px auto;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
+        display: flex;
+        padding: 20px;
+        gap: 20px;
+    }
+
+    .room-details {
+        flex: 1;
+    }
+
+    .room-details h3 {
+        font-size: 1.75rem;
+        margin-bottom: 15px;
+        color: #333;
+    }
+
+    .room-details p {
+        font-size: 1rem;
+        margin-bottom: 10px;
+    }
+
+    .room-details img {
+        width: 100%;
+        height: auto;
+        max-width: 350px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+    }
+
+    .reservation-body {
+        flex: 1;
+    }
+
+    .reservation-header {
+        background-color: #007bff;
+        color: white;
+        padding: 10px;
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: bold;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .form-label-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label-group > input {
+        height: 3.5rem;
+        padding: .75rem;
+        border-radius: .25rem;
+        border: 1px solid #ced4da;
+        width: 100%;
+    }
+
+    .form-label-group > label {
+        position: absolute;
+        top: 0.75rem;
+        left: 1rem;
+        color: #6c757d;
+        pointer-events: none;
+        transition: all .2s ease-in-out;
+        font-size: 1rem;
+        background: white;
+        padding: 0 .25rem;
+    }
+
+    .form-label-group input:focus ~ label,
+    .form-label-group input:not(:placeholder-shown) ~ label {
+        top: -0.5rem;
+        left: 1rem;
+        font-size: .75rem;
+        color: #007bff;
+        padding: 0 .25rem;
+    }
+
+    .form-control {
+        border-radius: .25rem;
+        border: 1px solid #ced4da;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+        padding: 1rem 2rem;
+        font-size: 1.25rem;
+        border-radius: .5rem;
+        width: 100%;
+        text-align: center;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #004085;
+    }
+
+    .number-input {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 1rem;
+    }
+
+    .number-input button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 0.5rem 1.5rem;
+        cursor: pointer;
+        font-size: 1.5rem;
+        border-radius: 0.25rem;
+    }
+
+    .number-input input {
+        text-align: center;
+        width: 4rem;
+        border: 1px solid #ced4da;
+        height: 3rem;
+        margin: 0 1rem;
+        font-size: 1.5rem;
+        border-radius: 0.25rem;
+    }
+
+    /* Responsive layout */
+    @media (max-width: 768px) {
         .reservation-container {
-            max-width: 800px;
-            margin: 80px auto;
-            background-color: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            border-radius: 12px;
-            overflow: hidden;
+            flex-direction: column;
         }
 
-        .reservation-header {
-            background-color: #007bff;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            font-size: 1.5rem;
-            font-weight: bold;
+        .room-details img {
+            max-width: 100%;
+            margin: 0 auto 20px;
         }
 
         .reservation-body {
-            padding: 40px;
-        }
-
-        .form-label-group {
-            position: relative;
-            margin-bottom: 1.5rem;
-        }
-
-        .form-label-group > input {
-            height: 3.5rem;
-            padding: .75rem;
-            border-radius: .25rem;
-            border: 1px solid #ced4da;
-        }
-
-        .form-label-group > label {
-            position: absolute;
-            top: .75rem;
-            left: .75rem;
-            display: block;
-            width: calc(100% - 1.5rem);
-            margin: 0;
-            line-height: 1.5;
-            color: #495057;
-            pointer-events: none;
-            background: white;
-            transition: all .2s ease-in-out;
-            font-size: 1rem;
-            padding: 0 .25rem;
-            border: 1px solid transparent;
-            border-radius: .25rem;
-        }
-
-        .form-label-group input:focus ~ label,
-        .form-label-group input:not(:placeholder-shown) ~ label {
-            top: -0.5rem;
-            left: .75rem;
-            font-size: .75rem;
-            color: #007bff;
-            background: white;
-            padding: 0 .25rem;
-        }
-
-        .form-control {
-            border-radius: .25rem;
-            box-shadow: none;
-            border: 1px solid #ced4da;
+            padding-top: 0;
         }
 
         .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-            padding: 1rem 2rem;
-            font-size: 1.25rem;
-            border-radius: .5rem;
+            width: 100%;
+            padding: 1rem;
+            font-size: 1rem;
         }
-
-        .btn-primary:hover {
-            background-color: #0056b3;
-            border-color: #004085;
-        }
-
-        .number-input {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 1rem;
-        }
-
-        .number-input button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 0.5rem 1.5rem;
-            cursor: pointer;
-            font-size: 1.5rem;
-            border-radius: 0.25rem;
-        }
-
-        .number-input button:disabled {
-            background-color: #6c757d;
-            cursor: not-allowed;
-        }
-
-        .number-input input {
-            text-align: center;
-            width: 4rem;
-            border: 1px solid #ced4da;
-            height: 3rem;
-            margin: 0 1rem;
-            font-size: 1.5rem;
-            border-radius: 0.25rem;
-        }
-
-        /* Responsive layout */
-        @media (max-width: 768px) {
-            .reservation-body {
-                padding: 20px;
-            }
-
-            .btn-primary {
-                width: 100%;
-                padding: 1rem;
-                font-size: 1rem;
-            }
-        }
-    </style>
-</head>
-<body>
-<!-- Navigation-->
-<nav class="navbar navbar-expand-lg navbar-light">
-    <div class="container px-4 px-lg-5">
-        <a class="navbar-brand" href="#!">YuhanTrip</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-                <li class="nav-item"><a class="nav-link active" aria-current="page" href="/home/homepage">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
-                       data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="/accommodation/accommodations">All Products</a></li>
-                        <li>
-                            <hr class="dropdown-divider"/>
-                        </li>
-                        <li><a class="dropdown-item" href="#!">Popular Items</a></li>
-                        <li><a class="dropdown-item" href="#!">New Arrivals</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
+    }
+</style>
 
 <!-- Main Content-->
 <div id="main-content">
     <div class="reservation-container">
-        <div class="reservation-header">예약하기</div>
+        <!-- Room Details Section -->
+        <div class="room-details">
+            <h3 th:text="${room.roomNm}">객실 이름</h3>
+            <img th:src="@{${room.roomImgUrl}}" class="room-img" alt="객실 이미지">
+            <p><strong>타입:</strong> <span th:text="${room.roomType}">객실 타입</span></p>
+            <p><strong>최대 수용 인원:</strong> <span th:text="${room.maxOccupancy}">최대 수용 인원</span></p>
+            <p><strong>면적:</strong> <span th:text="${room.roomArea}">객실 면적</span>㎡</p>
+            <p><strong>가격:</strong> <span th:text="${room.getPriceAsLong()}">가격</span>원</p>
+            <p><strong>편의시설:</strong> <span th:text="${room.amenities}">편의시설</span></p>
+            <p><strong>흡연 가능 여부:</strong> <span th:text="${room.smokingYn ? '예' : '아니오'}">흡연 가능 여부</span></p>
+            <p><strong>조식 포함 여부:</strong> <span th:text="${room.breakfastInclYn ? '예' : '아니오'}">조식 포함 여부</span></p>
+            <p><strong>체크인 시간:</strong> <span th:text="${room.checkInTime}">체크인 시간</span></p>
+            <p><strong>체크아웃 시간:</strong> <span th:text="${room.checkOutTime}">체크아웃 시간</span></p>
+            <p><strong>객실 소개:</strong> <span th:text="${room.roomIntr}">객실 소개</span></p>
+        </div>
         <div class="reservation-body">
+            <div class="reservation-header">예약하기</div>
             <div class="mb-4">
-                <h5 class="text-center" id="accommodationTitle">
-                    <span th:text="${reservation.accommodationTitle}">숙소 이름</span>
-                    - <span th:text="${reservation.roomNm}">객실 이름</span>
-                </h5>
                 <p class="text-center" id="pricePerNight" th:text="'1박 가격: ' + ${reservation.price} + ' 원'">1박 가격: 0 원</p>
             </div>
             <form id="reservationForm" action="/reservation/submit" method="post">
@@ -264,7 +276,6 @@
         </div>
     </div>
 </div>
-
 
 <!-- jQuery, Popper.js, and Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
