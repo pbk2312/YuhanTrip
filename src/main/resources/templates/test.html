@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>숙소 예약</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      padding: 20px;
+      gap: 20px;
+    }
+
+    .option {
+      flex: 1;
+      max-width: 250px;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .option:hover {
+      transform: translateY(-10px);
+    }
+
+    .card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: box-shadow 0.3s ease;
+    }
+
+    .card img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 15px;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover img {
+      transform: scale(1.1);
+    }
+
+    .info {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      text-align: center;
+      padding: 10px 0;
+      font-size: 1.2em;
+      border-radius: 0 0 15px 15px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- 호텔 -->
+  <div class="option">
+    <a th:href="@{/accommodation/search(title='호텔')}">
+      <div class="card">
+        <img th:src="@{/accommodation/hotel-1725150_1280.jpg}" alt="Hotel">
+        <div class="info">
+          <p>호텔</p>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <!-- 모텔 -->
+  <div class="option">
+    <a th:href="@{/accommodation/search(title='모텔')}">
+      <div class="card">
+        <img th:src="@{/accommodation/road-3189386_1280.jpg}" alt="Motel">
+        <div class="info">
+          <p>모텔</p>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <!-- 펜션 -->
+  <div class="option">
+    <a th:href="@{/accommodation/search(title='펜션')}">
+      <div class="card">
+        <img th:src="@{/accommodation/pension-4959272_1280.jpg}" alt="Pension">
+        <div class="info">
+          <p>펜션</p>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <!-- 기타 -->
+  <div class="option">
+    <a th:href="@{/accommodation/byregion}">
+      <div class="card">
+        <img th:src="@{/accommodation/other-placeholder.jpg}" alt="Other">
+        <div class="info">
+          <p>기타</p>
+        </div>
+      </div>
+    </a>
+  </div>
+</div>
+
+</body>
+</html>

@@ -129,173 +129,146 @@
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
         }
 
-        /* Carousel container */
-        #accommodationCarousel {
-            position: relative;
+        .section-header {
+            margin-bottom: 30px;
+            text-align: left; /* 왼쪽 정렬 */
         }
 
-        /* Section title styling */
         .section-title {
-            font-size: 1.75rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            text-align: center;
+            font-size: 2rem; /* 제목 크기 */
+            font-weight: 700; /* 두꺼운 폰트 */
+            color: #333; /* 제목 색상 */
+            text-transform: uppercase; /* 대문자 변환 */
+            position: relative; /* 상대 위치 */
+            display: inline-block; /* 인라인 블록 */
+            padding-bottom: 10px; /* 하단 여백 */
         }
 
-        /* Container styling to add white background */
-        #accommodationCarousel {
-            background-color: #fff; /* 컨테이너 배경을 흰색으로 설정 */
-            padding: 2rem 1rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        .section-title::after {
+            content: ''; /* 빈 콘텐츠 */
+            display: block; /* 블록 레벨 요소 */
+            width: 60px; /* 밑줄 너비 */
+            height: 4px; /* 밑줄 두께 */
+            background-color: #007bff; /* 밑줄 색상 */
+            position: absolute; /* 절대 위치 */
+            bottom: 0; /* 하단 맞춤 */
+            left: 50%; /* 수평 가운데 */
+            transform: translateX(-50%); /* 가운데 정렬 */
         }
 
-        /* Section title styling */
-        .section-title {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: #007bff; /* 파란색 텍스트 */
-            background-color: #fff; /* 흰색 배경 */
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 약간의 그림자 추가 */
-            border-left: 5px solid #007bff; /* 왼쪽에 파란색 선 추가 */
-            display: inline-block;
+        .accommodations-container {
+            background-color: #ffffff; /* 배경색 흰색 */
+            padding: 20px; /* 내부 여백 */
+            border-radius: 8px; /* 둥근 모서리 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 가벼운 그림자 */
         }
 
-
-        /* Card styling */
         .card {
             border: none;
-            border-radius: 10px;
+            border-radius: 15px;
             overflow: hidden;
-            background-color: #fff; /* 배경색을 흰색으로 설정 */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            height: 100%; /* 카드 높이를 100%로 설정 */
-            min-height: 400px; /* 카드 최소 높이 설정 */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
         }
-
 
         .card:hover {
-            transform: scale(1.02);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            transform: scale(1.05);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
         }
-
 
         .card-img-top {
             width: 100%;
-            height: 200px; /* 이미지 높이 설정 */
+            height: 200px; /* 카드의 이미지 높이 설정 */
             object-fit: cover; /* 이미지 비율 유지 */
-            border-bottom: 1px solid #ddd;
-            transition: opacity 0.3s ease;
         }
-
-        .card-img-top:hover {
-            opacity: 0.8;
-        }
-
 
         .card-body {
-            flex: 1; /* 카드 본문이 남은 공간을 차지하도록 설정 */
             padding: 1rem;
-            text-align: center;
         }
 
-
-
-        .card-text {
-            color: #555;
-        }
-
-        /* Card footer styling */
         .card-footer {
-            background: #f9f9f9;
+            background-color: #f8f9fa;
             border-top: 1px solid #ddd;
-            padding: 0.75rem;
+            padding: 0.75rem 1.25rem;
         }
 
-        /* Like button styling */
-        .like-button {
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 50%;
-            transition: background 0.3s ease, color 0.3s ease;
+        .card-footer .btn {
+            border-radius: 20px; /* 둥근 모서리 */
         }
 
-        .like-button:hover {
-            background: #e2e2e2;
-            color: #d9534f;
+        .card-footer i.bi-star-fill {
+            color: #ffd700; /* 별 색상 */
         }
 
-        /* Star icon styling */
-        .bi-star-fill {
-            font-size: 1rem;
+        /* 리뷰 갯수의 텍스트 스타일 */
+        .card-footer span:nth-child(3) {
+            color: #aaa; /* 연한 회색 색상으로 변경 */
+            font-size: 0.9rem; /* 폰트 크기 약간 줄임 */
+            margin-left: 8px; /* 별점과의 간격 */
         }
 
-        /* Carousel control buttons */
-        .carousel-control-prev,
-        .carousel-control-next {
-            width: 3rem;
-            height: 3rem;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 50%;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 10;
+        /* 전체 섹션 스타일링 */
+        .accommodation-selection {
+            background-color: #ffffff; /* 흰색 배경 */
+            padding: 20px;
+            text-align: left; /* 섹션 내용 왼쪽 정렬 */
         }
 
-        .carousel-control-prev {
-            left: -4rem;
+        .section-title {
+            font-size: 24px;
+            color: #333333;
+            margin-bottom: 20px;
         }
 
-        .carousel-control-next {
-            right: -4rem;
+        .selection-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
         }
 
-        .carousel-control-prev-icon,
-        .carousel-control-next-icon {
-            background-color: rgba(0, 0, 0, 0.3);
-            border-radius: 50%;
-            width: 2rem;
-            height: 2rem;
-            line-height: 2rem;
+        .selection {
+            flex: 1 1 30%; /* 3개 아이템을 가로로 나열 */
+            max-width: 300px; /* 아이템 최대 너비 */
         }
 
-        .carousel-control-prev-icon::after,
-        .carousel-control-next-icon::after {
-            content: '';
+        .highlight-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            height: 200px; /* 카드의 고정된 높이 */
+        }
+
+        .highlight-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 이미지를 컨테이너에 맞게 잘라서 채우기 */
             display: block;
-            width: 0;
-            height: 0;
-            border-width: 0.5rem;
-            border-style: solid;
-            border-color: transparent transparent transparent #fff;
         }
 
-        .carousel-control-prev-icon::after {
-            border-right-width: 0;
-            border-left-color: rgba(255, 255, 255, 0.5);
+        .details {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            color: #ffffff;
+            text-align: center;
+            padding: 10px;
+            box-sizing: border-box;
+            font-size: 18px;
+            font-weight: bold;
         }
 
-        .carousel-control-next-icon::after {
-            border-left-width: 0;
-            border-right-color: rgba(255, 255, 255, 0.5);
-        }
-
-        /* Ensure carousel items don't overflow */
-        .carousel-inner {
-            padding: 0 1rem;
-        }
-
-        .carousel-item {
-            padding: 0 0.5rem;
+        .highlight-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
         }
 
     </style>
+
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-light">
@@ -314,8 +287,11 @@
                        data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <li><a class="dropdown-item" href="/accommodation/byregion">All Products</a></li>
-                        <li><hr class="dropdown-divider"/></li>
-                        <li><a class="dropdown-item" href="/accommodation/byregion?sort=averageRating">Popular Items</a></li>
+                        <li>
+                            <hr class="dropdown-divider"/>
+                        </li>
+                        <li><a class="dropdown-item" href="/accommodation/byregion?sort=averageRating">Popular Items</a>
+                        </li>
                         <li><a class="dropdown-item" href="#!">New Arrivals</a></li>
                     </ul>
                 </li>
@@ -377,62 +353,89 @@
                 <label for="numGuests">숙박 인원수</label>
                 <input type="number" id="numGuests" name="numGuests" class="form-control" min="1" max="10" value="1">
             </div>
+
             <button type="submit" class="btn btn-primary">검색</button>
         </form>
-    </div>
-    <div class="container mt-4">
-        <!-- 인기 있는 숙소들 제목 추가 -->
-        <div class="section-title">인기 추천 숙소</div>
 
-        <div id="accommodationCarousel" class="carousel slide">
-            <div class="carousel-inner">
-                <!-- Example carousel item (Add more as needed) -->
-                <div class="carousel-item active">
-                    <div class="row">
-                        <div class="col" th:each="accommodation, iterStat : ${accommodations}">
-                            <div class="card">
-                                <a th:href="@{${'/accommodation/info?id=' + accommodation.id +
-                    (checkin != null ? '&checkin=' + checkin : '') +
-                    (checkout != null ? '&checkout=' + checkout : '') +
-                    (numGuests != null ? '&numGuests=' + numGuests : '')}}"
-                                   class="text-decoration-none text-dark">
-                                    <img th:src="${accommodation.firstimage != '' ? accommodation.firstimage : '/hotel-1725150_1280.jpg'}"
-                                         class="card-img-top" alt="이미지">
-                                    <div class="card-body">
-                                        <h5 class="card-title" th:text="${accommodation.title}">숙소 이름</h5>
-                                        <p class="card-text" th:text="${accommodation.addr1}">주소</p>
-                                    </div>
-                                </a>
-                                <div class="card-footer d-flex align-items-center justify-content-between">
-                                    <button class="btn btn-outline-danger btn-sm like-button" th:data-id="${accommodation.id}">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                    <div class="d-flex align-items-center">
-                                        <!-- 별 아이콘 -->
-                                        <i class="bi bi-star-fill text-warning"></i>
-                                        <!-- 평균 평점 표시 -->
-                                        <span th:text="${accommodation.averageRating} + '/5.0'">평점</span>
-                                    </div>
+    <!-- 숙소 목록 표시 영역 -->
+    <div class="accommodations-container bg-white p-4 rounded">
+        <!-- 숙소 유형 선택 -->
+        <section class="accommodation-selection">
+            <div class="selection-wrapper">
+                <div class="selection-container">
+                    <!-- Luxury Stay: 호텔 -->
+                    <div class="selection">
+                        <a th:href="@{/accommodation/search(title='호텔')}">
+                            <div class="highlight-card">
+                                <img src="/accommodation/hotel-1725150_1280.jpg" alt="Luxury Hotel">
+                                <div class="details">
+                                    <p>호텔</p>
                                 </div>
                             </div>
+                        </a>
+                    </div>
+
+                    <!-- Cozy Retreat: 모텔 -->
+                    <div class="selection">
+                        <a th:href="@{/accommodation/search(title='모텔')}">
+                            <div class="highlight-card">
+                                <img src="/accommodation/road-3189386_1280.jpg" alt="Cozy Motel">
+                                <div class="details">
+                                    <p>모텔</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Scenic Escape: 펜션 -->
+                    <div class="selection">
+                        <a th:href="@{/accommodation/search(title='펜션')}">
+                            <div class="highlight-card">
+                                <img src="/accommodation/pension-4959272_1280.jpg" alt="Scenic Pension">
+                                <div class="details">
+                                    <p>펜션</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="section-header d-flex justify-content-between align-items-center">
+            <h2 class="section-title">인기 추천 숙소</h2>
+            <!-- 전체보기 버튼 -->
+            <a href="/accommodation/byregion?sort=averageRating" class="btn btn-primary">전체보기</a>
+        </div>
+        <div class="row row-cols-1 row-cols-md-3 row-cols-lg-5 g-4">
+            <!-- Accommodations cards -->
+            <div class="col" th:each="accommodation : ${accommodations}">
+                <div class="card bg-white h-100">
+                    <a th:href="@{${'/accommodation/info?id=' + accommodation.id +
+                (checkin != null ? '&checkin=' + checkin : '') +
+                (checkout != null ? '&checkout=' + checkout : '') +
+                (numGuests != null ? '&numGuests=' + numGuests : '')}}"
+                       class="text-decoration-none text-dark">
+                        <img th:src="${accommodation.firstimage != '' ? accommodation.firstimage : '/accommodation/hotel-1725150_1280.jpg'}"
+                             class="card-img-top" alt="이미지">
+                        <div class="card-body">
+                            <h5 class="card-title" th:text="${accommodation.title}">숙소 이름</h5>
+                        </div>
+                    </a>
+                    <div class="card-footer d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <!-- 별 아이콘 -->
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <!-- 평균 평점 표시 -->
+                            <span th:text="${accommodation.averageRating} + '/5.0'">평점</span>
+                            <span th:text="${accommodation.reviewCount} + '명 평가'"></span>
                         </div>
                     </div>
                 </div>
-                <!-- Add more carousel-item divs for additional slides -->
             </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#accommodationCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#accommodationCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-            </button>
         </div>
     </div>
+    </div>
 </div>
-
-
 <!-- jQuery, Popper.js, and Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
@@ -489,7 +492,7 @@
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ /* 필요 시 요청 본문 추가 */ })
+            body: JSON.stringify({ /* 필요 시 요청 본문 추가 */})
         })
             .then(response => {
                 if (response.ok) {
