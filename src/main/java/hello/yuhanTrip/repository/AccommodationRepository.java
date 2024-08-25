@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public interface AccommodationRepository extends JpaRepository<Accommodation, Long> {
 
@@ -20,6 +21,12 @@ public interface AccommodationRepository extends JpaRepository<Accommodation, Lo
     @Query("SELECT a FROM Accommodation a WHERE a.status = :status " +
             "ORDER BY a.averageRating DESC, a.reviewCount DESC")
     Page<Accommodation> findAllByStatusWithSorting(@Param("status") AccommodationApplyStatus status, Pageable pageable);
+
+    // 평점순 정렬, 페이지 처리 없음
+    @Query("SELECT a FROM Accommodation a WHERE a.status = :status " +
+            "ORDER BY a.averageRating DESC, a.reviewCount DESC")
+    List<Accommodation> findAllByStatusWithSorting(@Param("status") AccommodationApplyStatus status);
+
 
     // 지역 코드로 숙소 리스트를 가져오는 쿼리 메서드
     Page<Accommodation> findByAreacode(String areacode, Pageable pageable);

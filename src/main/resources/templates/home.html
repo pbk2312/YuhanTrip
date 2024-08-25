@@ -129,7 +129,171 @@
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
         }
 
+        /* Carousel container */
+        #accommodationCarousel {
+            position: relative;
+        }
 
+        /* Section title styling */
+        .section-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        /* Container styling to add white background */
+        #accommodationCarousel {
+            background-color: #fff; /* 컨테이너 배경을 흰색으로 설정 */
+            padding: 2rem 1rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Section title styling */
+        .section-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #007bff; /* 파란색 텍스트 */
+            background-color: #fff; /* 흰색 배경 */
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 약간의 그림자 추가 */
+            border-left: 5px solid #007bff; /* 왼쪽에 파란색 선 추가 */
+            display: inline-block;
+        }
+
+
+        /* Card styling */
+        .card {
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: #fff; /* 배경색을 흰색으로 설정 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%; /* 카드 높이를 100%로 설정 */
+            min-height: 400px; /* 카드 최소 높이 설정 */
+        }
+
+
+        .card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+
+        .card-img-top {
+            width: 100%;
+            height: 200px; /* 이미지 높이 설정 */
+            object-fit: cover; /* 이미지 비율 유지 */
+            border-bottom: 1px solid #ddd;
+            transition: opacity 0.3s ease;
+        }
+
+        .card-img-top:hover {
+            opacity: 0.8;
+        }
+
+
+        .card-body {
+            flex: 1; /* 카드 본문이 남은 공간을 차지하도록 설정 */
+            padding: 1rem;
+            text-align: center;
+        }
+
+
+
+        .card-text {
+            color: #555;
+        }
+
+        /* Card footer styling */
+        .card-footer {
+            background: #f9f9f9;
+            border-top: 1px solid #ddd;
+            padding: 0.75rem;
+        }
+
+        /* Like button styling */
+        .like-button {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 50%;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .like-button:hover {
+            background: #e2e2e2;
+            color: #d9534f;
+        }
+
+        /* Star icon styling */
+        .bi-star-fill {
+            font-size: 1rem;
+        }
+
+        /* Carousel control buttons */
+        .carousel-control-prev,
+        .carousel-control-next {
+            width: 3rem;
+            height: 3rem;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+        }
+
+        .carousel-control-prev {
+            left: -4rem;
+        }
+
+        .carousel-control-next {
+            right: -4rem;
+        }
+
+        .carousel-control-prev-icon,
+        .carousel-control-next-icon {
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 50%;
+            width: 2rem;
+            height: 2rem;
+            line-height: 2rem;
+        }
+
+        .carousel-control-prev-icon::after,
+        .carousel-control-next-icon::after {
+            content: '';
+            display: block;
+            width: 0;
+            height: 0;
+            border-width: 0.5rem;
+            border-style: solid;
+            border-color: transparent transparent transparent #fff;
+        }
+
+        .carousel-control-prev-icon::after {
+            border-right-width: 0;
+            border-left-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .carousel-control-next-icon::after {
+            border-left-width: 0;
+            border-right-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Ensure carousel items don't overflow */
+        .carousel-inner {
+            padding: 0 1rem;
+        }
+
+        .carousel-item {
+            padding: 0 0.5rem;
+        }
 
     </style>
 </head>
@@ -213,11 +377,62 @@
                 <label for="numGuests">숙박 인원수</label>
                 <input type="number" id="numGuests" name="numGuests" class="form-control" min="1" max="10" value="1">
             </div>
-
             <button type="submit" class="btn btn-primary">검색</button>
         </form>
     </div>
+    <div class="container mt-4">
+        <!-- 인기 있는 숙소들 제목 추가 -->
+        <div class="section-title">인기 추천 숙소</div>
+
+        <div id="accommodationCarousel" class="carousel slide">
+            <div class="carousel-inner">
+                <!-- Example carousel item (Add more as needed) -->
+                <div class="carousel-item active">
+                    <div class="row">
+                        <div class="col" th:each="accommodation, iterStat : ${accommodations}">
+                            <div class="card">
+                                <a th:href="@{${'/accommodation/info?id=' + accommodation.id +
+                    (checkin != null ? '&checkin=' + checkin : '') +
+                    (checkout != null ? '&checkout=' + checkout : '') +
+                    (numGuests != null ? '&numGuests=' + numGuests : '')}}"
+                                   class="text-decoration-none text-dark">
+                                    <img th:src="${accommodation.firstimage != '' ? accommodation.firstimage : '/hotel-1725150_1280.jpg'}"
+                                         class="card-img-top" alt="이미지">
+                                    <div class="card-body">
+                                        <h5 class="card-title" th:text="${accommodation.title}">숙소 이름</h5>
+                                        <p class="card-text" th:text="${accommodation.addr1}">주소</p>
+                                    </div>
+                                </a>
+                                <div class="card-footer d-flex align-items-center justify-content-between">
+                                    <button class="btn btn-outline-danger btn-sm like-button" th:data-id="${accommodation.id}">
+                                        <i class="bi bi-heart"></i>
+                                    </button>
+                                    <div class="d-flex align-items-center">
+                                        <!-- 별 아이콘 -->
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <!-- 평균 평점 표시 -->
+                                        <span th:text="${accommodation.averageRating} + '/5.0'">평점</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Add more carousel-item divs for additional slides -->
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#accommodationCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#accommodationCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </div>
 </div>
+
+
 <!-- jQuery, Popper.js, and Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
