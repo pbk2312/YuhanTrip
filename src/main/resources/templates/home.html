@@ -267,6 +267,35 @@
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
         }
 
+        .icon-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px; /* 기존 이미지 높이 */
+            background-color: #f0f0f0; /* 배경색 */
+            border-radius: 10px; /* 둥근 모서리 */
+        }
+
+        .icon-container i {
+            font-size: 3rem; /* 아이콘 크기 */
+            color: #007bff; /* 아이콘 색상 */
+        }
+
+        .details {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            color: #ffffff;
+            text-align: center;
+            padding: 10px;
+            box-sizing: border-box;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+
     </style>
 
 </head>
@@ -363,11 +392,12 @@
         <section class="accommodation-selection">
             <div class="selection-wrapper">
                 <div class="selection-container">
-                    <!-- Luxury Stay: 호텔 -->
                     <div class="selection">
-                        <a th:href="@{/accommodation/search(title='호텔')}">
+                        <a href="/accommodation/search?title=호텔">
                             <div class="highlight-card">
-                                <img src="/accommodation/hotel-1725150_1280.jpg" alt="Luxury Hotel">
+                                <div class="icon-container">
+                                    <i class="bi bi-building"></i>
+                                </div>
                                 <div class="details">
                                     <p>호텔</p>
                                 </div>
@@ -375,11 +405,12 @@
                         </a>
                     </div>
 
-                    <!-- Cozy Retreat: 모텔 -->
                     <div class="selection">
-                        <a th:href="@{/accommodation/search(title='모텔')}">
+                        <a href="/accommodation/search?title=모텔">
                             <div class="highlight-card">
-                                <img src="/accommodation/road-3189386_1280.jpg" alt="Cozy Motel">
+                                <div class="icon-container">
+                                    <i class="bi bi-house-door"></i>
+                                </div>
                                 <div class="details">
                                     <p>모텔</p>
                                 </div>
@@ -387,11 +418,12 @@
                         </a>
                     </div>
 
-                    <!-- Scenic Escape: 펜션 -->
                     <div class="selection">
-                        <a th:href="@{/accommodation/search(title='펜션')}">
+                        <a href="/accommodation/search?title=펜션">
                             <div class="highlight-card">
-                                <img src="/accommodation/pension-4959272_1280.jpg" alt="Scenic Pension">
+                                <div class="icon-container">
+                                    <i class="bi bi-tree"></i>
+                                </div>
                                 <div class="details">
                                     <p>펜션</p>
                                 </div>
@@ -461,13 +493,14 @@
                 };
             }
         } else {
-            authButton.textContent = 'Login';
+            authButton.textContent = '로그인/회원가입'; // 여기서 텍스트를 변경합니다.
             authButton.onclick = () => window.location.href = '/member/login';
             if (window.location.pathname === '/member/withdrawalMembership') {
                 window.location.href = '/member/login';
             }
         }
     });
+
 
     function isTokenExpired(token) {
         try {

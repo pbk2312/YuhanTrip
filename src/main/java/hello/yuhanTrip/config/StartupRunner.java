@@ -1,6 +1,5 @@
 package hello.yuhanTrip.config;
 
-import hello.yuhanTrip.service.Accomodation.AccommodationService;
 import hello.yuhanTrip.service.Accomodation.AccommodationSettingService;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;

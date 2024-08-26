@@ -7,7 +7,7 @@ import hello.yuhanTrip.dto.ReservationUpdateDTO;
 import hello.yuhanTrip.exception.UnauthorizedException;
 import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.repository.PaymentRepository;
-import hello.yuhanTrip.service.Accomodation.AccommodationService;
+import hello.yuhanTrip.service.Accomodation.AccommodationServiceImpl;
 import hello.yuhanTrip.service.Accomodation.ReservationService;
 import hello.yuhanTrip.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +36,7 @@ public class ReservationController {
 
     private final TokenProvider tokenProvider;
     private final MemberService memberService;
-    private final AccommodationService accommodationService;
+    private final AccommodationServiceImpl accommodationService;
     private final ReservationService reservationService;
     private final PaymentRepository paymentRepository;
 

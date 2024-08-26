@@ -5,7 +5,7 @@ import hello.yuhanTrip.domain.Accommodation;
 import hello.yuhanTrip.domain.Member;
 import hello.yuhanTrip.domain.MemberLike;
 import hello.yuhanTrip.repository.MemberLikeRepository;
-import hello.yuhanTrip.service.Accomodation.AccommodationService;
+import hello.yuhanTrip.service.Accomodation.AccommodationServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Log4j2
 public class MemberLikeService {
 
-    private final AccommodationService accommodationService;
+    private final AccommodationServiceImpl accommodationService;
     private final MemberLikeRepository memberLikeRepository;
 
     @Transactional

@@ -8,11 +8,10 @@ import hello.yuhanTrip.dto.ReservationDTO;
 import hello.yuhanTrip.dto.ReviewWriteDTO;
 import hello.yuhanTrip.exception.UnauthorizedException;
 import hello.yuhanTrip.jwt.TokenProvider;
-import hello.yuhanTrip.service.Accomodation.AccommodationService;
+import hello.yuhanTrip.service.Accomodation.AccommodationServiceImpl;
 import hello.yuhanTrip.service.Accomodation.ReservationService;
 import hello.yuhanTrip.service.MemberService;
 import hello.yuhanTrip.service.ReviewService;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -41,7 +40,7 @@ public class ReviewController {
     private final TokenProvider tokenProvider;
     private final MemberService memberService;
     private final ReservationService reservationService;
-    private final AccommodationService accommodationService;
+    private final AccommodationServiceImpl accommodationService;
 
     @GetMapping("/reviewWrite")
     public String showReviewWrite(

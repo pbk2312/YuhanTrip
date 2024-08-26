@@ -6,7 +6,7 @@ import hello.yuhanTrip.domain.Reservation;
 import hello.yuhanTrip.domain.Room;
 import hello.yuhanTrip.dto.MypageMemberDTO;
 import hello.yuhanTrip.jwt.TokenProvider;
-import hello.yuhanTrip.service.Accomodation.AccommodationService;
+import hello.yuhanTrip.service.Accomodation.AccommodationServiceImpl;
 import hello.yuhanTrip.service.Accomodation.ReservationService;
 import hello.yuhanTrip.service.MemberService;
 import hello.yuhanTrip.service.RoleChangeRequestService;
@@ -38,7 +38,7 @@ public class MypageController {
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
     private final ReservationService reservationService;
-    private final AccommodationService accommodationService;
+    private final AccommodationServiceImpl accommodationService;
     private final RoleChangeRequestService roleChangeRequestService;
 
     // 토큰 유효성 검사 및 사용자 세부정보 가져오기

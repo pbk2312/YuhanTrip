@@ -23,7 +23,6 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class RoleChangeRequestService {
 
-    private final MemberService memberService;
     private final RoleChangeRequestRepository roleChangeRequestRepository;
 
     @Value("${upload.dir}")  // application.properties에서 경로를 주입받음

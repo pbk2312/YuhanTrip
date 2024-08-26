@@ -104,14 +104,27 @@
             }
         }
 
-        /* Links */
-        .small {
-            color: #007bff;
-            transition: color 0.3s ease;
+        /* Links as buttons */
+        .btn-link {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 30px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0 5px;
+            transition: background-color 0.3s ease;
         }
 
-        .small:hover {
-            color: #0056b3;
+        .btn-link:hover {
+            background-color: #0056b3;
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .btn-link:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5);
         }
     </style>
 </head>
@@ -149,7 +162,7 @@
 <div id="main-content">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-lg-5">
+            <div class="col-lg-6">
                 <div class="card shadow-lg border-0 rounded-lg mt-5">
                     <div class="card-header"><h3 class="text-center font-weight-light my-4">로그인</h3></div>
                     <div class="card-body">
@@ -168,9 +181,9 @@
                         </form>
                     </div>
                     <div class="card-footer text-center py-3">
-                        <div class="d-flex justify-content-between">
-                            <a class="small" href="/member/sendResetPasswordEmail">비밀번호 찾기</a>
-                            <a class="small" href="register">회원 가입</a>
+                        <div class="d-flex justify-content-center">
+                            <a class="btn-link" href="/member/sendResetPasswordEmail">비밀번호 찾기</a>
+                            <a class="btn-link" href="register">회원 가입</a>
                         </div>
                     </div>
                 </div>

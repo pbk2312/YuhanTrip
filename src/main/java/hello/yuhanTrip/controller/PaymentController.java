@@ -9,7 +9,7 @@ import hello.yuhanTrip.dto.payment.PaymentCancelDTO;
 import hello.yuhanTrip.dto.payment.PaymentDTO;
 import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.repository.ReservationRepository;
-import hello.yuhanTrip.service.Accomodation.AccommodationService;
+import hello.yuhanTrip.service.Accomodation.AccommodationServiceImpl;
 import hello.yuhanTrip.service.Accomodation.ReservationService;
 import hello.yuhanTrip.service.PaymentService;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ public class PaymentController {
     private final TokenProvider tokenProvider;
     private final PaymentService paymentService;
     private final ReservationService reservationService;
-    private final AccommodationService accommodationService;
+    private final AccommodationServiceImpl accommodationService;
 
     @Value("${imp_key}")
     private String impKey;

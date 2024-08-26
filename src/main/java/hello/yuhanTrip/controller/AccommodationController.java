@@ -4,7 +4,7 @@ import hello.yuhanTrip.domain.*;
 import hello.yuhanTrip.dto.AccommodationRegisterDTO;
 import hello.yuhanTrip.dto.RoomDTO;
 import hello.yuhanTrip.jwt.TokenProvider;
-import hello.yuhanTrip.service.Accomodation.AccommodationService;
+import hello.yuhanTrip.service.Accomodation.AccommodationServiceImpl;
 import hello.yuhanTrip.service.MemberLikeService;
 import hello.yuhanTrip.service.MemberService;
 import hello.yuhanTrip.service.ReviewService;
@@ -13,7 +13,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -33,7 +32,7 @@ import java.util.List;
 @Log4j2
 public class AccommodationController {
 
-    private final AccommodationService accommodationService;
+    private final AccommodationServiceImpl accommodationService;
     private final TokenProvider tokenProvider;
     private final MemberService memberService;
     private final MemberLikeService memberLikeService;
@@ -318,4 +317,3 @@ public class AccommodationController {
 
 
 }
-

@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
-import java.util.List;
 
 public interface AccommodationRepository extends JpaRepository<Accommodation, Long> {
 
@@ -22,12 +21,6 @@ public interface AccommodationRepository extends JpaRepository<Accommodation, Lo
             "ORDER BY a.averageRating DESC, a.reviewCount DESC")
     Page<Accommodation> findAllByStatusWithSorting(@Param("status") AccommodationApplyStatus status, Pageable pageable);
 
-    // 평점순 정렬, 페이지 처리 없음
-    @Query("SELECT a FROM Accommodation a WHERE a.status = :status " +
-            "ORDER BY a.averageRating DESC, a.reviewCount DESC")
-    List<Accommodation> findAllByStatusWithSorting(@Param("status") AccommodationApplyStatus status);
-
-
     // 지역 코드로 숙소 리스트를 가져오는 쿼리 메서드
     Page<Accommodation> findByAreacode(String areacode, Pageable pageable);
 
@@ -37,16 +30,11 @@ public interface AccommodationRepository extends JpaRepository<Accommodation, Lo
             "WHERE a.status = :status " +
             "AND (:areaCode IS NULL OR a.areacode = :areaCode) " +
             "AND r.maxOccupancy >= :numGuests " +
-            "AND EXISTS (" +
-            "  SELECT 1 FROM Room r2 " +
-            "  WHERE r2.accommodation = a " +
-            "  AND r2.maxOccupancy >= :numGuests " +
-            "  AND NOT EXISTS (" +
+            "AND NOT EXISTS (" +
             "    SELECT 1 FROM Reservation res " +
-            "    WHERE res.room = r2 " +
+            "    WHERE res.room IN (SELECT r2 FROM Room r2 WHERE r2.accommodation = a) " +
             "    AND res.checkInDate < :checkOutDate " +
             "    AND res.checkOutDate > :checkInDate" +
-            "  )" +
             ")")
     Page<Accommodation> findAvailableAccommodations(
             @Param("status") AccommodationApplyStatus status,
@@ -63,16 +51,11 @@ public interface AccommodationRepository extends JpaRepository<Accommodation, Lo
             "WHERE a.status = :status " +
             "AND (:areaCode IS NULL OR a.areacode = :areaCode) " +
             "AND r.maxOccupancy >= :numGuests " +
-            "AND EXISTS (" +
-            "  SELECT 1 FROM Room r2 " +
-            "  WHERE r2.accommodation = a " +
-            "  AND r2.maxOccupancy >= :numGuests " +
-            "  AND NOT EXISTS (" +
+            "AND NOT EXISTS (" +
             "    SELECT 1 FROM Reservation res " +
-            "    WHERE res.room = r2 " +
+            "    WHERE res.room IN (SELECT r2 FROM Room r2 WHERE r2.accommodation = a) " +
             "    AND res.checkInDate < :checkOutDate " +
             "    AND res.checkOutDate > :checkInDate" +
-            "  )" +
             ") " +
             "ORDER BY a.averageRating DESC, a.reviewCount DESC")
     Page<Accommodation> findAvailableAccommodationsByAverageRating(
@@ -90,16 +73,11 @@ public interface AccommodationRepository extends JpaRepository<Accommodation, Lo
             "WHERE a.status = :status " +
             "AND (:areaCode IS NULL OR a.areacode = :areaCode) " +
             "AND r.maxOccupancy >= :numGuests " +
-            "AND EXISTS (" +
-            "  SELECT 1 FROM Room r2 " +
-            "  WHERE r2.accommodation = a " +
-            "  AND r2.maxOccupancy >= :numGuests " +
-            "  AND NOT EXISTS (" +
+            "AND NOT EXISTS (" +
             "    SELECT 1 FROM Reservation res " +
-            "    WHERE res.room = r2 " +
+            "    WHERE res.room IN (SELECT r2 FROM Room r2 WHERE r2.accommodation = a) " +
             "    AND res.checkInDate < :checkOutDate " +
             "    AND res.checkOutDate > :checkInDate" +
-            "  )" +
             ") " +
             "ORDER BY a.averagePrice DESC, a.averageRating DESC, a.reviewCount DESC")
     Page<Accommodation> findAvailableAccommodationsOrderByAveragePriceDesc(
@@ -117,16 +95,11 @@ public interface AccommodationRepository extends JpaRepository<Accommodation, Lo
             "WHERE a.status = :status " +
             "AND (:areaCode IS NULL OR a.areacode = :areaCode) " +
             "AND r.maxOccupancy >= :numGuests " +
-            "AND EXISTS (" +
-            "  SELECT 1 FROM Room r2 " +
-            "  WHERE r2.accommodation = a " +
-            "  AND r2.maxOccupancy >= :numGuests " +
-            "  AND NOT EXISTS (" +
+            "AND NOT EXISTS (" +
             "    SELECT 1 FROM Reservation res " +
-            "    WHERE res.room = r2 " +
+            "    WHERE res.room IN (SELECT r2 FROM Room r2 WHERE r2.accommodation = a) " +
             "    AND res.checkInDate < :checkOutDate " +
             "    AND res.checkOutDate > :checkInDate" +
-            "  )" +
             ") " +
             "ORDER BY a.averagePrice ASC, a.averageRating DESC, a.reviewCount DESC")
     Page<Accommodation> findAvailableAccommodationsOrderByAveragePriceAsc(
