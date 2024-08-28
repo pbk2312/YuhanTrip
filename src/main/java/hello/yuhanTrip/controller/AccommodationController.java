@@ -42,16 +42,16 @@ public class AccommodationController {
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 
-
     @GetMapping("/byregion")
     public String listAccommodationsByRegion(Model model,
                                              @RequestParam(value = "region", required = false) String region,
                                              @RequestParam(value = "checkin", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkin,
                                              @RequestParam(value = "checkout", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkout,
                                              @RequestParam(value = "numGuests", required = false) Integer numGuests,
+                                             @RequestParam(value = "title", required = false) String title,
                                              @RequestParam(defaultValue = "0") int page,
                                              @RequestParam(defaultValue = "12") int size,
-                                             @RequestParam(required = false) String sort) {  // sort 파라미터 추가
+                                             @RequestParam(required = false) String sort) {
 
         log.info("지역 코드로 숙소 리스트를 조회합니다. 지역: {}, 페이지: {}, 사이즈: {}, 체크인 날짜: {}, 체크아웃 날짜: {}, 숙박 인원 수: {}, 정렬: {}", region, page, size, checkin, checkout, numGuests, sort);
 
@@ -62,23 +62,10 @@ public class AccommodationController {
         Page<Accommodation> accommodationsPage;
         boolean filterByAvailability = (checkin != null && checkout != null && numGuests != null);
 
-        if (region != null && !region.isEmpty()) {
-            // 지역 코드가 제공된 경우
-            Integer areaCode = RegionCode.getCodeByRegion(region);
-            if (areaCode == null) {
-                log.error("잘못된 지역 이름: {}", region);
-                return "error"; // 잘못된 지역 이름 처리
-            }
+        Integer areaCode = (region != null && !region.isEmpty()) ? RegionCode.getCodeByRegion(region) : null;
 
-            accommodationsPage = fetchAccommodationsWithSortingAndFiltering(
-                    areaCode, filterByAvailability, checkin, checkout, numGuests, page, size, sort);
-
-            model.addAttribute("region", region);
-        } else {
-            // 지역 코드가 제공되지 않은 경우
-            accommodationsPage = fetchAccommodationsWithSortingAndFiltering(
-                    null, filterByAvailability, checkin, checkout, numGuests, page, size, sort);
-        }
+        accommodationsPage = fetchAccommodationsWithSortingAndFiltering(
+                title, areaCode, filterByAvailability, checkin, checkout, numGuests, page, size, sort);
 
         int totalPages = accommodationsPage.getTotalPages();
         int currentPage = page;
@@ -109,8 +96,8 @@ public class AccommodationController {
         return "/accommodation/accommodations"; // 뷰 이름
     }
 
-
-    private Page<Accommodation> fetchAccommodationsWithSortingAndFiltering(Integer areaCode,
+    private Page<Accommodation> fetchAccommodationsWithSortingAndFiltering(String title,
+                                                                           Integer areaCode,
                                                                            boolean filterByAvailability,
                                                                            LocalDate checkin,
                                                                            LocalDate checkout,
@@ -118,72 +105,72 @@ public class AccommodationController {
                                                                            int page,
                                                                            int size,
                                                                            String sort) {
+        Pageable pageable = PageRequest.of(page, size);
+
         if (filterByAvailability) {
             // 체크인, 체크아웃, 게스트 수가 제공된 경우
-            if ("averageRating".equalsIgnoreCase(sort)) {
-                return accommodationService.getAvailableAccommodationsByAverageRating(
-                        areaCode != null ? String.valueOf(areaCode) : null, checkin, checkout, numGuests, page, size);
-            } else if ("priceDesc".equalsIgnoreCase(sort)) {
-                return accommodationService.getAvailableAccommodationsOrderByPriceDesc(
-                        areaCode != null ? String.valueOf(areaCode) : null, checkin, checkout, numGuests, page, size);
-            } else if ("priceAsc".equalsIgnoreCase(sort)) {
-                return accommodationService.getAvailableAccommodationsOrderByPriceAsc(
-                        areaCode != null ? String.valueOf(areaCode) : null, checkin, checkout, numGuests, page, size);
-            } else {
-                return accommodationService.getAvailableAccommodations(
-                        areaCode != null ? String.valueOf(areaCode) : null, checkin, checkout, numGuests, page, size);
+            switch (sort != null ? sort.toLowerCase() : "default") {
+                case "averagerating":
+                    return accommodationService.getAvailableAccommodationsSearchByTitle(
+                            title,
+                            areaCode != null ? String.valueOf(areaCode) : null,
+                            checkin,
+                            checkout,
+                            numGuests,
+                            "RATING", // 정렬 기준 설정
+                            pageable
+                    );
+                case "pricedesc":
+                    return accommodationService.getAvailableAccommodationsSearchByTitle(
+                            title,
+                            areaCode != null ? String.valueOf(areaCode) : null,
+                            checkin,
+                            checkout,
+                            numGuests,
+                            "PRICE_DESC", // 정렬 기준 설정
+                            pageable
+                    );
+                case "priceasc":
+                    return accommodationService.getAvailableAccommodationsSearchByTitle(
+                            title,
+                            areaCode != null ? String.valueOf(areaCode) : null,
+                            checkin,
+                            checkout,
+                            numGuests,
+                            "PRICE_ASC", // 정렬 기준 설정
+                            pageable
+                    );
+                default:
+                    return accommodationService.getAvailableAccommodationsSearchByTitle(
+                            title,
+                            areaCode != null ? String.valueOf(areaCode) : null,
+                            checkin,
+                            checkout,
+                            numGuests,
+                            "DEFAULT", // 기본 정렬 기준 설정
+                            pageable
+                    );
             }
         } else {
             // 필터링 없이 조회 (정렬 적용)
-            if ("averageRating".equalsIgnoreCase(sort)) {
-                return accommodationService.getAvailableAccommodationsSortedByRatingAndReview(PageRequest.of(page, size));
-            } else if ("priceDesc".equalsIgnoreCase(sort)) {
-                return areaCode != null
-                        ? accommodationService.getAllAccommodationsOrderByPriceDesc(page, size)
-                        : accommodationService.getAllAccommodationsOrderByPriceDesc(page, size);
-            } else if ("priceAsc".equalsIgnoreCase(sort)) {
-                return areaCode != null
-                        ? accommodationService.getAllAccommodationsOrderByPriceAsc(page, size)
-                        : accommodationService.getAllAccommodationsOrderByPriceAsc(page, size);
-            } else {
-                return areaCode != null
-                        ? accommodationService.getAccommodationsByAreaCode(String.valueOf(areaCode), page, size)
-                        : accommodationService.getAccommodations(page, size);
+            switch (sort != null ? sort.toLowerCase() : "default") {
+                case "averagerating":
+                    return accommodationService.getAvailableAccommodationsSortedByRatingAndReview(pageable);
+                case "pricedesc":
+                    return areaCode != null
+                            ? accommodationService.getAllAccommodationsOrderByPriceDesc(page, size)
+                            : accommodationService.getAllAccommodationsOrderByPriceDesc(page, size);
+                case "priceasc":
+                    return areaCode != null
+                            ? accommodationService.getAllAccommodationsOrderByPriceAsc(page, size)
+                            : accommodationService.getAllAccommodationsOrderByPriceAsc(page, size);
+                default:
+                    return areaCode != null
+                            ? accommodationService.getAccommodationsByAreaCode(String.valueOf(areaCode), page, size)
+                            : accommodationService.getAccommodations(page, size);
             }
         }
     }
-
-
-    @GetMapping("/info")
-    public String getAccommodationInfo(
-            @RequestParam("id") Long id,
-            @RequestParam(value = "checkin", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkInDate,
-            @RequestParam(value = "checkout", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkOutDate,
-            @RequestParam(value = "numGuests", required = false) Integer numberOfGuests,
-            Model model) {
-
-        log.info("숙소 정보를 가져옵니다... ID: {}", id);
-        log.info("선택 사항 - 체크인 날짜: {}, 체크아웃 날짜: {}, 숙박 인원 수: {}", checkInDate, checkOutDate, numberOfGuests);
-
-        Accommodation accommodation = accommodationService.getAccommodationInfo(id);
-
-        List<Room> availableRooms = (checkInDate == null || checkOutDate == null) ?
-                accommodation.getRooms() :
-                accommodationService.getAvailableRoomsByAccommodation(id, checkInDate, checkOutDate);
-
-        List<Review> reviews = reviewService.getReviewsByAccommodation(id);
-
-
-        model.addAttribute("availableRooms", availableRooms);
-        model.addAttribute("checkin", checkInDate);
-        model.addAttribute("checkout", checkOutDate);
-        model.addAttribute("numGuests", numberOfGuests);
-        model.addAttribute("accommodation", accommodation);
-        model.addAttribute("reviews", reviews);
-
-        return "/accommodation/accommodationInfo";
-    }
-
 
 
     @GetMapping("/search")
@@ -227,6 +214,35 @@ public class AccommodationController {
         return "/accommodation/accommodations"; // 뷰 이름
     }
 
+    @GetMapping("/info")
+    public String getAccommodationInfo(
+            @RequestParam("id") Long id,
+            @RequestParam(value = "checkin", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkInDate,
+            @RequestParam(value = "checkout", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkOutDate,
+            @RequestParam(value = "numGuests", required = false) Integer numberOfGuests,
+            Model model) {
+
+        log.info("숙소 정보를 가져옵니다... ID: {}", id);
+        log.info("선택 사항 - 체크인 날짜: {}, 체크아웃 날짜: {}, 숙박 인원 수: {}", checkInDate, checkOutDate, numberOfGuests);
+
+        Accommodation accommodation = accommodationService.getAccommodationInfo(id);
+
+        List<Room> availableRooms = (checkInDate == null || checkOutDate == null) ?
+                accommodation.getRooms() :
+                accommodationService.getAvailableRoomsByAccommodation(id, checkInDate, checkOutDate);
+
+        List<Review> reviews = reviewService.getReviewsByAccommodation(id);
+
+
+        model.addAttribute("availableRooms", availableRooms);
+        model.addAttribute("checkin", checkInDate);
+        model.addAttribute("checkout", checkOutDate);
+        model.addAttribute("numGuests", numberOfGuests);
+        model.addAttribute("accommodation", accommodation);
+        model.addAttribute("reviews", reviews);
+
+        return "/accommodation/accommodationInfo";
+    }
 
 
     @GetMapping("/reviews/{id}")

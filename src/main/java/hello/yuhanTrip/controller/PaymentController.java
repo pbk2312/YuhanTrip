@@ -34,11 +34,6 @@ public class PaymentController {
     private final ReservationService reservationService;
     private final AccommodationServiceImpl accommodationService;
 
-    @Value("${imp_key}")
-    private String impKey;
-
-    @Value("${imp_secret}")
-    private String impSecret;
 
     @GetMapping("/paymentPage")
     public String paymentPage(

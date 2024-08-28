@@ -33,12 +33,18 @@ public class HomeController {
                            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOutDate,
                            @RequestParam(defaultValue = "1") int numGuests) {
 
-        // Pageable 객체 생성
-        Pageable pageable = PageRequest.of(page, size);
 
-        // 예약 가능한 승인된 숙소 목록을 가져옴
+
+        // 인기 추천 숙소 가져오기
         Page<Accommodation> accommodations = accommodationService.getAvailableAccommodations(
-                areaCode, checkInDate, checkOutDate, numGuests, page, size);
+                areaCode,             // 지역 코드
+                checkInDate,          // 체크인 날짜
+                checkOutDate,         // 체크아웃 날짜
+                numGuests,            // 인원 수
+                page,                 // 페이지 번호
+                size,                 // 페이지 크기
+                "RATING"
+        );
 
         // 모델에 숙소 목록과 페이지 정보를 추가
         model.addAttribute("accommodations", accommodations.getContent());

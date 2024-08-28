@@ -20,11 +20,11 @@ import java.util.*;
 @Service
 @Log4j2
 @RequiredArgsConstructor
-public class AccommodationServiceImpl implements AccommodationService{
+public class AccommodationServiceImpl implements AccommodationService {
     private final AccommodationRepository accommodationRepository;
 
     private final RoomRepository roomRepository;
-    private MemberService memberService;
+    private final MemberService memberService;
     private final AccommodationFactory accommodationFactory; // AccommodationFactory 주입
 
     @JsonIgnore
@@ -67,7 +67,6 @@ public class AccommodationServiceImpl implements AccommodationService{
     }
 
 
-
     /**
      * 승인된 숙소를 페이지네이션하여 반환합니다.
      *
@@ -106,37 +105,27 @@ public class AccommodationServiceImpl implements AccommodationService{
      * @param numGuests    인원 수
      * @param page         페이지 번호
      * @param size         페이지 크기
+     * @param sortBy       정렬 기준 (예: "RATING", "PRICE_DESC", "PRICE_ASC")
      * @return 페이지네이션된 예약 가능한 숙소 목록
      */
-
-
     @Override
     public Page<Accommodation> getAvailableAccommodations(
-            String areaCode, LocalDate checkInDate, LocalDate checkOutDate, int numGuests, int page, int size) {
+            String areaCode, LocalDate checkInDate, LocalDate checkOutDate, int numGuests, int page, int size, String sortBy) {
+        // 페이지 요청을 생성
+        Pageable pageable = PageRequest.of(page, size);
+
+        // 정렬 기준을 추가하여 메서드 호출
         return accommodationRepository.findAvailableAccommodations(
-                AccommodationApplyStatus.APPROVED, areaCode, checkInDate, checkOutDate, numGuests, PageRequest.of(page, size)
+                AccommodationApplyStatus.APPROVED,
+                areaCode,
+                checkInDate,
+                checkOutDate,
+                numGuests,
+                sortBy,
+                pageable
         );
     }
 
-    /**
-     * 평점 순으로 예약 가능한 숙소를 조회합니다.
-     *
-     * @param areaCode     지역 코드
-     * @param checkInDate  체크인 날짜
-     * @param checkOutDate 체크아웃 날짜
-     * @param numGuests    인원 수
-     * @param page         페이지 번호
-     * @param size         페이지 크기
-     * @return 페이지네이션된 평점 순 숙소 목록
-     */
-
-    @Override
-    public Page<Accommodation> getAvailableAccommodationsByAverageRating(
-            String areaCode, LocalDate checkInDate, LocalDate checkOutDate, int numGuests, int page, int size) {
-        return accommodationRepository.findAvailableAccommodationsByAverageRating(
-                AccommodationApplyStatus.APPROVED, areaCode, checkInDate, checkOutDate, numGuests, PageRequest.of(page, size)
-        );
-    }
 
     /**
      * 상태에 따라 숙소를 조회하고, 평점과 리뷰 수로 정렬하여 반환합니다.
@@ -170,46 +159,6 @@ public class AccommodationServiceImpl implements AccommodationService{
         );
     }
 
-    /**
-     * 높은 가격순으로 예약 가능한 숙소를 조회합니다.
-     *
-     * @param areaCode     지역 코드
-     * @param checkInDate  체크인 날짜
-     * @param checkOutDate 체크아웃 날짜
-     * @param numGuests    인원 수
-     * @param page         페이지 번호
-     * @param size         페이지 크기
-     * @return 페이지네이션된 높은 가격순 숙소 목록
-     */
-
-    @Override
-    public Page<Accommodation> getAvailableAccommodationsOrderByPriceDesc(
-            String areaCode, LocalDate checkInDate, LocalDate checkOutDate, int numGuests, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return accommodationRepository.findAvailableAccommodationsOrderByAveragePriceDesc(
-                AccommodationApplyStatus.APPROVED, areaCode, checkInDate, checkOutDate, numGuests, pageable
-        );
-    }
-
-    /**
-     * 낮은 가격순으로 예약 가능한 숙소를 조회합니다.
-     *
-     * @param areaCode     지역 코드
-     * @param checkInDate  체크인 날짜
-     * @param checkOutDate 체크아웃 날짜
-     * @param numGuests    인원 수
-     * @param page         페이지 번호
-     * @param size         페이지 크기
-     * @return 페이지네이션된 낮은 가격순 숙소 목록
-     */
-    @Override
-    public Page<Accommodation> getAvailableAccommodationsOrderByPriceAsc(
-            String areaCode, LocalDate checkInDate, LocalDate checkOutDate, int numGuests, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return accommodationRepository.findAvailableAccommodationsOrderByAveragePriceAsc(
-                AccommodationApplyStatus.APPROVED, areaCode, checkInDate, checkOutDate, numGuests, pageable
-        );
-    }
 
     /**
      * 전체 숙소 중 높은 가격순으로 조회합니다.
@@ -255,5 +204,15 @@ public class AccommodationServiceImpl implements AccommodationService{
     public Page<Accommodation> searchByTitle(String title, Pageable pageable) {
         return accommodationRepository.findByTitleContainingIgnoreCase(title, pageable);
     }
+
+    @Override
+    public Page<Accommodation> getAvailableAccommodationsSearchByTitle(String title, String areaCode,
+                                                                       LocalDate checkInDate, LocalDate checkOutDate, int numGuests,
+                                                                       String sortBy, Pageable pageable) {
+        return accommodationRepository.findByTitleWithFiltersAndSort(title, AccommodationApplyStatus.APPROVED, areaCode, checkInDate, checkOutDate, numGuests, sortBy, pageable);
+
+    }
+
+
 
 }
