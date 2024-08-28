@@ -224,7 +224,6 @@ public class AccommodationServiceImpl implements AccommodationService {
     /**
      * 유형, 지역 코드, 게스트 수, 체크인/체크아웃 날짜, 정렬 기준에 따라 필터링된 숙소를 반환합니다.
      *
-     * @param status       숙소 상태 (예: APPROVED)
      * @param type         숙소 유형 (예: HOTEL, HOSTEL)
      * @param areaCode     지역 코드
      * @param checkInDate  체크인 날짜
@@ -237,7 +236,6 @@ public class AccommodationServiceImpl implements AccommodationService {
      */
     @Override
     public Page<Accommodation> findAvailableAccommodationsByType(
-            AccommodationApplyStatus status,
             AccommodationType type,
             String areaCode,
             LocalDate checkInDate,
@@ -249,7 +247,7 @@ public class AccommodationServiceImpl implements AccommodationService {
     ) {
         Pageable pageable = PageRequest.of(page, size);
         return accommodationRepository.findAvailableAccommodationsByType(
-                status,
+                AccommodationApplyStatus.APPROVED,
                 type,
                 areaCode,
                 checkInDate,

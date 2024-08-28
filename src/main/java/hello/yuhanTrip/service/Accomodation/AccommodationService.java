@@ -48,7 +48,6 @@ public interface AccommodationService {
 
     // 유형, 지역 코드, 게스트 수, 체크인/체크아웃 날짜, 정렬 기준에 따라 필터링된 숙소를 가져오는 메서드
     Page<Accommodation> findAvailableAccommodationsByType(
-            AccommodationApplyStatus status,
             AccommodationType type,
             String areaCode,
             LocalDate checkInDate,

@@ -48,7 +48,6 @@ public class AccommodationController {
                                              @RequestParam(value = "checkin", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkin,
                                              @RequestParam(value = "checkout", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkout,
                                              @RequestParam(value = "numGuests", required = false) Integer numGuests,
-                                             @RequestParam(value = "title", required = false) String title,
                                              @RequestParam(defaultValue = "0") int page,
                                              @RequestParam(defaultValue = "12") int size,
                                              @RequestParam(required = false) String sort) {
@@ -65,7 +64,7 @@ public class AccommodationController {
         Integer areaCode = (region != null && !region.isEmpty()) ? RegionCode.getCodeByRegion(region) : null;
 
         accommodationsPage = fetchAccommodationsWithSortingAndFiltering(
-                title, areaCode, filterByAvailability, checkin, checkout, numGuests, page, size, sort);
+                areaCode, filterByAvailability, checkin, checkout, numGuests, page, size, sort);
 
         int totalPages = accommodationsPage.getTotalPages();
         int currentPage = page;
@@ -96,7 +95,7 @@ public class AccommodationController {
         return "/accommodation/accommodations"; // 뷰 이름
     }
 
-    private Page<Accommodation> fetchAccommodationsWithSortingAndFiltering(String title,
+    private Page<Accommodation> fetchAccommodationsWithSortingAndFiltering(
                                                                            Integer areaCode,
                                                                            boolean filterByAvailability,
                                                                            LocalDate checkin,
