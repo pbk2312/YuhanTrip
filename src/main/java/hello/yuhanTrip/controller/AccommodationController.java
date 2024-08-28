@@ -109,48 +109,15 @@ public class AccommodationController {
 
         if (filterByAvailability) {
             // 체크인, 체크아웃, 게스트 수가 제공된 경우
-            switch (sort != null ? sort.toLowerCase() : "default") {
-                case "averagerating":
-                    return accommodationService.getAvailableAccommodationsSearchByTitle(
-                            title,
-                            areaCode != null ? String.valueOf(areaCode) : null,
-                            checkin,
-                            checkout,
-                            numGuests,
-                            "RATING", // 정렬 기준 설정
-                            pageable
-                    );
-                case "pricedesc":
-                    return accommodationService.getAvailableAccommodationsSearchByTitle(
-                            title,
-                            areaCode != null ? String.valueOf(areaCode) : null,
-                            checkin,
-                            checkout,
-                            numGuests,
-                            "PRICE_DESC", // 정렬 기준 설정
-                            pageable
-                    );
-                case "priceasc":
-                    return accommodationService.getAvailableAccommodationsSearchByTitle(
-                            title,
-                            areaCode != null ? String.valueOf(areaCode) : null,
-                            checkin,
-                            checkout,
-                            numGuests,
-                            "PRICE_ASC", // 정렬 기준 설정
-                            pageable
-                    );
-                default:
-                    return accommodationService.getAvailableAccommodationsSearchByTitle(
-                            title,
-                            areaCode != null ? String.valueOf(areaCode) : null,
-                            checkin,
-                            checkout,
-                            numGuests,
-                            "DEFAULT", // 기본 정렬 기준 설정
-                            pageable
-                    );
-            }
+            return accommodationService.getAvailableAccommodations(
+                    areaCode != null ? String.valueOf(areaCode) : null,
+                    checkin,
+                    checkout,
+                    numGuests,
+                    page,
+                    size,
+                    sort != null ? sort.toUpperCase() : "DEFAULT"
+            );
         } else {
             // 필터링 없이 조회 (정렬 적용)
             switch (sort != null ? sort.toLowerCase() : "default") {

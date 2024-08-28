@@ -205,14 +205,76 @@ public class AccommodationServiceImpl implements AccommodationService {
         return accommodationRepository.findByTitleContainingIgnoreCase(title, pageable);
     }
 
-    @Override
-    public Page<Accommodation> getAvailableAccommodationsSearchByTitle(String title, String areaCode,
-                                                                       LocalDate checkInDate, LocalDate checkOutDate, int numGuests,
-                                                                       String sortBy, Pageable pageable) {
-        return accommodationRepository.findByTitleWithFiltersAndSort(title, AccommodationApplyStatus.APPROVED, areaCode, checkInDate, checkOutDate, numGuests, sortBy, pageable);
 
+    /**
+     * 특정 숙소 유형과 상태로 숙소를 필터링하여 반환합니다.
+     *
+     * @param status  숙소 상태 (예: APPROVED)
+     * @param type    숙소 유형 (예: HOTEL, HOSTEL)
+     * @param page    페이지 번호
+     * @param size    페이지 크기
+     * @return 페이지네이션된 숙소 목록
+     */
+    @Override
+    public Page<Accommodation> getAccommodationsByStatusAndType(AccommodationApplyStatus status, AccommodationType type, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return accommodationRepository.findAllByStatusAndType(status, type, pageable);
     }
 
+    /**
+     * 유형, 지역 코드, 게스트 수, 체크인/체크아웃 날짜, 정렬 기준에 따라 필터링된 숙소를 반환합니다.
+     *
+     * @param status       숙소 상태 (예: APPROVED)
+     * @param type         숙소 유형 (예: HOTEL, HOSTEL)
+     * @param areaCode     지역 코드
+     * @param checkInDate  체크인 날짜
+     * @param checkOutDate 체크아웃 날짜
+     * @param numGuests    게스트 수
+     * @param sortBy       정렬 기준 (예: RATING, PRICE_DESC, PRICE_ASC)
+     * @param page         페이지 번호
+     * @param size         페이지 크기
+     * @return 페이지네이션된 숙소 목록
+     */
+    @Override
+    public Page<Accommodation> findAvailableAccommodationsByType(
+            AccommodationApplyStatus status,
+            AccommodationType type,
+            String areaCode,
+            LocalDate checkInDate,
+            LocalDate checkOutDate,
+            int numGuests,
+            String sortBy,
+            int page,
+            int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return accommodationRepository.findAvailableAccommodationsByType(
+                status,
+                type,
+                areaCode,
+                checkInDate,
+                checkOutDate,
+                numGuests,
+                sortBy,
+                pageable
+        );
+    }
+
+
+    /**
+     * 지역 코드와 숙소 유형으로 필터링하여 숙소 목록을 반환합니다.
+     *
+     * @param areaCode 지역 코드
+     * @param type     숙소 유형 (예: HOTEL, HOSTEL)
+     * @param page     페이지 번호
+     * @param size     페이지 크기
+     * @return 페이지네이션된 숙소 목록
+     */
+    @Override
+    public Page<Accommodation> getAccommodationsByAreaCodeAndType(String areaCode, AccommodationType type, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return accommodationRepository.findByAreacodeAndType(areaCode, type, pageable);
+    }
 
 
 }

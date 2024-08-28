@@ -51,6 +51,9 @@ public class Accommodation {
     @Enumerated(EnumType.STRING)
     private AccommodationApplyStatus status;
 
+    @Enumerated(EnumType.STRING)  // 새로 추가된 부분
+    private AccommodationType type;  // 숙소 유형 (호텔, 모텔, 펜션, 게스트하우스,기타)
+
     @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Room> rooms = new ArrayList<>();
@@ -66,6 +69,28 @@ public class Accommodation {
 
     @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews;  // 추가된 부분
+
+
+    // 새로 추가된 부분: title 필드에 포함된 단어에 따라 type 자동 설정
+    @PrePersist
+    @PreUpdate
+    private void setAccommodationType() {
+        if (this.title != null) {
+            String lowerTitle = this.title.toLowerCase(); // 소문자로 변환하여 비교
+
+            if (lowerTitle.contains("호텔")) {
+                this.type = AccommodationType.HOTEL;
+            } else if (lowerTitle.contains("모텔")) {
+                this.type = AccommodationType.MOTEL;
+            } else if (lowerTitle.contains("펜션")) {
+                this.type = AccommodationType.PENSION;
+            } else if (lowerTitle.contains("게스트하우스")) {
+                this.type = AccommodationType.GUESTHOUSE;
+            } else {
+                this.type = AccommodationType.OTHER; // 기타로 설정
+            }
+        }
+    }
 
 
 

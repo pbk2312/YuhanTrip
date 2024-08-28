@@ -2,6 +2,7 @@ package hello.yuhanTrip.repository;
 
 import hello.yuhanTrip.domain.Accommodation;
 import hello.yuhanTrip.domain.AccommodationApplyStatus;
+import hello.yuhanTrip.domain.AccommodationType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -69,10 +70,23 @@ public interface AccommodationRepository extends JpaRepository<Accommodation, Lo
     // Title로 검색 결과를 페이지네이션하여 반환
     Page<Accommodation> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 
-    @Query("SELECT a FROM Accommodation a " +
+
+    // 특정 숙소 유형(AccommodationType)으로 숙소를 필터링
+    @Query("SELECT a FROM Accommodation a WHERE a.status = :status AND a.type = :type")
+    Page<Accommodation> findAllByStatusAndType(
+            @Param("status") AccommodationApplyStatus status,
+            @Param("type") AccommodationType type,
+            Pageable pageable
+    );
+
+    // 지역 코드와 유형을 기반으로 숙소 리스트를 가져오는 메서드
+    Page<Accommodation> findByAreacodeAndType(String areacode, AccommodationType type, Pageable pageable);
+
+
+    @Query("SELECT DISTINCT a FROM Accommodation a " +
             "JOIN a.rooms r " +
-            "WHERE a.title LIKE %:title% " +
-            "AND a.status = :status " +
+            "WHERE a.status = :status " +
+            "AND a.type = :type " +
             "AND (:areaCode IS NULL OR a.areacode = :areaCode) " +
             "AND r.maxOccupancy >= :numGuests " +
             "AND NOT EXISTS (" +
@@ -82,13 +96,13 @@ public interface AccommodationRepository extends JpaRepository<Accommodation, Lo
             "    AND res.checkOutDate > :checkInDate" +
             ") " +
             "ORDER BY " +
-            "  CASE WHEN :sortBy = 'RATING' THEN a.averageRating END DESC, " +
-            "  CASE WHEN :sortBy = 'RATING' THEN a.reviewCount END DESC, " +
-            "  CASE WHEN :sortBy = 'PRICE_DESC' THEN a.averagePrice END DESC, " +
-            "  CASE WHEN :sortBy = 'PRICE_ASC' THEN a.averagePrice END ASC")
-    Page<Accommodation> findByTitleWithFiltersAndSort(
-            @Param("title") String title,
+            "CASE WHEN :sortBy = 'RATING' THEN a.averageRating END DESC, " +
+            "CASE WHEN :sortBy = 'RATING' THEN a.reviewCount END DESC, " +
+            "CASE WHEN :sortBy = 'PRICE_DESC' THEN a.averagePrice END DESC, " +
+            "CASE WHEN :sortBy = 'PRICE_ASC' THEN a.averagePrice END ASC")
+    Page<Accommodation> findAvailableAccommodationsByType(
             @Param("status") AccommodationApplyStatus status,
+            @Param("type") AccommodationType type,
             @Param("areaCode") String areaCode,
             @Param("checkInDate") LocalDate checkInDate,
             @Param("checkOutDate") LocalDate checkOutDate,
