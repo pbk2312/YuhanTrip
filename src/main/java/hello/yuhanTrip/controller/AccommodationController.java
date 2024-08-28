@@ -42,29 +42,47 @@ public class AccommodationController {
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 
+
     @GetMapping("/byregion")
     public String listAccommodationsByRegion(Model model,
                                              @RequestParam(value = "region", required = false) String region,
                                              @RequestParam(value = "checkin", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkin,
                                              @RequestParam(value = "checkout", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkout,
+                                             @RequestParam(value = "type", required = false) AccommodationType type, // 숙소 유형 추가
                                              @RequestParam(value = "numGuests", required = false) Integer numGuests,
                                              @RequestParam(defaultValue = "0") int page,
                                              @RequestParam(defaultValue = "12") int size,
                                              @RequestParam(required = false) String sort) {
 
-        log.info("지역 코드로 숙소 리스트를 조회합니다. 지역: {}, 페이지: {}, 사이즈: {}, 체크인 날짜: {}, 체크아웃 날짜: {}, 숙박 인원 수: {}, 정렬: {}", region, page, size, checkin, checkout, numGuests, sort);
+        log.info("지역 코드로 숙소 리스트를 조회합니다. 지역: {}, 페이지: {}, 사이즈: {}, 체크인 날짜: {}, 체크아웃 날짜: {}, 숙박 인원 수: {}, 정렬: {}, 타입 : {} ", region, page, size, checkin, checkout, numGuests, sort, type);
 
         // 페이지 번호와 사이즈 검증
         page = Math.max(page, 0);
         size = Math.max(size, 1);
 
-        Page<Accommodation> accommodationsPage;
-        boolean filterByAvailability = (checkin != null && checkout != null && numGuests != null);
-
         Integer areaCode = (region != null && !region.isEmpty()) ? RegionCode.getCodeByRegion(region) : null;
 
-        accommodationsPage = fetchAccommodationsWithSortingAndFiltering(
-                areaCode, filterByAvailability, checkin, checkout, numGuests, page, size, sort);
+        Page<Accommodation> accommodationsPage;
+
+        // 필터링과 정렬을 기반으로 메소드를 호출
+        if (type != null && checkin == null && checkout == null && numGuests == null && areaCode == null) {
+            // 숙소 유형만 제공된 경우
+            accommodationsPage = accommodationService.getAccommodationsByStatusAndType(
+                    type,
+                    page,
+                    size
+            );
+        } else if (checkin != null && checkout != null && numGuests != null && type != null) {
+            // 체크인, 체크아웃, 게스트 수, 숙소 유형이 제공된 경우
+            accommodationsPage = fetchAccommodationsWithSortingAndFiltering(
+                    type, areaCode, true, checkin, checkout, numGuests, page, size, sort
+            );
+        } else {
+            // 필터링 없이 조회 (정렬 적용)
+            accommodationsPage = fetchAccommodationsWithSortingAndFiltering(
+                    type, areaCode, false, checkin, checkout, numGuests, page, size, sort
+            );
+        }
 
         int totalPages = accommodationsPage.getTotalPages();
         int currentPage = page;
@@ -89,33 +107,34 @@ public class AccommodationController {
         model.addAttribute("numGuests", numGuests);
         model.addAttribute("sort", sort);
         model.addAttribute("searchType", "region");
-
+        model.addAttribute("type", type != null ? type.name() : "");  // type 값을 영어 문자열로 설정
         log.info("현재 페이지: {}, 전체 페이지: {}, 시작 페이지: {}, 끝 페이지: {}", currentPage, totalPages, startPage, endPage);
 
         return "/accommodation/accommodations"; // 뷰 이름
     }
-
     private Page<Accommodation> fetchAccommodationsWithSortingAndFiltering(
-                                                                           Integer areaCode,
-                                                                           boolean filterByAvailability,
-                                                                           LocalDate checkin,
-                                                                           LocalDate checkout,
-                                                                           Integer numGuests,
-                                                                           int page,
-                                                                           int size,
-                                                                           String sort) {
+            AccommodationType type,
+            Integer areaCode,
+            boolean filterByAvailability,
+            LocalDate checkin,
+            LocalDate checkout,
+            Integer numGuests,
+            int page,
+            int size,
+            String sort) {
         Pageable pageable = PageRequest.of(page, size);
 
         if (filterByAvailability) {
-            // 체크인, 체크아웃, 게스트 수가 제공된 경우
-            return accommodationService.getAvailableAccommodations(
+            // 체크인, 체크아웃, 게스트 수, 숙소 유형이 제공된 경우
+            return accommodationService.findAvailableAccommodationsByType(
+                    type,
                     areaCode != null ? String.valueOf(areaCode) : null,
                     checkin,
                     checkout,
                     numGuests,
+                    sort != null ? sort.toUpperCase() : "DEFAULT",
                     page,
-                    size,
-                    sort != null ? sort.toUpperCase() : "DEFAULT"
+                    size
             );
         } else {
             // 필터링 없이 조회 (정렬 적용)
@@ -137,7 +156,6 @@ public class AccommodationController {
             }
         }
     }
-
 
     @GetMapping("/search")
     public String searchByTitle(

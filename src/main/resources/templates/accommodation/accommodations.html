@@ -294,9 +294,21 @@
                            th:value="${numGuests != null ? numGuests : 1}">
                 </div>
 
+
+                <div class="form-group">
+                    <label for="type">숙소 유형</label>
+                    <select id="type" name="type" class="form-control">
+                        <option value="">전체보기</option>
+                        <option value="HOTEL" th:selected="${type == 'HOTEL'}">호텔</option>
+                        <option value="MOTEL" th:selected="${type == 'MOTEL'}">모텔</option>
+                        <option value="PENSION" th:selected="${type == 'PENSION'}">펜션</option>
+                        <option value="GUESTHOUSE" th:selected="${type == 'GUESTHOUSE'}">게스트하우스</option>
+                        <option value="OTHER" th:selected="${type == 'OTHER'}">기타</option>
+                    </select>
+                </div>
+
                 <button type="submit" class="btn btn-primary mt-2">검색</button>
             </form>
-
 
 
             <div class="accommodation-container">
@@ -359,43 +371,13 @@
             <!-- 조건에 따라 다른 페이지 네비게이션 표시 -->
             <nav class="mt-4">
                 <ul class="pagination justify-content-center">
-                    <!-- 제목 검색일 때의 페이지 네비게이션 -->
-                    <li th:if="${searchType == 'title'}">
-                        <ul class="pagination justify-content-center">
-                            <!-- Previous button -->
-                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                                <a class="page-link page-link-lg"
-                                   th:href="@{'/accommodation/search'(title=${title}, page=${currentPage - 1}, size=${pageSize})}">
-                                    <span aria-hidden="true">&laquo;</span>
-                                </a>
-                            </li>
-
-                            <!-- Page numbers -->
-                            <li class="page-item" th:each="i : ${#numbers.sequence(startPage, endPage)}"
-                                th:classappend="${i == currentPage} ? 'active'">
-                                <a class="page-link page-link-lg"
-                                   th:href="@{'/accommodation/search'(title=${title}, page=${i}, size=${pageSize})}">
-                                    <span th:text="${i + 1}">1</span>
-                                </a>
-                            </li>
-
-                            <!-- Next button -->
-                            <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
-                                <a class="page-link page-link-lg"
-                                   th:href="@{'/accommodation/search'(title=${title}, page=${currentPage + 1}, size=${pageSize})}">
-                                    <span aria-hidden="true">&raquo;</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-
                     <!-- 지역 검색일 때의 페이지 네비게이션 -->
                     <li th:if="${searchType == 'region'}">
                         <ul class="pagination justify-content-center">
                             <!-- Previous button -->
                             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
                                 <a class="page-link page-link-lg"
-                                   th:href="@{'/accommodation/byregion'(region=${region}, checkin=${checkin}, checkout=${checkout}, numGuests=${numGuests}, sort=${sort}, page=${currentPage - 1}, size=${pageSize})}">
+                                   th:href="@{'/accommodation/byregion'(region=${region}, checkin=${checkin}, checkout=${checkout}, numGuests=${numGuests}, type=${type}, sort=${sort}, page=${currentPage - 1}, size=${pageSize})}">
                                     <span aria-hidden="true">&laquo;</span>
                                 </a>
                             </li>
@@ -404,7 +386,7 @@
                             <li class="page-item" th:each="i : ${#numbers.sequence(startPage, endPage)}"
                                 th:classappend="${i == currentPage} ? 'active'">
                                 <a class="page-link page-link-lg"
-                                   th:href="@{'/accommodation/byregion'(region=${region}, checkin=${checkin}, checkout=${checkout}, numGuests=${numGuests}, sort=${sort}, page=${i}, size=${pageSize})}">
+                                   th:href="@{'/accommodation/byregion'(region=${region}, checkin=${checkin}, checkout=${checkout}, numGuests=${numGuests}, type=${type}, sort=${sort}, page=${i}, size=${pageSize})}">
                                     <span th:text="${i + 1}">1</span>
                                 </a>
                             </li>
@@ -412,7 +394,7 @@
                             <!-- Next button -->
                             <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
                                 <a class="page-link page-link-lg"
-                                   th:href="@{'/accommodation/byregion'(region=${region}, checkin=${checkin}, checkout=${checkout}, numGuests=${numGuests}, sort=${sort}, page=${currentPage + 1}, size=${pageSize})}">
+                                   th:href="@{'/accommodation/byregion'(region=${region}, checkin=${checkin}, checkout=${checkout}, numGuests=${numGuests}, type=${type}, sort=${sort}, page=${currentPage + 1}, size=${pageSize})}">
                                     <span aria-hidden="true">&raquo;</span>
                                 </a>
                             </li>

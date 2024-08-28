@@ -41,7 +41,7 @@ public interface AccommodationService {
 
 
     // 특정 숙소 유형(AccommodationType)으로 숙소를 필터링하는 메서드
-    Page<Accommodation> getAccommodationsByStatusAndType(AccommodationApplyStatus status, AccommodationType type, int page, int size);
+    Page<Accommodation> getAccommodationsByStatusAndType(AccommodationType type, int page, int size);
 
     // 지역 코드와 유형을 기반으로 숙소 리스트를 가져오는 메서드
     Page<Accommodation> getAccommodationsByAreaCodeAndType(String areaCode, AccommodationType type, int page, int size);

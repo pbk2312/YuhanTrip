@@ -386,52 +386,80 @@
             <button type="submit" class="btn btn-primary">검색</button>
         </form>
 
-    <!-- 숙소 목록 표시 영역 -->
-    <div class="accommodations-container bg-white p-4 rounded">
-        <!-- 숙소 유형 선택 -->
-        <section class="accommodation-selection">
-            <div class="selection-wrapper">
-                <div class="selection-container">
-                    <div class="selection">
-                        <a href="/accommodation/search?title=호텔">
-                            <div class="highlight-card">
-                                <div class="icon-container">
-                                    <i class="bi bi-building"></i>
+        <!-- 숙소 목록 표시 영역 -->
+        <div class="accommodations-container bg-white p-4 rounded">
+            <!-- 숙소 유형 선택 -->
+            <section class="accommodation-selection">
+                <div class="selection-wrapper">
+                    <div class="selection-container">
+                        <div class="selection">
+                            <a href="/accommodation/byregion?type=HOTEL">
+                                <div class="highlight-card">
+                                    <div class="icon-container">
+                                        <i class="bi bi-building"></i>
+                                    </div>
+                                    <div class="details">
+                                        <p>호텔</p>
+                                    </div>
                                 </div>
-                                <div class="details">
-                                    <p>호텔</p>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
+                            </a>
+                        </div>
 
-                    <div class="selection">
-                        <a href="/accommodation/search?title=모텔">
-                            <div class="highlight-card">
-                                <div class="icon-container">
-                                    <i class="bi bi-house-door"></i>
+                        <div class="selection">
+                            <a href="/accommodation/byregion?type=MOTEL">
+                                <div class="highlight-card">
+                                    <div class="icon-container">
+                                        <i class="bi bi-house-door"></i>
+                                    </div>
+                                    <div class="details">
+                                        <p>모텔</p>
+                                    </div>
                                 </div>
-                                <div class="details">
-                                    <p>모텔</p>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
+                            </a>
+                        </div>
 
-                    <div class="selection">
-                        <a href="/accommodation/search?title=펜션">
-                            <div class="highlight-card">
-                                <div class="icon-container">
-                                    <i class="bi bi-tree"></i>
+                        <div class="selection">
+                            <a href="/accommodation/byregion?type=PENSION">
+                                <div class="highlight-card">
+                                    <div class="icon-container">
+                                        <i class="bi bi-tree"></i>
+                                    </div>
+                                    <div class="details">
+                                        <p>펜션</p>
+                                    </div>
                                 </div>
-                                <div class="details">
-                                    <p>펜션</p>
+                            </a>
+                        </div>
+
+                        <div class="selection">
+                            <a href="/accommodation/byregion?type=GUESTHOUSE">
+                                <div class="highlight-card">
+                                    <div class="icon-container">
+                                        <i class="bi bi-house"></i>
+                                    </div>
+                                    <div class="details">
+                                        <p>게스트하우스</p>
+                                    </div>
                                 </div>
-                            </div>
-                        </a>
+                            </a>
+                        </div>
+
+                        <div class="selection">
+                            <a href="/accommodation/byregion?type=OTHER">
+                                <div class="highlight-card">
+                                    <div class="icon-container">
+                                        <i class="bi bi-box"></i>
+                                    </div>
+                                    <div class="details">
+                                        <p>기타</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </section>
+        </div>
         </section>
         <div class="section-header d-flex justify-content-between align-items-center">
             <h2 class="section-title">인기 추천 숙소</h2>
@@ -466,7 +494,7 @@
             </div>
         </div>
     </div>
-    </div>
+</div>
 </div>
 <!-- jQuery, Popper.js, and Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

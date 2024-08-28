@@ -209,16 +209,15 @@ public class AccommodationServiceImpl implements AccommodationService {
     /**
      * 특정 숙소 유형과 상태로 숙소를 필터링하여 반환합니다.
      *
-     * @param status  숙소 상태 (예: APPROVED)
      * @param type    숙소 유형 (예: HOTEL, HOSTEL)
      * @param page    페이지 번호
      * @param size    페이지 크기
      * @return 페이지네이션된 숙소 목록
      */
     @Override
-    public Page<Accommodation> getAccommodationsByStatusAndType(AccommodationApplyStatus status, AccommodationType type, int page, int size) {
+    public Page<Accommodation> getAccommodationsByStatusAndType(AccommodationType type, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return accommodationRepository.findAllByStatusAndType(status, type, pageable);
+        return accommodationRepository.findAllByStatusAndType(AccommodationApplyStatus.APPROVED, type, pageable);
     }
 
     /**
