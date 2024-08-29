@@ -43,8 +43,6 @@ public interface AccommodationService {
     // 특정 숙소 유형(AccommodationType)으로 숙소를 필터링하는 메서드
     Page<Accommodation> getAccommodationsByStatusAndType(AccommodationType type, int page, int size);
 
-    // 지역 코드와 유형을 기반으로 숙소 리스트를 가져오는 메서드
-    Page<Accommodation> getAccommodationsByAreaCodeAndType(String areaCode, AccommodationType type, int page, int size);
 
     // 유형, 지역 코드, 게스트 수, 체크인/체크아웃 날짜, 정렬 기준에 따라 필터링된 숙소를 가져오는 메서드
     Page<Accommodation> findAvailableAccommodationsByType(
@@ -58,6 +56,7 @@ public interface AccommodationService {
             int size
     );
 
+    Page<Accommodation> getPendingAccommodations(Pageable pageable);
 
-
+    void approveAccommodation(Long id);
 }

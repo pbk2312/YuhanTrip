@@ -32,7 +32,7 @@ public class RoleChangeRequestService {
     private String uploadDir;
 
     @Transactional
-    public void requestRoleChange(Member member, MultipartFile file) {
+    public void requestRoleChange(Member member, MultipartFile file,String accommodationTitle,String accommodationDescription) {
 
         // 중복 요청 방지 로직 추가
         if (roleChangeRequestRepository.existsByMemberAndRequestedRoleAndStatus(
@@ -46,6 +46,8 @@ public class RoleChangeRequestService {
         // 역할 변경 요청 생성 및 저장
         RoleChangeRequest roleChangeRequest = RoleChangeRequest.builder()
                 .requestedRole(MemberRole.ROLE_HOST)
+                .accommodationTitle(accommodationTitle)
+                .accommodationDescription(accommodationDescription)
                 .requestDate(LocalDateTime.now())
                 .status(RequestStatus.PENDING)
                 .member(member)
@@ -104,4 +106,10 @@ public class RoleChangeRequestService {
         request.setRejectionReason(rejectionReason);
         roleChangeRequestRepository.save(request);
     }
+
+    public RoleChangeRequest getRequestById(Long id) {
+        return roleChangeRequestRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("요청을 찾을 수 없습니다."));
+    }
+
 }

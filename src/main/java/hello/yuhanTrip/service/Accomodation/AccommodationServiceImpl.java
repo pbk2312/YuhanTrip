@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -258,20 +259,15 @@ public class AccommodationServiceImpl implements AccommodationService {
     }
 
 
-    /**
-     * 지역 코드와 숙소 유형으로 필터링하여 숙소 목록을 반환합니다.
-     *
-     * @param areaCode 지역 코드
-     * @param type     숙소 유형 (예: HOTEL, HOSTEL)
-     * @param page     페이지 번호
-     * @param size     페이지 크기
-     * @return 페이지네이션된 숙소 목록
-     */
-    @Override
-    public Page<Accommodation> getAccommodationsByAreaCodeAndType(String areaCode, AccommodationType type, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return accommodationRepository.findByAreacodeAndType(areaCode, type, pageable);
+    public Page<Accommodation> getPendingAccommodations(Pageable pageable) {
+        return accommodationRepository.findAllByStatus(AccommodationApplyStatus.PENDING, pageable);
     }
 
-
+    @Transactional
+    public void approveAccommodation(Long id) {
+        Accommodation accommodation = accommodationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("숙소를 찾을 수 없습니다."));
+        accommodation.setStatus(AccommodationApplyStatus.APPROVED);
+        accommodationRepository.save(accommodation);
+    }
 }

@@ -4,6 +4,7 @@ import hello.yuhanTrip.domain.Accommodation;
 import hello.yuhanTrip.domain.Member;
 import hello.yuhanTrip.domain.Reservation;
 import hello.yuhanTrip.domain.Room;
+import hello.yuhanTrip.domain.admin.RoleChangeRequest;
 import hello.yuhanTrip.dto.MypageMemberDTO;
 import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.service.Accomodation.AccommodationServiceImpl;
@@ -13,6 +14,7 @@ import hello.yuhanTrip.service.RoleChangeRequestService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.boot.Banner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -281,7 +283,10 @@ public class MypageController {
     @PostMapping("/roleChangeRequest")
     public ResponseEntity<String> roleChangeRequest(
             @CookieValue(value = "accessToken", required = false) String accessToken,
-            @RequestParam("file") MultipartFile file
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("accommodationTitle") String accommodationTitle,
+            @RequestParam("accommodationDescription") String accommodationDescription
+
     ) {
         if (validateAccessToken(accessToken) != null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -301,7 +306,7 @@ public class MypageController {
         }
 
         try {
-            roleChangeRequestService.requestRoleChange(member, file);
+            roleChangeRequestService.requestRoleChange(member, file, accommodationTitle, accommodationDescription);
             return ResponseEntity.ok("역할 변경 요청이 성공적으로 제출되었습니다.");
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -317,5 +322,33 @@ public class MypageController {
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
+    }
+
+    @GetMapping("/roleChangeRequestList")
+    public String roleChangeRequestList(
+            @CookieValue(value = "accessToken", required = false) String accessToken,
+            @RequestParam("id") Long id,
+            Model model
+    ) {
+        if (validateAccessToken(accessToken) != null) {
+            return "redirect:/login";
+        }
+
+        UserDetails userDetails = getUserDetails(accessToken);
+        if (userDetails == null) {
+            return "redirect:/login";
+        }
+
+        Member member = findMemberByEmail(userDetails.getUsername());
+        if (member == null) {
+            return "redirect:/error";
+        }
+
+        RoleChangeRequest request = roleChangeRequestService.getRequestById(id);
+
+        model.addAttribute("request", request);
+
+        return "/mypage/roleChangeRequestList";
+
     }
 }

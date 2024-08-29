@@ -2,10 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>관리자 페이지</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        h2 {
+            margin-top: 40px;
+        }
+    </style>
 </head>
 <body>
-<h1>호스트 승급 요청 관리</h1>
+
+<h1>관리자 페이지</h1>
+
+<h2>호스트 승급 요청 관리</h2>
 <table>
     <thead>
     <tr>
@@ -14,6 +38,7 @@
         <th>요청 역할</th>
         <th>상태</th>
         <th>요청 일자</th>
+        <th>첨부 파일</th>
         <th>승인</th>
         <th>거절</th>
     </tr>
@@ -26,18 +51,53 @@
         <td th:text="${request.status}"></td>
         <td th:text="${request.requestDate}"></td>
         <td>
-            <form th:action="@{/admin/request/{id}/approve(request.id)}" method="post">
+            <a th:if="${request.attachmentFilePath != null}" th:href="@{/admin/request/file/{id}(id=${request.id})}" th:text="${request.attachmentFileName}"></a>
+        </td>
+        <td>
+            <form th:action="@{/admin/request/approve}" method="post">
+                <input type="hidden" name="id" th:value="${request.id}"/>
                 <button type="submit">승인</button>
             </form>
         </td>
         <td>
-            <form th:action="@{/admin/request/{id}/reject(request.id)}" method="post">
-                <input type="text" name="rejectionReason" placeholder="거절 사유" required>
+            <form th:action="@{/admin/request/reject}" method="post">
+                <input type="hidden" name="id" th:value="${request.id}"/>
+                <input type="text" name="rejectionReason" placeholder="거절 사유" required/>
                 <button type="submit">거절</button>
             </form>
         </td>
     </tr>
     </tbody>
 </table>
+
+<h2>승인 대기 중인 숙소 목록</h2>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>제목</th>
+        <th>주소</th>
+        <th>상태</th>
+        <th>등록일</th>
+        <th>승인</th> <!-- 승인 버튼 추가 -->
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="accommodation : ${accommodations.content}">
+        <td th:text="${accommodation.id}"></td>
+        <td th:text="${accommodation.title}"></td>
+        <td th:text="${accommodation.addr1} + ' ' + ${accommodation.addr2}"></td>
+        <td th:text="${accommodation.status}"></td>
+        <td th:text="${accommodation.createdtime}"></td>
+        <td>
+            <form th:action="@{/admin/accommodation/approve}" method="post">
+                <input type="hidden" name="id" th:value="${accommodation.id}"/>
+                <button type="submit">승인</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
 </body>
 </html>
