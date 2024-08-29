@@ -54,79 +54,43 @@
         }
 
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
+            max-width: 1800px; /* 최대 너비를 1800px로 설정 */
+            width: 100%; /* 100% 너비로 설정 */
+            margin: 0 auto; /* 중앙 정렬 */
+            padding: 0 15px; /* 좌우에 패딩 추가 */
         }
 
-        /* 검색 폼 */
-        .search-form-container {
-            position: relative;
-            background: url('/beach-1836335_1280.jpg') no-repeat center center;
-            background-size: cover;
-            border-radius: 8px;
-            padding: 20px;
-            margin-top: 60px; /* 네비게이션 바와의 간격 조정 */
-            margin-bottom: 40px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
 
-        .search-form-header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .search-form-header h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #fff; /* 흰색으로 변경 */
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .search-form-header span {
-            color: #fff; /* 흰색으로 변경 */
-            font-size: 2.5rem;
-            text-transform: uppercase;
-        }
-
-        .search-form {
-            background: #fff; /* 흰색 배경으로 변경 */
-            padding: 20px; /* 여백 추가 */
-            border-radius: 8px; /* 모서리 둥글게 */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 그림자 추가 */
+        .form-horizontal {
             display: flex;
             flex-wrap: wrap;
-            gap: 15px;
-            align-items: center;
+            gap: 20px; /* 요소 간 간격 */
+            align-items: center; /* 세로 중앙 정렬 */
+            background: rgba(255, 255, 255, 0.8); /* 배경색 */
+            padding: 20px; /* 패딩 추가 */
+            border-radius: 15px; /* 둥근 모서리 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 박스 그림자 */
+            margin: 20px; /* 외부 간격 */
         }
 
-        .search-form .form-group {
-            flex: 1 1 200px; /* 폼 요소들이 적절히 정렬되도록 설정 */
+        .form-horizontal .form-group {
+            flex: 1; /* 모든 폼 그룹을 동일한 공간으로 설정 */
+            min-width: 150px; /* 각 항목의 최소 너비 */
         }
 
-        .search-form label {
-            font-weight: 500;
-            color: #00aaff; /* 하늘색으로 변경 */
+        .form-horizontal button {
+            flex: 0 0 auto; /* 버튼의 크기를 고정 */
+            margin-left: auto; /* 버튼을 오른쪽으로 정렬 */
+            background-color: #007bff; /* 버튼 배경색 */
+            color: white; /* 버튼 텍스트 색상 */
+            padding: 10px 20px; /* 버튼 패딩 */
+            border: none; /* 버튼 테두리 제거 */
+            border-radius: 5px; /* 버튼 모서리 둥글게 */
+            cursor: pointer; /* 마우스 포인터 변경 */
         }
 
-        .search-form .form-control {
-            border-radius: 4px;
-        }
-
-        .search-form .btn {
-            width: 100%; /* 버튼이 폼의 너비에 맞게 조정 */
-            border-radius: 4px;
-            flex: 0 0 auto;
-            align-self: flex-start;
-            margin-top: 10px; /* 버튼과 폼 요소 간의 간격 추가 */
-        }
-
-        .search-form-overlay h2 {
-            margin-bottom: 20px;
-            font-size: 2rem;
-            font-weight: 700;
-            color: #333;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+        .form-horizontal button:hover {
+            background-color: #0056b3; /* 버튼 호버 배경색 */
         }
 
         .section-header {
@@ -294,8 +258,6 @@
             font-size: 18px;
             font-weight: bold;
         }
-
-
     </style>
 
 </head>
@@ -310,7 +272,7 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
                 <li class="nav-item"><a class="nav-link active" aria-current="page" href="/home/homepage">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
+                <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
                        data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
@@ -319,9 +281,7 @@
                         <li>
                             <hr class="dropdown-divider"/>
                         </li>
-                        <li><a class="dropdown-item" href="/accommodation/byregion?sort=averageRating">Popular Items</a>
-                        </li>
-                        <li><a class="dropdown-item" href="#!">New Arrivals</a></li>
+                        <li><a class="dropdown-item" href="/accommodation/byregion?sort=averageRating">Popular Items</a></li>
                     </ul>
                 </li>
             </ul>
@@ -337,61 +297,69 @@
 </nav>
 
 <div class="container">
-    <!-- 검색 폼 -->
-    <div class="search-form-container">
-        <div class="search-form-header">
-            <h1>놀러갈때는 <span>YuhanTrip</span></h1>
-        </div>
-
-        <form class="search-form" action="/accommodation/byregion" method="GET">
+    <div class="search-form-container" style="margin-bottom: 40px;">
+        <form action="/accommodation/byregion" method="get" class="mb-4 form-horizontal">
             <div class="form-group">
                 <label for="region">지역 선택</label>
-                <select id="region" name="region" class="form-control">
+                <select id="region" name="region" class="form-control" th:value="${region}">
                     <option value="">모든 지역</option>
-                    <option value="Seoul">서울</option>
-                    <option value="Incheon">인천</option>
-                    <option value="Daejeon">대전</option>
-                    <option value="Daegu">대구</option>
-                    <option value="Gwangju">광주</option>
-                    <option value="Busan">부산</option>
-                    <option value="Ulsan">울산</option>
-                    <option value="Sejong">세종</option>
-                    <option value="Gyeonggi">경기</option>
-                    <option value="Gangwon">강원</option>
-                    <option value="Chungbuk">충북</option>
-                    <option value="Chungnam">충남</option>
-                    <option value="Gyeongbuk">경북</option>
-                    <option value="Gyeongnam">경남</option>
-                    <option value="Jeonbuk">전북</option>
-                    <option value="Jeonnam">전남</option>
-                    <option value="Jeju">제주</option>
+                    <option value="Seoul" th:selected="${region == 'Seoul'}">서울</option>
+                    <option value="Incheon" th:selected="${region == 'Incheon'}">인천</option>
+                    <option value="Daejeon" th:selected="${region == 'Daejeon'}">대전</option>
+                    <option value="Daegu" th:selected="${region == 'Daegu'}">대구</option>
+                    <option value="Gwangju" th:selected="${region == 'Gwangju'}">광주</option>
+                    <option value="Busan" th:selected="${region == 'Busan'}">부산</option>
+                    <option value="Ulsan" th:selected="${region == 'Ulsan'}">울산</option>
+                    <option value="Sejong" th:selected="${region == 'Sejong'}">세종</option>
+                    <option value="Gyeonggi" th:selected="${region == 'Gyeonggi'}">경기</option>
+                    <option value="Gangwon" th:selected="${region == 'Gangwon'}">강원</option>
+                    <option value="Chungbuk" th:selected="${region == 'Chungbuk'}">충북</option>
+                    <option value="Chungnam" th:selected="${region == 'Chungnam'}">충남</option>
+                    <option value="Gyeongbuk" th:selected="${region == 'Gyeongbuk'}">경북</option>
+                    <option value="Gyeongnam" th:selected="${region == 'Gyeongnam'}">경남</option>
+                    <option value="Jeonbuk" th:selected="${region == 'Jeonbuk'}">전북</option>
+                    <option value="Jeonnam" th:selected="${region == 'Jeonnam'}">전남</option>
+                    <option value="Jeju" th:selected="${region == 'Jeju'}">제주</option>
                 </select>
             </div>
 
             <div class="form-group">
                 <label for="checkin">체크인 날짜</label>
-                <input type="date" id="checkin" name="checkin" class="form-control">
+                <input type="date" id="checkin" name="checkin" class="form-control" th:value="${checkin}" required>
             </div>
 
             <div class="form-group">
                 <label for="checkout">체크아웃 날짜</label>
-                <input type="date" id="checkout" name="checkout" class="form-control">
+                <input type="date" id="checkout" name="checkout" class="form-control" th:value="${checkout}" required>
             </div>
 
             <div class="form-group">
                 <label for="numGuests">숙박 인원수</label>
-                <input type="number" id="numGuests" name="numGuests" class="form-control" min="1" max="10" value="1">
+                <input type="number" id="numGuests" name="numGuests" class="form-control" min="1" max="10" th:value="${numGuests != null ? numGuests : 1}">
             </div>
 
-            <button type="submit" class="btn btn-primary">검색</button>
+            <div class="form-group">
+                <label for="type">숙소 유형</label>
+                <select id="type" name="type" class="form-control">
+                    <option value="">전체보기</option>
+                    <option value="HOTEL" th:selected="${type == 'HOTEL'}">호텔</option>
+                    <option value="MOTEL" th:selected="${type == 'MOTEL'}">모텔</option>
+                    <option value="PENSION" th:selected="${type == 'PENSION'}">펜션</option>
+                    <option value="GUESTHOUSE" th:selected="${type == 'GUESTHOUSE'}">게스트하우스</option>
+                    <option value="OTHER" th:selected="${type == 'OTHER'}">기타</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-2">검색</button>
         </form>
+    </div>
+
 
         <!-- 숙소 목록 표시 영역 -->
         <div class="accommodations-container bg-white p-4 rounded">
-            <!-- 숙소 유형 선택 -->
-            <section class="accommodation-selection">
+            <section class="accommodation-selection"  style="margin-bottom: 40px;">
                 <div class="selection-wrapper">
-                    <div class="selection-container">
+                    <div class="selection-container" style="display: flex; justify-content: space-between; gap: 20px;">
                         <div class="selection">
                             <a href="/accommodation/byregion?type=HOTEL">
                                 <div class="highlight-card">
@@ -459,8 +427,7 @@
                     </div>
                 </div>
             </section>
-        </div>
-        </section>
+
         <div class="section-header d-flex justify-content-between align-items-center">
             <h2 class="section-title">인기 추천 숙소</h2>
             <!-- 전체보기 버튼 -->
@@ -495,7 +462,7 @@
         </div>
     </div>
 </div>
-</div>
+
 <!-- jQuery, Popper.js, and Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>

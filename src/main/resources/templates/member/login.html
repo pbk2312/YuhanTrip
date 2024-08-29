@@ -70,7 +70,7 @@
 
         .form-control {
             border-radius: 10px;
-            padding: 10px;
+            padding: 15px;
             background-color: rgba(255, 255, 255, 0.8);
             border: none;
         }
@@ -82,7 +82,7 @@
         .btn-primary {
             background-color: #007bff;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 30px;
             border-radius: 30px;
             font-size: 1rem;
             transition: background-color 0.3s ease;
@@ -126,6 +126,19 @@
             outline: none;
             box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5);
         }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group input {
+            width: 100%;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: flex-end;
+        }
     </style>
 </head>
 <body>
@@ -140,17 +153,16 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
                 <li class="nav-item"><a class="nav-link active" aria-current="page" href="/home/homepage">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
+                <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
                        data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="/accommodation/accommodations">All Products</a></li>
+                        <li><a class="dropdown-item" href="/accommodation/byregion">All Products</a></li>
                         <li>
                             <hr class="dropdown-divider"/>
                         </li>
-                        <li><a class="dropdown-item" href="#!">Popular Items</a></li>
-                        <li><a class="dropdown-item" href="#!">New Arrivals</a></li>
+                        <li><a class="dropdown-item" href="/accommodation/byregion?sort=averageRating">Popular Items</a></li>
                     </ul>
                 </li>
             </ul>
@@ -175,7 +187,7 @@
                                 <input class="form-control" id="inputPassword" type="password" placeholder="Password"/>
                                 <label for="inputPassword">비밀번호</label>
                             </div>
-                            <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
+                            <div class="btn-container mt-4 mb-0">
                                 <button type="button" class="btn btn-primary" id="loginButton">로그인</button>
                             </div>
                         </form>
@@ -230,9 +242,10 @@
             })
             .then(data => {
                 const accessToken = data.accessToken;
+                const redirectUrl = data.redirectUrl || '/home/homepage'; // 서버에서 반환된 URL 사용
                 localStorage.setItem('accessToken', accessToken);
                 alert('로그인 성공');
-                window.location.href = '/home/homepage';
+                window.location.href = redirectUrl; // 원래 페이지로 리다이렉트
             })
             .catch(error => {
                 console.error('로그인 오류:', error);

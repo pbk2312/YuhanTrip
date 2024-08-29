@@ -10,6 +10,7 @@ import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.repository.ResetTokenRepository;
 import hello.yuhanTrip.service.MemberService;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -23,6 +24,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Log4j2
 @Controller
@@ -51,20 +54,35 @@ public class MemberController {
         }
     }
 
+
     @GetMapping("/login")
-    public String showLogin(@ModelAttribute LoginDTO loginDTO) {
+    public String showLogin(HttpServletRequest request, @ModelAttribute LoginDTO loginDTO) {
+        // Referer 헤더에서 원래 페이지 URL 추출
+        String refererUrl = request.getHeader("Referer");
+        if (refererUrl != null) {
+            request.getSession().setAttribute("redirectUrl", refererUrl);
+        }
         return "/member/login";
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TokenDTO> login(@RequestBody LoginDTO loginDTO, HttpServletResponse response) {
+    public ResponseEntity<Map<String, String>> login(@RequestBody LoginDTO loginDTO, HttpServletResponse response, HttpServletRequest request) {
         log.info("로그인 요청...");
         TokenDTO tokenDTO = memberService.login(loginDTO);
         log.info("로그인이 완료되었습니다. 반환된 토큰: {}", tokenDTO);
 
         addCookie(response, "accessToken", tokenDTO.getAccessToken(), 60 * 60);
 
-        return ResponseEntity.ok(tokenDTO);
+        // 세션에서 원래 페이지 URL 가져오기
+        String redirectUrl = (String) request.getSession().getAttribute("redirectUrl");
+        request.getSession().removeAttribute("redirectUrl"); // 세션에서 제거
+
+        // TokenDTO를 제외한 응답 객체를 생성
+        Map<String, String> responseMap = new HashMap<>();
+        responseMap.put("accessToken", tokenDTO.getAccessToken());
+        responseMap.put("redirectUrl", redirectUrl != null ? redirectUrl : "/home/homepage");
+
+        return ResponseEntity.ok(responseMap);
     }
 
     @PostMapping("/logout")

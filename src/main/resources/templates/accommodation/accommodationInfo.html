@@ -410,7 +410,7 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
                 <li class="nav-item"><a class="nav-link active" aria-current="page" href="/home/homepage">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
+                <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
                        data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
@@ -420,7 +420,6 @@
                             <hr class="dropdown-divider"/>
                         </li>
                         <li><a class="dropdown-item" href="/accommodation/byregion?sort=averageRating">Popular Items</a></li>
-                        <li><a class="dropdown-item" href="#!">New Arrivals</a></li>
                     </ul>
                 </li>
             </ul>
@@ -575,9 +574,11 @@
                                         <button class="reservation-button" th:data-id="${room.id}">
                                             <i class="bi bi-calendar-check"></i> 예약하기
                                         </button>
+                                        <!-- 로그인 메시지 추가 -->
+                                    <div class="login-message">
+                                        로그인 후 이용 가능합니다.
+                                    </div>
                                     </p>
-                                    <!-- 로그인 메시지 -->
-                                    <div class="login-message">로그인 후 이용할 수 있습니다.</div>
                                 </div>
                             </div>
                         </div>
@@ -673,6 +674,7 @@
 
 
         // 예약 버튼 클릭 이벤트 처리
+        // 예약 버튼 클릭 이벤트 처리
         document.querySelectorAll('.reservation-button').forEach(button => {
             button.addEventListener('click', function (event) {
                 const token = localStorage.getItem('accessToken');
@@ -680,7 +682,7 @@
                 const loginMessage = roomCard.querySelector('.login-message'); // 해당 room-card 내의 로그인 메시지 찾기
 
                 if (!token) {
-                    loginMessage.classList.add('show');
+                    loginMessage.style.display = 'block'; // 로그인 메시지 표시
                     event.preventDefault(); // 클릭 이벤트 중단
                     return;
                 }
@@ -691,8 +693,6 @@
 
                 // 예약하기 버튼 클릭 시, 예약 페이지로 이동
                 const roomId = this.getAttribute('data-id');
-
-                // 체크인과 체크아웃 날짜를 URL에 추가
                 const url = `/reservation?id=${roomId}&checkin=${checkin}&checkout=${checkout}`;
                 window.location.href = url;
             });

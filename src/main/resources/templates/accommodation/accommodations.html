@@ -127,15 +127,7 @@
             transform: scale(1.05); /* 버튼 확대 효과 */
         }
 
-        .sort-dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #f8f9fa;
-            min-width: 160px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 1;
-            border-radius: 8px;
-        }
+
 
         .sort-dropdown-content a {
             color: #007bff;
@@ -223,10 +215,9 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
                 <li class="nav-item"><a class="nav-link active" aria-current="page" href="/home/homepage">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
+                <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="/accommodation/byregion?sort=averageRating"
-                       role="button"
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
                        data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <li><a class="dropdown-item" href="/accommodation/byregion">All Products</a></li>
@@ -234,7 +225,6 @@
                             <hr class="dropdown-divider"/>
                         </li>
                         <li><a class="dropdown-item" href="/accommodation/byregion?sort=averageRating">Popular Items</a></li>
-                        <li><a class="dropdown-item" href="#!">New Arrivals</a></li>
                     </ul>
                 </li>
             </ul>
@@ -280,20 +270,18 @@
 
                 <div class="form-group">
                     <label for="checkin">체크인 날짜</label>
-                    <input type="date" id="checkin" name="checkin" class="form-control" th:value="${checkin}">
+                    <input type="date" id="checkin" name="checkin" class="form-control" th:value="${checkin}" required>
                 </div>
 
                 <div class="form-group">
                     <label for="checkout">체크아웃 날짜</label>
-                    <input type="date" id="checkout" name="checkout" class="form-control" th:value="${checkout}">
+                    <input type="date" id="checkout" name="checkout" class="form-control" th:value="${checkout}" required>
                 </div>
 
                 <div class="form-group">
                     <label for="numGuests">숙박 인원수</label>
-                    <input type="number" id="numGuests" name="numGuests" class="form-control" min="1" max="10"
-                           th:value="${numGuests != null ? numGuests : 1}">
+                    <input type="number" id="numGuests" name="numGuests" class="form-control" min="1" max="10" th:value="${numGuests != null ? numGuests : 1}">
                 </div>
-
 
                 <div class="form-group">
                     <label for="type">숙소 유형</label>

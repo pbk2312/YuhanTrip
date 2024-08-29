@@ -8,6 +8,8 @@ import hello.yuhanTrip.repository.RoleChangeRequestRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +19,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @Log4j2
@@ -74,5 +77,31 @@ public class RoleChangeRequestService {
             log.error("파일 저장 중 오류 발생", e);
             throw new RuntimeException("파일 저장 중 오류가 발생했습니다.");
         }
+    }
+
+    public Page<RoleChangeRequest> getPendingRequests(Pageable pageable) {
+        return roleChangeRequestRepository.findByStatus(RequestStatus.PENDING, pageable);
+    }
+
+    @Transactional
+    public void approveRequest(Long requestId) {
+        RoleChangeRequest request = roleChangeRequestRepository.findById(requestId)
+                .orElseThrow(() -> new IllegalArgumentException("요청을 찾을 수 없습니다."));
+        request.setStatus(RequestStatus.APPROVED);
+
+        // 승급 로직 추가 (예: MemberRole 변경)
+        Member member = request.getMember();
+        member.setMemberRole(MemberRole.ROLE_HOST);
+
+        roleChangeRequestRepository.save(request);
+    }
+
+    @Transactional
+    public void rejectRequest(Long requestId, String rejectionReason) {
+        RoleChangeRequest request = roleChangeRequestRepository.findById(requestId)
+                .orElseThrow(() -> new IllegalArgumentException("요청을 찾을 수 없습니다."));
+        request.setStatus(RequestStatus.REJECTED);
+        request.setRejectionReason(rejectionReason);
+        roleChangeRequestRepository.save(request);
     }
 }

@@ -105,6 +105,10 @@ public class MypageController {
             HttpSession session,
             Model model
     ) {
+        if (validateAccessToken(accessToken) != null) {
+            return "redirect:/member/login";
+        }
+
         if (validateAccessToken(accessToken) != null || session.getAttribute("passwordChecked") == null) {
             return "redirect:/mypage/check";
         }

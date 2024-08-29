@@ -1,6 +1,7 @@
 package hello.yuhanTrip.controller;
 
 import hello.yuhanTrip.domain.Accommodation;
+import hello.yuhanTrip.domain.AccommodationType;
 import hello.yuhanTrip.service.Accomodation.AccommodationServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,24 +28,13 @@ public class HomeController {
     @GetMapping("/homepage")
     public String homePage(Model model,
                            @RequestParam(defaultValue = "0") int page,
-                           @RequestParam(defaultValue = "5") int size,
-                           @RequestParam(required = false) String areaCode,
-                           @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkInDate,
-                           @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOutDate,
-                           @RequestParam(defaultValue = "1") int numGuests) {
+                           @RequestParam(defaultValue = "5") int size) {
 
-
+        // Pageable 객체 생성
+        Pageable pageable = PageRequest.of(page, size);
 
         // 인기 추천 숙소 가져오기
-        Page<Accommodation> accommodations = accommodationService.getAvailableAccommodations(
-                areaCode,             // 지역 코드
-                checkInDate,          // 체크인 날짜
-                checkOutDate,         // 체크아웃 날짜
-                numGuests,            // 인원 수
-                page,                 // 페이지 번호
-                size,                 // 페이지 크기
-                "RATING"
-        );
+        Page<Accommodation> accommodations = accommodationService.getAvailableAccommodationsSortedByRatingAndReview(pageable);
 
         // 모델에 숙소 목록과 페이지 정보를 추가
         model.addAttribute("accommodations", accommodations.getContent());
@@ -54,5 +44,4 @@ public class HomeController {
         // 홈 페이지 템플릿으로 이동
         return "home";
     }
-
 }
