@@ -112,4 +112,10 @@ public class RoleChangeRequestService {
                 .orElseThrow(() -> new IllegalArgumentException("요청을 찾을 수 없습니다."));
     }
 
+    public  List<RoleChangeRequest> getRequestByMember(Member member) {
+        List<RoleChangeRequest> roleChangeRequests = member.getRoleChangeRequests();
+
+        return roleChangeRequests;
+    }
+
 }

@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>역할 변경 요청 상세</title>
+  <title>역할 변경 요청 리스트</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 20px;
+      background-color: #f4f4f4;
     }
     h1 {
       font-size: 24px;
@@ -18,12 +19,14 @@
       width: 100%;
       border-collapse: collapse;
       margin-bottom: 20px;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
     table, th, td {
       border: 1px solid #ddd;
     }
     th, td {
-      padding: 8px;
+      padding: 12px;
       text-align: left;
     }
     th {
@@ -41,82 +44,52 @@
     .section {
       margin-bottom: 20px;
     }
+    .btn {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+    .btn:hover {
+      background-color: #0056b3;
+    }
   </style>
 </head>
 <body>
 
-<h1>역할 변경 요청 상세</h1>
+<h1>역할 변경 요청 리스트</h1>
 
 <div class="section">
-  <h2>요청 정보</h2>
   <table>
+    <thead>
     <tr>
       <th>ID</th>
-      <td th:text="${request.id}"></td>
-    </tr>
-    <tr>
       <th>요청자</th>
-      <td th:text="${request.member.email}"></td>
-    </tr>
-    <tr>
       <th>요청된 역할</th>
-      <td th:text="${request.requestedRole}"></td>
-    </tr>
-    <tr>
       <th>요청 상태</th>
-      <td th:text="${request.status}" th:classappend="${request.status.toString().toLowerCase()}"></td>
-    </tr>
-    <tr>
       <th>요청 일자</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="request : ${requestByMember}">
+      <td th:text="${request.id}"></td>
+      <td th:text="${request.member.email}"></td>
+      <td th:text="${request.requestedRole}"></td>
+      <td th:text="${request.status}" th:classappend="${request.status.toString().toLowerCase()}"></td>
       <td th:text="${request.requestDate}"></td>
     </tr>
+    </tbody>
   </table>
 </div>
 
-<div class="section" th:if="${request.attachmentFilePath != null}">
-  <h2>첨부 파일</h2>
-  <a th:href="@{/admin/request/file/{id}(id=${request.id})}" th:text="${request.attachmentFileName}"></a>
-</div>
-
-<div class="section">
-  <h2>숙소 정보</h2>
-  <table>
-    <tr>
-      <th>숙소 이름</th>
-      <td th:text="${request.accommodationTitle}"></td>
-    </tr>
-    <tr>
-      <th>숙소 설명</th>
-      <td th:text="${request.accommodationDescription}"></td>
-    </tr>
-  </table>
-</div>
-
-<div class="section" th:if="${request.status == T(hello.yuhanTrip.domain.admin.RequestStatus).APPROVED}">
-  <h2>승인 정보</h2>
-  <table>
-    <tr>
-      <th>승인자</th>
-      <td th:text="${request.approver.email}"></td>
-    </tr>
-    <tr>
-      <th>승인 일자</th>
-      <td th:text="${request.approvalDate}"></td>
-    </tr>
-  </table>
-</div>
-
-<div class="section" th:if="${request.status == T(hello.yuhanTrip.domain.admin.RequestStatus).REJECTED}">
-  <h2>거절 정보</h2>
-  <table>
-    <tr>
-      <th>거절 사유</th>
-      <td th:text="${request.rejectionReason}"></td>
-    </tr>
-  </table>
-</div>
-
-<a href="/mypage">마이 페이지로 돌아가기</a>
+<a href="/mypage/memberInfo" class="btn">마이 페이지로 돌아가기</a>
 
 </body>
 </html>

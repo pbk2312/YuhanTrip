@@ -177,28 +177,6 @@
 <script src="js/scripts.js"></script>
 
 <script>
-    document.getElementById('hostRequestForm').addEventListener('submit', function(event) {
-        event.preventDefault(); // 기본 폼 제출 방지
-
-        const formData = new FormData(this);
-
-        fetch('/mypage/roleChangeRequest', {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    window.location.href = '/roleChangeRequestList?id=' + data.requestId;
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('역할 변경 요청 처리 중 오류가 발생했습니다.');
-            });
-    });
 </script>
 </body>
 </html>

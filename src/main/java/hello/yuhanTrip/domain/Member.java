@@ -2,6 +2,7 @@ package hello.yuhanTrip.domain;
 
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import hello.yuhanTrip.domain.admin.RoleChangeRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -52,6 +53,9 @@ public class Member {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews;  // 추가된 부분
+
+    @OneToMany(mappedBy = "member")
+    private List<RoleChangeRequest> roleChangeRequests;  // 추가된 부분
 
 }
 

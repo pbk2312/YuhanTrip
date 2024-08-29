@@ -11,6 +11,7 @@ import hello.yuhanTrip.service.Accomodation.AccommodationServiceImpl;
 import hello.yuhanTrip.service.Accomodation.ReservationService;
 import hello.yuhanTrip.service.MemberService;
 import hello.yuhanTrip.service.RoleChangeRequestService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -281,40 +282,34 @@ public class MypageController {
     }
 
     @PostMapping("/roleChangeRequest")
-    public ResponseEntity<String> roleChangeRequest(
+    public String roleChangeRequest(
             @CookieValue(value = "accessToken", required = false) String accessToken,
             @RequestParam("file") MultipartFile file,
             @RequestParam("accommodationTitle") String accommodationTitle,
-            @RequestParam("accommodationDescription") String accommodationDescription
-
-    ) {
+            @RequestParam("accommodationDescription") String accommodationDescription,
+            HttpServletRequest request) {
         if (validateAccessToken(accessToken) != null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("로그인이 필요합니다.");
+            return "redirect:/login"; // 로그인 페이지로 리다이렉트
         }
 
         UserDetails userDetails = getUserDetails(accessToken);
         if (userDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("유효하지 않은 사용자입니다.");
+            return "redirect:/login"; // 로그인 페이지로 리다이렉트
         }
 
         Member member = findMemberByEmail(userDetails.getUsername());
         if (member == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("회원 정보를 찾을 수 없습니다.");
+            return "redirect:/error"; // 오류 페이지로 리다이렉트
         }
 
         try {
             roleChangeRequestService.requestRoleChange(member, file, accommodationTitle, accommodationDescription);
-            return ResponseEntity.ok("역할 변경 요청이 성공적으로 제출되었습니다.");
+            return "redirect:/mypage/roleChangeRequestList"; // 성공 시 리스트 페이지로 리다이렉트
         } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(e.getMessage());
+            return "redirect:/error?message=" + e.getMessage(); // 오류 페이지로 리다이렉트
         } catch (Exception e) {
             log.error("역할 변경 요청 처리 중 오류 발생: ", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("역할 변경 요청 처리 중 오류가 발생했습니다.");
+            return "redirect:/error?message=역할 변경 요청 처리 중 오류가 발생했습니다."; // 오류 페이지로 리다이렉트
         }
     }
 
@@ -327,7 +322,6 @@ public class MypageController {
     @GetMapping("/roleChangeRequestList")
     public String roleChangeRequestList(
             @CookieValue(value = "accessToken", required = false) String accessToken,
-            @RequestParam("id") Long id,
             Model model
     ) {
         if (validateAccessToken(accessToken) != null) {
@@ -344,9 +338,11 @@ public class MypageController {
             return "redirect:/error";
         }
 
-        RoleChangeRequest request = roleChangeRequestService.getRequestById(id);
 
-        model.addAttribute("request", request);
+        List<RoleChangeRequest> requestByMember = roleChangeRequestService.getRequestByMember(member);
+
+
+        model.addAttribute("requestByMember", requestByMember);
 
         return "/mypage/roleChangeRequestList";
 
