@@ -251,10 +251,11 @@ public class ReservationController {
     }
 
 
+
     // 결제 실패
     @GetMapping("/fail-payment")
     public String failPaymentPage() {
-        return "fail-payment";
+        return "error";
     }
 
     private Member getUserDetails(String accessToken) {
