@@ -296,19 +296,6 @@ public class AccommodationSettingService {
 
 
 
-    @Transactional
-    public void updateAverageRating(Long accommodationId, double averageRating) {
 
-        // 해당 숙소를 조회
-        Accommodation accommodation = accommodationRepository.findById(accommodationId)
-                .orElseThrow(() -> new RuntimeException("Accommodation not found with id: " + accommodationId));
-
-        // 평균 평점 업데이트
-        accommodation.setAverageRating(averageRating);
-
-        // 저장
-        accommodationRepository.save(accommodation);
-
-    }
 
 }

@@ -79,8 +79,6 @@ public interface AccommodationRepository extends JpaRepository<Accommodation, Lo
             Pageable pageable
     );
 
-    // 지역 코드와 유형을 기반으로 숙소 리스트를 가져오는 메서드
-    Page<Accommodation> findByAreacodeAndType(String areacode, AccommodationType type, Pageable pageable);
 
 
     @Query("SELECT DISTINCT a FROM Accommodation a " +
@@ -108,6 +106,29 @@ public interface AccommodationRepository extends JpaRepository<Accommodation, Lo
             @Param("checkOutDate") LocalDate checkOutDate,
             @Param("numGuests") int numGuests,
             @Param("sortBy") String sortBy,
+            Pageable pageable
+    );
+
+
+
+    @Query("SELECT a FROM Accommodation a WHERE a.status = :status AND a.type = :type ORDER BY a.averageRating DESC")
+    Page<Accommodation> findByStatusAndTypeOrderByAverageRatingDesc(
+            @Param("status") AccommodationApplyStatus status,
+            @Param("type") AccommodationType type,
+            Pageable pageable
+    );
+
+    @Query("SELECT a FROM Accommodation a WHERE a.status = :status AND a.type = :type ORDER BY a.averagePrice DESC")
+    Page<Accommodation> findByStatusAndTypeOrderByPriceDesc(
+            @Param("status") AccommodationApplyStatus status,
+            @Param("type") AccommodationType type,
+            Pageable pageable
+    );
+
+    @Query("SELECT a FROM Accommodation a WHERE a.status = :status AND a.type = :type ORDER BY a.averagePrice ASC")
+    Page<Accommodation> findByStatusAndTypeOrderByPriceAsc(
+            @Param("status") AccommodationApplyStatus status,
+            @Param("type") AccommodationType type,
             Pageable pageable
     );
 

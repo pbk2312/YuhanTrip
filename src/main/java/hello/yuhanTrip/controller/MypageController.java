@@ -44,34 +44,8 @@ public class MypageController {
     private final AccommodationServiceImpl accommodationService;
     private final RoleChangeRequestService roleChangeRequestService;
 
-    // 토큰 유효성 검사 및 사용자 세부정보 가져오기
-    private UserDetails getUserDetailsOrRedirect(String accessToken) {
-        if (isInvalidToken(accessToken)) {
-            return null; // 토큰이 유효하지 않으면 null 반환
-        }
-        return getUserDetails(accessToken);
-    }
 
-    private boolean isInvalidToken(String accessToken) {
-        return accessToken == null || !tokenProvider.validate(accessToken);
-    }
-
-    private UserDetails getUserDetails(String accessToken) {
-        Authentication authentication = tokenProvider.getAuthentication(accessToken);
-        return (UserDetails) authentication.getPrincipal();
-    }
-
-    private Member findMemberByEmail(String email) {
-        return memberService.findByEmail(email);
-    }
-
-    private ResponseEntity<Void> validateAccessToken(String accessToken) {
-        if (isInvalidToken(accessToken)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        return null;
-    }
-
+    // 비밀번호 확인
     @GetMapping("/check")
     public String mypageCheck(@CookieValue(value = "accessToken", required = false) String accessToken) {
         if (validateAccessToken(accessToken) != null) {
@@ -85,6 +59,8 @@ public class MypageController {
         return "/mypage/mypageCheck";
     }
 
+
+    // 비밀번호 확인
     @PostMapping("/checkPassword")
     public ResponseEntity<Void> checkPassword(
             @RequestParam("password") String password,
@@ -101,6 +77,8 @@ public class MypageController {
         session.setAttribute("passwordChecked", true);
         return ResponseEntity.ok().build();
     }
+
+    // 개인 정보 보기
 
     @GetMapping("/memberInfo")
     public String memberInfo(
@@ -129,6 +107,8 @@ public class MypageController {
         return "/mypage/memberInfo";
     }
 
+
+    // 개인정보 수정
     @GetMapping("/editMemberInfo")
     public String getEditMemberInfo(
             @CookieValue(value = "accessToken", required = false) String accessToken,
@@ -152,6 +132,8 @@ public class MypageController {
         return "/mypage/editMemberInfo";
     }
 
+
+    // 개인정보 수정
     @PostMapping("/editMemberInfoSubmit")
     public ResponseEntity<Void> editMemberInfoSubmit(
             @CookieValue(value = "accessToken", required = false) String accessToken,
@@ -183,6 +165,8 @@ public class MypageController {
         }
     }
 
+    // 숙소 등록 리스트
+
     @GetMapping("/memberAccommodations")
     public String getAccommodationsByMembers(
             @CookieValue(value = "accessToken", required = false) String accessToken,
@@ -199,6 +183,8 @@ public class MypageController {
         return "/mypage/accommodationByMember";
     }
 
+
+    // 예약 상황
     @GetMapping("/reservationSituation")
     public String reservationSituation(
             @CookieValue(value = "accessToken", required = false) String accessToken,
@@ -232,6 +218,8 @@ public class MypageController {
         return "/mypage/reservationSituation";
     }
 
+
+    // 예약 취소
     @PostMapping("/cancelReservation")
     public ResponseEntity<String> cancelReservation(
             @CookieValue(value = "accessToken", required = false) String accessToken,
@@ -261,6 +249,8 @@ public class MypageController {
         }
     }
 
+
+    // 호스트 승급 신청
     @GetMapping("/roleChangeRequestForm")
     public String roleChangeRequestForm(@CookieValue(value = "accessToken", required = false) String accessToken, Model model) {
         if (validateAccessToken(accessToken) != null) {
@@ -281,13 +271,14 @@ public class MypageController {
         return "/mypage/roleChangeRequestForm";
     }
 
+
+    // 호스트 승급 신청
     @PostMapping("/roleChangeRequest")
     public String roleChangeRequest(
             @CookieValue(value = "accessToken", required = false) String accessToken,
             @RequestParam("file") MultipartFile file,
             @RequestParam("accommodationTitle") String accommodationTitle,
-            @RequestParam("accommodationDescription") String accommodationDescription,
-            HttpServletRequest request) {
+            @RequestParam("accommodationDescription") String accommodationDescription) {
         if (validateAccessToken(accessToken) != null) {
             return "redirect:/login"; // 로그인 페이지로 리다이렉트
         }
@@ -313,12 +304,8 @@ public class MypageController {
         }
     }
 
-    private void validatePassword(String rawPassword, String encodedPassword) {
-        if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
-            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
-        }
-    }
 
+    // 호스트 승급 신청 리스트
     @GetMapping("/roleChangeRequestList")
     public String roleChangeRequestList(
             @CookieValue(value = "accessToken", required = false) String accessToken,
@@ -346,5 +333,39 @@ public class MypageController {
 
         return "/mypage/roleChangeRequestList";
 
+    }
+
+    private void validatePassword(String rawPassword, String encodedPassword) {
+        if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
+            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+        }
+    }
+
+    // 토큰 유효성 검사 및 사용자 세부정보 가져오기
+    private UserDetails getUserDetailsOrRedirect(String accessToken) {
+        if (isInvalidToken(accessToken)) {
+            return null; // 토큰이 유효하지 않으면 null 반환
+        }
+        return getUserDetails(accessToken);
+    }
+
+    private boolean isInvalidToken(String accessToken) {
+        return accessToken == null || !tokenProvider.validate(accessToken);
+    }
+
+    private UserDetails getUserDetails(String accessToken) {
+        Authentication authentication = tokenProvider.getAuthentication(accessToken);
+        return (UserDetails) authentication.getPrincipal();
+    }
+
+    private Member findMemberByEmail(String email) {
+        return memberService.findByEmail(email);
+    }
+
+    private ResponseEntity<Void> validateAccessToken(String accessToken) {
+        if (isInvalidToken(accessToken)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return null;
     }
 }

@@ -20,6 +20,8 @@ public class EmailController {
 
     private final EmailService emailService;
 
+
+    // 이메일 보내기
     @PostMapping("/sendCertificationMail")
     public ResponseEntity<String> sendCertificationMail(@RequestBody EmailRequestDTO emailRequestDTO) {
         try {
@@ -31,6 +33,8 @@ public class EmailController {
         }
     }
 
+
+    // 이메일 확인
     @PostMapping("/verifyEmail")
     public ResponseEntity<String> verifyEmail(@RequestBody EmailVerificationRequestDTO emailVerificationRequestDTO) {
         try {

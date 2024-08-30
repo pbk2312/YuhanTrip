@@ -1,6 +1,5 @@
 package hello.yuhanTrip.service;
 
-
 import hello.yuhanTrip.domain.Review;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,46 +9,30 @@ import java.util.List;
 
 public interface ReviewService {
 
-    /**
-     * 리뷰와 관련된 이미지를 추가합니다.
-     *
-     * @param accommodationId 숙소 ID
-     * @param memberEmail      회원 이메일
-     * @param reservationId    예약 ID
-     * @param content          리뷰 내용
-     * @param rating           평점
-     * @param images           이미지 파일 리스트
-     * @return 저장된 리뷰 객체
-     * @throws java.io.IOException 파일 저장 중 오류 발생 시
-     */
-    Review addReviewWithImages(Long accommodationId, String memberEmail, Long reservationId, String content, int rating, List<MultipartFile> images) throws IOException;
+    // 숙소에 대한 리뷰를 추가하고 이미지도 함께 업로드하는 메서드
+    Review addReviewWithImages(
+            Long accommodationId,              // 숙소 ID
+            String memberEmail,                // 회원 이메일
+            Long reservationId,                // 예약 ID
+            String content,                    // 리뷰 내용
+            int rating,                        // 리뷰 평점
+            List<MultipartFile> images         // 업로드할 이미지 목록
+    ) throws IOException;                   // 이미지 업로드 시 발생할 수 있는 예외 처리
 
+    // 특정 회원이 작성한 리뷰를 페이지네이션하여 가져오는 메서드
+    Page<Review> getReviewsByMemberWithPagination(
+            Long memberId,    // 회원 ID
+            int page,         // 페이지 번호
+            int size          // 페이지당 리뷰 수
+    );
 
-    /**
-     * 페이지네이션을 적용하여 회원 ID로 작성된 리뷰를 조회합니다.
-     *
-     * @param memberId 회원 ID
-     * @param page     페이지 번호
-     * @param size     페이지 크기
-     * @return 페이지네이션된 리뷰 목록
-     */
-    Page<Review> getReviewsByMemberWithPagination(Long memberId, int page, int size);
+    // 특정 숙소에 대한 모든 리뷰를 가져오는 메서드
+    List<Review> getReviewsByAccommodation(
+            Long accommodationId // 숙소 ID
+    );
 
-    /**
-     * 숙소 ID로 작성된 리뷰를 조회합니다.
-     *
-     * @param accommodationId 숙소 ID
-     * @return 숙소에 대한 리뷰 목록
-     */
-    List<Review> getReviewsByAccommodation(Long accommodationId);
-
-    /**
-     * 리뷰 ID로 리뷰를 조회합니다.
-     *
-     * @param id 리뷰 ID
-     * @return 리뷰 객체
-     */
-    Review findReviewById(Long id);
-
+    // 리뷰 ID로 리뷰를 찾아 반환하는 메서드
+    Review findReviewById(
+            Long id // 리뷰 ID
+    );
 }
-

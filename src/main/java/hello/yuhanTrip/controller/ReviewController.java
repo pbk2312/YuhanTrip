@@ -42,6 +42,8 @@ public class ReviewController {
     private final ReservationService reservationService;
     private final AccommodationServiceImpl accommodationService;
 
+
+    // 리뷰 쓰기
     @GetMapping("/reviewWrite")
     public String showReviewWrite(
             @CookieValue(value = "accessToken", required = false) String accessToken,
@@ -89,6 +91,8 @@ public class ReviewController {
         }
     }
 
+
+    // 리뷰 제출
     @PostMapping("/submitReview")
     public ResponseEntity<String> submitReview(
             @CookieValue(value = "accessToken", required = false) String accessToken,
@@ -135,6 +139,8 @@ public class ReviewController {
     }
 
 
+
+    // 리뷰 조회
     @GetMapping("/myReviews")
     public String getMyReviews(
             @CookieValue(value = "accessToken", required = false) String accessToken,

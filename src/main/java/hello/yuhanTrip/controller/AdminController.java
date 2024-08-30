@@ -2,6 +2,7 @@ package hello.yuhanTrip.controller;
 
 import hello.yuhanTrip.domain.Accommodation;
 import hello.yuhanTrip.domain.admin.RoleChangeRequest;
+import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.service.Accomodation.AccommodationService;
 import hello.yuhanTrip.service.RoleChangeRequestService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +29,8 @@ public class AdminController {
 
     private final RoleChangeRequestService roleChangeRequestService;
     private final AccommodationService accommodationService;
+    private final TokenProvider tokenProvider;
+
     @GetMapping("/about")
     public String aboutPage() {
         return "about";
@@ -36,30 +41,33 @@ public class AdminController {
             @CookieValue(value = "accessToken", required = false) String accessToken,
             Model model
     ) {
-        Page<RoleChangeRequest> requests = roleChangeRequestService.getPendingRequests(PageRequest.of(0, 10));
+        UserDetails userDetails = validateTokenAndGetUserDetails(accessToken);
+        if (userDetails == null) {
+            return "redirect:/login";
+        }
 
+        Page<RoleChangeRequest> requests = roleChangeRequestService.getPendingRequests(PageRequest.of(0, 10));
         Page<Accommodation> accommodations = accommodationService.getPendingAccommodations(PageRequest.of(0, 10));
+
         model.addAttribute("accommodations", accommodations);
         model.addAttribute("requests", requests);
-        return "/admin/manageMent"; // 관리자 페이지의 뷰 이름
+        return "/admin/manageMent";
     }
 
     @PostMapping("/admin/request/approve")
-    public String approveRequest(
-            @RequestParam("id") Long id,
-            Model model) {
+    public String approveRequest(@RequestParam("id") Long id) {
         roleChangeRequestService.approveRequest(id);
         return "redirect:/admin/manageMent";
     }
 
     @PostMapping("/admin/request/reject")
-    public String rejectRequest(@RequestParam("id") Long id, String rejectionReason, Model model) {
+    public String rejectRequest(@RequestParam("id") Long id, @RequestParam("rejectionReason") String rejectionReason) {
         roleChangeRequestService.rejectRequest(id, rejectionReason);
         return "redirect:/admin/manageMent";
     }
 
     @PostMapping("/admin/accommodation/approve")
-    public String approveAccommodation(@RequestParam("id") Long id, Model model) {
+    public String approveAccommodation(@RequestParam("id") Long id) {
         accommodationService.approveAccommodation(id);
         return "redirect:/admin/manageMent";
     }
@@ -68,18 +76,41 @@ public class AdminController {
     public ResponseEntity<Resource> downloadFile(@PathVariable("id") Long id) {
         RoleChangeRequest request = roleChangeRequestService.getRequestById(id);
         if (request == null || request.getAttachmentFilePath() == null) {
+            log.warn("File not found for request ID: {}", id);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
 
         File file = new File(request.getAttachmentFilePath());
         Resource resource = new FileSystemResource(file);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + request.getAttachmentFileName());
-        headers.add(HttpHeaders.CONTENT_TYPE, request.getAttachmentFileType());
+        HttpHeaders headers = createFileHeaders(request);
 
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(resource);
+    }
+
+    private UserDetails validateTokenAndGetUserDetails(String accessToken) {
+        if (isInvalidToken(accessToken)) {
+            log.info("Invalid access token.");
+            return null;
+        }
+        return getUserDetails(accessToken);
+    }
+
+    private boolean isInvalidToken(String accessToken) {
+        return accessToken == null || !tokenProvider.validate(accessToken);
+    }
+
+    private UserDetails getUserDetails(String accessToken) {
+        Authentication authentication = tokenProvider.getAuthentication(accessToken);
+        return (UserDetails) authentication.getPrincipal();
+    }
+
+    private HttpHeaders createFileHeaders(RoleChangeRequest request) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + request.getAttachmentFileName());
+        headers.add(HttpHeaders.CONTENT_TYPE, request.getAttachmentFileType());
+        return headers;
     }
 }

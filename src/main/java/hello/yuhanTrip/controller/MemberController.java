@@ -37,11 +37,13 @@ public class MemberController {
     private final ResetTokenRepository resetTokenRepository;
     private final TokenProvider tokenProvider;
 
+    // 회원가입
     @GetMapping("/register")
     public String showRegisterForm(@ModelAttribute MemberRequestDTO memberRequestDTO) {
         return "/member/register";
     }
 
+    // 회원가입
     @PostMapping("/register")
     public String register(@ModelAttribute MemberRequestDTO memberRequestDTO) {
         try {
@@ -55,6 +57,7 @@ public class MemberController {
     }
 
 
+    // 로그인
     @GetMapping("/login")
     public String showLogin(HttpServletRequest request, @ModelAttribute LoginDTO loginDTO) {
         // Referer 헤더에서 원래 페이지 URL 추출
@@ -65,6 +68,7 @@ public class MemberController {
         return "/member/login";
     }
 
+    // 로그인
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody LoginDTO loginDTO, HttpServletResponse response, HttpServletRequest request) {
         log.info("로그인 요청...");
@@ -85,6 +89,7 @@ public class MemberController {
         return ResponseEntity.ok(responseMap);
     }
 
+    // 로그아웃
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@CookieValue(value = "accessToken", required = false) String accessToken, HttpServletResponse response) {
         if (isInvalidToken(accessToken)) {
@@ -101,12 +106,15 @@ public class MemberController {
         return ResponseEntity.ok("로그아웃 완료");
     }
 
+    // 비밀번호 재설정
     @GetMapping("/sendResetPasswordEmail")
     public String sendResetPasswordForm(Model model) {
         model.addAttribute("emailRequestDTO", new EmailRequestDTO());
         return "/member/resetPasswordForm";
     }
 
+
+    // 비밀번호 재설정 이메일
     @PostMapping("/sendResetPasswordEmail")
     public String sendResetPasswordEmail(@RequestBody EmailRequestDTO emailRequestDTO, RedirectAttributes redirectAttributes) {
         try {
@@ -119,6 +127,8 @@ public class MemberController {
         }
     }
 
+
+    // 비밀번호 재설정
     @GetMapping("/updatePassword")
     public String updatePassword(@RequestParam("token") String resetToken, @RequestParam("email") String email, Model model) {
         validateResetToken(email, resetToken);
@@ -129,6 +139,8 @@ public class MemberController {
         return "/member/updatePassword";
     }
 
+
+    // 비밀번호 재설정
     @PostMapping("/updatePassword")
     public String changePassword(@RequestParam("token") String resetToken, @RequestParam("email") String email,
                                  @ModelAttribute MemberChangePasswordDTO memberChangePasswordDTO, RedirectAttributes redirectAttributes) {
@@ -141,6 +153,8 @@ public class MemberController {
         return "redirect:/home/homepage";
     }
 
+
+    // 회원 탈퇴
     @GetMapping("/withdrawalMembership")
     public String getWithdrawalMembershipForm(@CookieValue(value = "accessToken", required = false) String accessToken, Model model) {
         if (isInvalidToken(accessToken)) {
@@ -155,6 +169,8 @@ public class MemberController {
         return "/member/withdrawalMembership";
     }
 
+
+    // 회원 탈퇴
     @PostMapping("/deleteAccount")
     public ResponseEntity<Void> deleteAccount(@RequestBody WithdrawalMembershipDTO withdrawalMembershipDTO,
                                               @CookieValue(value = "accessToken", required = false) String accessToken,

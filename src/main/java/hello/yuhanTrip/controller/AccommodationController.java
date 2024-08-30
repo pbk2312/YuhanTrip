@@ -42,7 +42,6 @@ public class AccommodationController {
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 
-
     @GetMapping("/byregion")
     public String listAccommodationsByRegion(Model model,
                                              @RequestParam(value = "region", required = false) String region,
@@ -67,10 +66,8 @@ public class AccommodationController {
         // 필터링과 정렬을 기반으로 메소드를 호출
         if (type != null && checkin == null && checkout == null && numGuests == null && areaCode == null) {
             // 숙소 유형만 제공된 경우
-            accommodationsPage = accommodationService.getAccommodationsByStatusAndType(
-                    type,
-                    page,
-                    size
+            accommodationsPage = fetchAccommodationsWithSortingAndFiltering(
+                    type, null, false, checkin, checkout, numGuests, page, size, sort
             );
         } else if (checkin != null && checkout != null && numGuests != null && type != null) {
             // 체크인, 체크아웃, 게스트 수, 숙소 유형이 제공된 경우
@@ -112,6 +109,7 @@ public class AccommodationController {
 
         return "/accommodation/accommodations"; // 뷰 이름
     }
+
     private Page<Accommodation> fetchAccommodationsWithSortingAndFiltering(
             AccommodationType type,
             Integer areaCode,
@@ -124,7 +122,19 @@ public class AccommodationController {
             String sort) {
         Pageable pageable = PageRequest.of(page, size);
 
-        if (filterByAvailability) {
+        if (type != null) {
+            // 숙소 유형이 제공된 경우
+            switch (sort != null ? sort.toLowerCase() : "default") {
+                case "averagerating":
+                    return accommodationService.getAccommodationsByTypeSortedByRatingAndReview(type, pageable);
+                case "pricedesc":
+                    return accommodationService.getAccommodationsByTypeOrderByPriceDesc(type, page, size);
+                case "priceasc":
+                    return accommodationService.getAccommodationsByTypeOrderByPriceAsc(type, page, size);
+                default:
+                    return accommodationService.getAccommodationsByTypeSortedByRatingAndReview(type, pageable);
+            }
+        } else if (filterByAvailability) {
             // 체크인, 체크아웃, 게스트 수, 숙소 유형이 제공된 경우
             return accommodationService.findAvailableAccommodationsByType(
                     type,
@@ -198,6 +208,8 @@ public class AccommodationController {
         return "/accommodation/accommodations"; // 뷰 이름
     }
 
+
+    // 숙소 상세 정보 조회
     @GetMapping("/info")
     public String getAccommodationInfo(
             @RequestParam("id") Long id,
@@ -229,6 +241,7 @@ public class AccommodationController {
     }
 
 
+    // 리뷰 가져오기
     @GetMapping("/reviews/{id}")
     @ResponseBody
     public ResponseEntity<Review> getReviewDetails(@PathVariable Long id) {
@@ -240,50 +253,20 @@ public class AccommodationController {
     }
 
 
-    @GetMapping("/memberLikeHistory")
-    public String memberLikeHistory(
-            @CookieValue(value = "accessToken", required = false) String accessToken,
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "3") int size,
-            Model model
-    ) {
-        // 인증 확인
-        if (accessToken == null || !tokenProvider.validate(accessToken)) {
-            return "redirect:/member/login"; // 로그인 페이지로 리다이렉트
-        }
-
-        try {
-            // 페이지 번호와 사이즈 검증
-            page = Math.max(page, 0); // 페이지 번호는 음수일 수 없음
-            size = Math.max(size, 1); // 페이지 사이즈는 1 이상이어야 함
-
-            Authentication authentication = tokenProvider.getAuthentication(accessToken);
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            Member member = memberService.findByEmail(userDetails.getUsername());
-
-            Pageable pageable = PageRequest.of(page, size);
-            Page<Accommodation> likesByMember = memberLikeService.getLikesByMember(member, pageable);
-
-            model.addAttribute("likesByMember", likesByMember);
-            model.addAttribute("currentPage", page);
-            model.addAttribute("totalPages", likesByMember.getTotalPages());
-            model.addAttribute("pageSize", size); // 페이지 사이즈 모델에 추가
-
-            return "/accommodation/likesByMember";
-        } catch (Exception e) {
-            log.error("Error processing /memberLikeHistory request", e);
-            return "error"; // 오류 페이지로 리다이렉트
-        }
-    }
 
 
+
+    // 숙소 등록하기
     @GetMapping("/registerForm")
     public String accommodationRegister(
             Model model,
             @CookieValue(value = "accessToken", required = false) String accessToken
     ) {
 
-
+        // 인증 확인
+        if (accessToken == null || !tokenProvider.validate(accessToken)) {
+            return "redirect:/member/login"; // 로그인 페이지로 리다이렉트
+        }
         AccommodationRegisterDTO accommodationRegisterDTO = new AccommodationRegisterDTO();
         RoomDTO roomDTO = new RoomDTO();
 
@@ -294,6 +277,8 @@ public class AccommodationController {
 
     }
 
+
+    // 숙소 등록하기
     @PostMapping("/register")
     public ResponseEntity<String> registerAccommodation(
             @CookieValue(value = "accessToken", required = false) String accessToken,

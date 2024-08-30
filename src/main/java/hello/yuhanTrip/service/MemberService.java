@@ -13,80 +13,34 @@ import hello.yuhanTrip.dto.token.TokenDTO;
 import java.util.List;
 
 public interface MemberService {
-    /**
-     * 회원 가입
-     *
-     * @param memberRequestDTO 회원 가입 요청 DTO
-     * @return 성공 메시지
-     */
+
+    // 회원 가입을 처리하는 메서드
     String register(MemberRequestDTO memberRequestDTO);
 
-    /**
-     * 로그인
-     *
-     * @param loginDTO 로그인 요청 DTO
-     * @return 로그인 성공 시 발급된 토큰 DTO
-     */
+    // 로그인 요청을 처리하고, 인증 토큰을 반환하는 메서드
     TokenDTO login(LoginDTO loginDTO);
 
-    /**
-     * 로그아웃
-     *
-     * @param logoutDTO 로그아웃 요청 DTO
-     */
+    // 로그아웃 요청을 처리하는 메서드
     void logout(LogoutDTO logoutDTO);
 
-    /**
-     * 비밀번호 재설정 이메일 전송
-     *
-     * @param emailRequestDTO 비밀번호 재설정 이메일 요청 DTO
-     * @return 이메일 전송 성공 메시지
-     */
+    // 비밀번호 재설정을 위한 이메일을 발송하는 메서드
     String sendPasswordResetEmail(EmailRequestDTO emailRequestDTO);
 
-    /**
-     * 비밀번호 변경
-     *
-     * @param memberChangePasswordDTO 비밀번호 변경 DTO
-     */
+    // 회원의 비밀번호를 변경하는 메서드
     void memberChangePassword(MemberChangePasswordDTO memberChangePasswordDTO);
 
-    /**
-     * 회원 탈퇴
-     *
-     * @param withdrawalMembershipDTO 회원 탈퇴 DTO
-     * @return 탈퇴 성공 메시지
-     */
+    // 회원 탈퇴를 처리하는 메서드
     String deleteAccount(WithdrawalMembershipDTO withdrawalMembershipDTO);
 
-    /**
-     * 회원 정보 업데이트
-     *
-     * @param member 업데이트할 회원 정보
-     */
+    // 회원 정보를 업데이트하는 메서드
     void updateMember(Member member);
 
-    /**
-     * 호스트 권한 확인
-     *
-     * @param memberId 회원 ID
-     * @return 호스트 권한을 가진 회원
-     */
+    // 호스트로서 유효한 회원인지 확인하는 메서드
     Member validateHost(Long memberId);
 
-    /**
-     * 회원 ID로 소속된 숙소 목록 조회
-     *
-     * @param memberId 회원 ID
-     * @return 해당 회원이 소속된 숙소 목록
-     */
+    // 특정 회원 ID에 의해 등록된 숙소 목록을 반환하는 메서드
     List<Accommodation> getAccommodationsByMemberId(Long memberId);
 
-    /**
-     * 이메일로 회원 조회
-     *
-     * @param email 회원 이메일
-     * @return 해당 이메일의 회원
-     */
+    // 이메일로 회원 정보를 조회하는 메서드
     Member findByEmail(String email);
 }

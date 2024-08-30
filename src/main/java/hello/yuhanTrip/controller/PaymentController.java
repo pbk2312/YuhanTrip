@@ -35,6 +35,8 @@ public class PaymentController {
     private final AccommodationServiceImpl accommodationService;
 
 
+
+    // 결제 페이지
     @GetMapping("/paymentPage")
     public String paymentPage(
             @RequestParam("reservationId") Long reservationId,
@@ -79,6 +81,7 @@ public class PaymentController {
     }
 
 
+    // 결제 하기
     @ResponseBody
     @PostMapping("/payment")
     public ResponseEntity<IamportResponse<Payment>> validationPayment(@RequestBody PaymentCallbackRequest request) {
@@ -91,6 +94,9 @@ public class PaymentController {
 
 
 
+
+
+    // 결제 취소 페이지
     @GetMapping("/paymentCancelPage")
     public String paymentCancel(@RequestParam("reservationId") Long reservationId,
                                 Model model) {
