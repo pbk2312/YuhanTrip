@@ -5,6 +5,7 @@ import hello.yuhanTrip.dto.AccommodationRegisterDTO;
 import hello.yuhanTrip.dto.RoomDTO;
 import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.service.Accomodation.AccommodationServiceImpl;
+import hello.yuhanTrip.service.MemberLikeService;
 import hello.yuhanTrip.service.MemberService;
 import hello.yuhanTrip.service.ReviewService;
 import lombok.RequiredArgsConstructor;
@@ -34,93 +35,62 @@ public class AccommodationController {
     private final AccommodationServiceImpl accommodationService;
     private final TokenProvider tokenProvider;
     private final MemberService memberService;
+    private final MemberLikeService memberLikeService;
     private final ReviewService reviewService;
 
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    private static final String DEFAULT_SORT = "default";
+
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
 
     @GetMapping("/byregion")
     public String listAccommodationsByRegion(Model model,
                                              @RequestParam(value = "region", required = false) String region,
                                              @RequestParam(value = "checkin", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkin,
                                              @RequestParam(value = "checkout", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkout,
-                                             @RequestParam(value = "type", required = false) AccommodationType type,
+                                             @RequestParam(value = "type", required = false) AccommodationType type, // 숙소 유형 추가
                                              @RequestParam(value = "numGuests", required = false) Integer numGuests,
                                              @RequestParam(defaultValue = "0") int page,
                                              @RequestParam(defaultValue = "12") int size,
                                              @RequestParam(required = false) String sort) {
 
-        log.info("지역 코드로 숙소 리스트를 조회합니다. 지역: {}, 페이지: {}, 사이즈: {}, 체크인 날짜: {}, 체크아웃 날짜: {}, 숙박 인원 수: {}, 정렬: {}, 타입: {}",
-                region, page, size, checkin, checkout, numGuests, sort, type);
+        log.info("지역 코드로 숙소 리스트를 조회합니다. 지역: {}, 페이지: {}, 사이즈: {}, 체크인 날짜: {}, 체크아웃 날짜: {}, 숙박 인원 수: {}, 정렬: {}, 타입 : {} ", region, page, size, checkin, checkout, numGuests, sort, type);
 
+        // 페이지 번호와 사이즈 검증
         page = Math.max(page, 0);
         size = Math.max(size, 1);
+
         Integer areaCode = (region != null && !region.isEmpty()) ? RegionCode.getCodeByRegion(region) : null;
 
+        Page<Accommodation> accommodationsPage;
+
         // 필터링과 정렬을 기반으로 메소드를 호출
-        Page<Accommodation> accommodationsPage = fetchAccommodations(type, areaCode, checkin, checkout, numGuests, page, size, sort);
-
-        setPaginationAttributes(model, accommodationsPage, page, size, region, checkin, checkout, numGuests, sort, type);
-
-        return "/accommodation/accommodations"; // 뷰 이름
-    }
-
-    private Page<Accommodation> fetchAccommodations(AccommodationType type, Integer areaCode, LocalDate checkin,
-                                                    LocalDate checkout, Integer numGuests, int page, int size, String sort) {
-        Pageable pageable = PageRequest.of(page, size);
-        boolean filterByAvailability = checkin != null && checkout != null && numGuests != null;
-
-        if (type != null && !filterByAvailability && areaCode == null) {
-            return fetchByTypeWithSorting(type, sort, pageable, page, size);
-        } else if (filterByAvailability) {
-            return accommodationService.findAvailableAccommodationsByType(type, areaCode != null ? String.valueOf(areaCode) : null,
-                    checkin, checkout, numGuests, resolveSortOrder(sort), page, size);
+        if (type != null && checkin == null && checkout == null && numGuests == null && areaCode == null) {
+            // 숙소 유형만 제공된 경우
+            accommodationsPage = fetchAccommodationsWithSortingAndFiltering(
+                    type, null, false, checkin, checkout, numGuests, page, size, sort
+            );
+        } else if (checkin != null && checkout != null && numGuests != null && type != null) {
+            // 체크인, 체크아웃, 게스트 수, 숙소 유형이 제공된 경우
+            accommodationsPage = fetchAccommodationsWithSortingAndFiltering(
+                    type, areaCode, true, checkin, checkout, numGuests, page, size, sort
+            );
         } else {
-            return fetchAllAccommodationsWithSorting(areaCode, sort, page, size, pageable);
+            // 필터링 없이 조회 (정렬 적용)
+            accommodationsPage = fetchAccommodationsWithSortingAndFiltering(
+                    type, areaCode, false, checkin, checkout, numGuests, page, size, sort
+            );
         }
-    }
 
-    private Page<Accommodation> fetchByTypeWithSorting(AccommodationType type, String sort, Pageable pageable, int page, int size) {
-        switch (resolveSortOrder(sort)) {
-            case "AVERAGERATING":
-                return accommodationService.getAccommodationsByTypeSortedByRatingAndReview(type, pageable);
-            case "PRICEDESC":
-                return accommodationService.getAccommodationsByTypeOrderByPriceDesc(type, page, size);
-            case "PRICEASC":
-                return accommodationService.getAccommodationsByTypeOrderByPriceAsc(type, page, size);
-            default:
-                return accommodationService.getAccommodationsByTypeSortedByRatingAndReview(type, pageable);
-        }
-    }
-
-    private Page<Accommodation> fetchAllAccommodationsWithSorting(Integer areaCode, String sort, int page, int size, Pageable pageable) {
-        switch (resolveSortOrder(sort)) {
-            case "AVERAGERATING":
-                return accommodationService.getAvailableAccommodationsSortedByRatingAndReview(pageable);
-            case "PRICEDESC":
-                return areaCode != null
-                        ? accommodationService.getAllAccommodationsOrderByPriceDesc(page, size)
-                        : accommodationService.getAllAccommodationsOrderByPriceDesc(page, size);
-            case "PRICEASC":
-                return areaCode != null
-                        ? accommodationService.getAllAccommodationsOrderByPriceAsc(page, size)
-                        : accommodationService.getAllAccommodationsOrderByPriceAsc(page, size);
-            default:
-                return areaCode != null
-                        ? accommodationService.getAccommodationsByAreaCode(String.valueOf(areaCode), page, size)
-                        : accommodationService.getAccommodations(page, size);
-        }
-    }
-
-    private String resolveSortOrder(String sort) {
-        return sort != null ? sort.toUpperCase() : DEFAULT_SORT.toUpperCase();
-    }
-
-    private void setPaginationAttributes(Model model, Page<Accommodation> accommodationsPage, int currentPage, int size,
-                                         String region, LocalDate checkin, LocalDate checkout, Integer numGuests, String sort, AccommodationType type) {
         int totalPages = accommodationsPage.getTotalPages();
+        int currentPage = page;
+
+        // 페이지 번호 범위 계산
         int startPage = Math.max(0, currentPage - 5);
         int endPage = Math.min(totalPages - 1, currentPage + 5);
+
+        // 날짜를 포맷팅하여 문자열로 변환
+        String checkinFormatted = checkin != null ? checkin.format(formatter) : null;
+        String checkoutFormatted = checkout != null ? checkout.format(formatter) : null;
 
         model.addAttribute("accommodations", accommodationsPage.getContent());
         model.addAttribute("currentPage", currentPage);
@@ -129,30 +99,115 @@ public class AccommodationController {
         model.addAttribute("endPage", endPage);
         model.addAttribute("pageSize", size);
         model.addAttribute("region", region);
-        model.addAttribute("checkin", checkin != null ? checkin.format(FORMATTER) : null);
-        model.addAttribute("checkout", checkout != null ? checkout.format(FORMATTER) : null);
+        model.addAttribute("checkin", checkinFormatted);
+        model.addAttribute("checkout", checkoutFormatted);
         model.addAttribute("numGuests", numGuests);
         model.addAttribute("sort", sort);
         model.addAttribute("searchType", "region");
-        model.addAttribute("type", type != null ? type.name() : "");
-    }
-
-    @GetMapping("/search")
-    public String searchByTitle(@RequestParam String title, @RequestParam(defaultValue = "0") int page,
-                                @RequestParam(defaultValue = "12") int size, Model model) {
-        log.info("제목으로 검색합니다. 제목: {}, 페이지: {}, 사이즈: {}", title, page, size);
-        page = Math.max(page, 0);
-        size = Math.max(size, 1);
-        Pageable pageable = PageRequest.of(page, size);
-
-        Page<Accommodation> accommodationsPage = accommodationService.searchByTitle(title, pageable);
-
-        setPaginationAttributes(model, accommodationsPage, page, size, null, null, null, null, null, null);
-        model.addAttribute("title", title);
-        model.addAttribute("searchType", "title");
+        model.addAttribute("type", type != null ? type.name() : "");  // type 값을 영어 문자열로 설정
+        log.info("현재 페이지: {}, 전체 페이지: {}, 시작 페이지: {}, 끝 페이지: {}", currentPage, totalPages, startPage, endPage);
 
         return "/accommodation/accommodations"; // 뷰 이름
     }
+
+    private Page<Accommodation> fetchAccommodationsWithSortingAndFiltering(
+            AccommodationType type,
+            Integer areaCode,
+            boolean filterByAvailability,
+            LocalDate checkin,
+            LocalDate checkout,
+            Integer numGuests,
+            int page,
+            int size,
+            String sort) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        if (type != null) {
+            // 숙소 유형이 제공된 경우
+            switch (sort != null ? sort.toLowerCase() : "default") {
+                case "averagerating":
+                    return accommodationService.getAccommodationsByTypeSortedByRatingAndReview(type, pageable);
+                case "pricedesc":
+                    return accommodationService.getAccommodationsByTypeOrderByPriceDesc(type, page, size);
+                case "priceasc":
+                    return accommodationService.getAccommodationsByTypeOrderByPriceAsc(type, page, size);
+                default:
+                    return accommodationService.getAccommodationsByTypeSortedByRatingAndReview(type, pageable);
+            }
+        } else if (filterByAvailability) {
+            // 체크인, 체크아웃, 게스트 수, 숙소 유형이 제공된 경우
+            return accommodationService.findAvailableAccommodationsByType(
+                    type,
+                    areaCode != null ? String.valueOf(areaCode) : null,
+                    checkin,
+                    checkout,
+                    numGuests,
+                    sort != null ? sort.toUpperCase() : "DEFAULT",
+                    page,
+                    size
+            );
+        } else {
+            // 필터링 없이 조회 (정렬 적용)
+            switch (sort != null ? sort.toLowerCase() : "default") {
+                case "averagerating":
+                    return accommodationService.getAvailableAccommodationsSortedByRatingAndReview(pageable);
+                case "pricedesc":
+                    return areaCode != null
+                            ? accommodationService.getAllAccommodationsOrderByPriceDesc(page, size)
+                            : accommodationService.getAllAccommodationsOrderByPriceDesc(page, size);
+                case "priceasc":
+                    return areaCode != null
+                            ? accommodationService.getAllAccommodationsOrderByPriceAsc(page, size)
+                            : accommodationService.getAllAccommodationsOrderByPriceAsc(page, size);
+                default:
+                    return areaCode != null
+                            ? accommodationService.getAccommodationsByAreaCode(String.valueOf(areaCode), page, size)
+                            : accommodationService.getAccommodations(page, size);
+            }
+        }
+    }
+
+    @GetMapping("/search")
+    public String searchByTitle(
+            @RequestParam String title,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size,
+            Model model) {
+
+        log.info("제목으로 검색합니다. 제목: {}, 페이지: {}, 사이즈: {}", title, page, size);
+
+        // 페이지 설정
+        page = Math.max(page, 0);
+        size = Math.max(size, 1);
+
+        // 페이지 요청 설정
+        Pageable pageable = PageRequest.of(page, size);
+
+        // 제목으로 검색
+        Page<Accommodation> accommodationsPage = accommodationService.searchByTitle(title, pageable);
+
+        List<Accommodation> accommodations = accommodationsPage.getContent();
+        int totalPages = accommodationsPage.getTotalPages();
+        int currentPage = page;
+
+        // 페이지 번호 범위 계산
+        int startPage = Math.max(0, currentPage - 5);
+        int endPage = Math.min(totalPages - 1, currentPage + 5);
+
+        model.addAttribute("accommodations", accommodations);
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+        model.addAttribute("pageSize", size);
+        model.addAttribute("title", title);
+        model.addAttribute("searchType", "title");
+
+        log.info("현재 페이지: {}, 전체 페이지: {}, 시작 페이지: {}, 끝 페이지: {}", currentPage, totalPages, startPage, endPage);
+
+        return "/accommodation/accommodations"; // 뷰 이름
+    }
+
 
     // 숙소 상세 정보 조회
     @GetMapping("/info")
