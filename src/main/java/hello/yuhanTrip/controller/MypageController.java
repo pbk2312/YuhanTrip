@@ -9,13 +9,15 @@ import hello.yuhanTrip.dto.MypageMemberDTO;
 import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.service.Accomodation.AccommodationServiceImpl;
 import hello.yuhanTrip.service.Accomodation.ReservationService;
+import hello.yuhanTrip.service.MemberLikeService;
 import hello.yuhanTrip.service.MemberService;
 import hello.yuhanTrip.service.RoleChangeRequestService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.boot.Banner;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -43,7 +45,7 @@ public class MypageController {
     private final ReservationService reservationService;
     private final AccommodationServiceImpl accommodationService;
     private final RoleChangeRequestService roleChangeRequestService;
-
+    private final MemberLikeService memberLikeService;
 
     // 비밀번호 확인
     @GetMapping("/check")
@@ -333,6 +335,43 @@ public class MypageController {
 
         return "/mypage/roleChangeRequestList";
 
+    }
+
+    // 좋아요 목록 가져오기
+    @GetMapping("/memberLikeHistory")
+    public String memberLikeHistory(
+            @CookieValue(value = "accessToken", required = false) String accessToken,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "3") int size,
+            Model model
+    ) {
+        // 인증 확인
+        if (accessToken == null || !tokenProvider.validate(accessToken)) {
+            return "redirect:/member/login"; // 로그인 페이지로 리다이렉트
+        }
+
+        try {
+            // 페이지 번호와 사이즈 검증
+            page = Math.max(page, 0); // 페이지 번호는 음수일 수 없음
+            size = Math.max(size, 1); // 페이지 사이즈는 1 이상이어야 함
+
+            Authentication authentication = tokenProvider.getAuthentication(accessToken);
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            Member member = memberService.findByEmail(userDetails.getUsername());
+
+            Pageable pageable = PageRequest.of(page, size);
+            Page<Accommodation> likesByMember = memberLikeService.getLikesByMember(member, pageable);
+
+            model.addAttribute("likesByMember", likesByMember);
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", likesByMember.getTotalPages());
+            model.addAttribute("pageSize", size); // 페이지 사이즈 모델에 추가
+
+            return "/accommodation/likesByMember";
+        } catch (Exception e) {
+            log.error("Error processing /memberLikeHistory request", e);
+            return "error"; // 오류 페이지로 리다이렉트
+        }
     }
 
     private void validatePassword(String rawPassword, String encodedPassword) {
