@@ -19,7 +19,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
-    private static int filterInvocationCount = 0;
     public static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer";
 
@@ -32,7 +31,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
         log.info("Request ID: {} - 요청 URI: {}에 대한 JWT 필터 시작", requestId, request.getRequestURI());
 
-        filterInvocationCount++;
 
         // Request Header와 쿠키에서 토큰을 꺼낸다
         String jwt = resolveToken(request);
@@ -83,11 +81,4 @@ public class JwtFilter extends OncePerRequestFilter {
         return null;
     }
 
-    public static int getFilterInvocationCount() {
-        return filterInvocationCount;
-    }
-
-    public static void resetFilterInvocationCount() {
-        filterInvocationCount = 0;
-    }
 }
