@@ -25,18 +25,16 @@ import java.io.File;
 @Controller
 @Log4j2
 @RequiredArgsConstructor
+@RequestMapping("/admin")
 public class AdminController {
 
     private final RoleChangeRequestService roleChangeRequestService;
     private final AccommodationService accommodationService;
     private final TokenProvider tokenProvider;
 
-    @GetMapping("/about")
-    public String aboutPage() {
-        return "about";
-    }
 
-    @GetMapping("/admin/manageMent")
+
+    @GetMapping("/manageMent")
     public String manageMentPage(
             @CookieValue(value = "accessToken", required = false) String accessToken,
             Model model
@@ -54,25 +52,25 @@ public class AdminController {
         return "/admin/manageMent";
     }
 
-    @PostMapping("/admin/request/approve")
+    @PostMapping("/request/approve")
     public String approveRequest(@RequestParam("id") Long id) {
         roleChangeRequestService.approveRequest(id);
         return "redirect:/admin/manageMent";
     }
 
-    @PostMapping("/admin/request/reject")
+    @PostMapping("/request/reject")
     public String rejectRequest(@RequestParam("id") Long id, @RequestParam("rejectionReason") String rejectionReason) {
         roleChangeRequestService.rejectRequest(id, rejectionReason);
         return "redirect:/admin/manageMent";
     }
 
-    @PostMapping("/admin/accommodation/approve")
+    @PostMapping("/accommodation/approve")
     public String approveAccommodation(@RequestParam("id") Long id) {
         accommodationService.approveAccommodation(id);
         return "redirect:/admin/manageMent";
     }
 
-    @GetMapping("/admin/request/file/{id}")
+    @GetMapping("/request/file/{id}")
     public ResponseEntity<Resource> downloadFile(@PathVariable("id") Long id) {
         RoleChangeRequest request = roleChangeRequestService.getRequestById(id);
         if (request == null || request.getAttachmentFilePath() == null) {

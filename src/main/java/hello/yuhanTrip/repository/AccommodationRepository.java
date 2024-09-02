@@ -71,14 +71,6 @@ public interface AccommodationRepository extends JpaRepository<Accommodation, Lo
     Page<Accommodation> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 
 
-    // 특정 숙소 유형(AccommodationType)으로 숙소를 필터링
-    @Query("SELECT a FROM Accommodation a WHERE a.status = :status AND a.type = :type")
-    Page<Accommodation> findAllByStatusAndType(
-            @Param("status") AccommodationApplyStatus status,
-            @Param("type") AccommodationType type,
-            Pageable pageable
-    );
-
 
 
     @Query("SELECT DISTINCT a FROM Accommodation a " +

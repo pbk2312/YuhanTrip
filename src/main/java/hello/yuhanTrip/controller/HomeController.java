@@ -15,14 +15,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 
 @Controller
-@RequestMapping("/home")
 @RequiredArgsConstructor
 @Slf4j
 public class HomeController {
 
     private final AccommodationServiceImpl accommodationService;
 
-    @GetMapping("/homepage")
+    @GetMapping("/home/homepage")
     public String homePage(Model model,
                            @RequestParam(defaultValue = "0") int page,
                            @RequestParam(defaultValue = "5") int size) {
@@ -41,4 +40,9 @@ public class HomeController {
         // 홈 페이지 템플릿으로 이동
         return "home";
     }
+    @GetMapping("/about")
+    public String aboutPage() {
+        return "about";
+    }
+
 }

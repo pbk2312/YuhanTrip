@@ -99,10 +99,20 @@ public class PaymentController {
     // 결제 취소 페이지
     @GetMapping("/paymentCancelPage")
     public String paymentCancel(@RequestParam("reservationId") Long reservationId,
+                                @CookieValue(value = "accessToken", required = false) String accessToken,
                                 Model model) {
 
         log.info("환불 받을 예약 번호: {}", reservationId);
 
+        // 인증 확인
+        if (accessToken == null || !tokenProvider.validate(accessToken)) {
+            return "redirect:/member/login"; // 로그인 페이지로 리다이렉트
+        }
+
+        Authentication authentication = tokenProvider.getAuthentication(accessToken);
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        log.info("환불 신청 유저 : {}" ,userDetails.getUsername());
         // 1. 예약 정보 조회
         Reservation reservation = reservationService.findReservation(reservationId);
         Accommodation accommodation = accommodationService.getAccommodationInfo(reservation.getAccommodationId());
