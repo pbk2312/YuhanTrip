@@ -49,7 +49,7 @@ public class AdminController {
 
         model.addAttribute("accommodations", accommodations);
         model.addAttribute("requests", requests);
-        return "/admin/manageMent";
+        return "admin/manageMent";
     }
 
     @PostMapping("/request/approve")

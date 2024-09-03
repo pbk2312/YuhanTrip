@@ -40,7 +40,7 @@ public class MemberController {
     // 회원가입
     @GetMapping("/register")
     public String showRegisterForm(@ModelAttribute MemberRequestDTO memberRequestDTO) {
-        return "/member/register";
+        return "member/register";
     }
 
     // 회원가입
@@ -65,7 +65,7 @@ public class MemberController {
         if (refererUrl != null) {
             request.getSession().setAttribute("redirectUrl", refererUrl);
         }
-        return "/member/login";
+        return "member/login";
     }
 
     // 로그인
@@ -110,7 +110,7 @@ public class MemberController {
     @GetMapping("/sendResetPasswordEmail")
     public String sendResetPasswordForm(Model model) {
         model.addAttribute("emailRequestDTO", new EmailRequestDTO());
-        return "/member/resetPasswordForm";
+        return "member/resetPasswordForm";
     }
 
 
@@ -136,7 +136,7 @@ public class MemberController {
         model.addAttribute("email", email);
         model.addAttribute("resetToken", resetToken);
 
-        return "/member/updatePassword";
+        return "member/updatePassword";
     }
 
 
@@ -166,7 +166,7 @@ public class MemberController {
 
         model.addAttribute("withdrawalMembershipDTO", new WithdrawalMembershipDTO());
 
-        return "/member/withdrawalMembership";
+        return "member/withdrawalMembership";
     }
 
 

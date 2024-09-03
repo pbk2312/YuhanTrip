@@ -56,7 +56,7 @@ public class ReservationController {
 
         model.addAttribute("reservation", reservationDTO);
         model.addAttribute("room", room);
-        return "/reservation/reservation";
+        return "reservation/reservation";
     }
 
 
@@ -67,10 +67,10 @@ public class ReservationController {
             reservationService.removeReservation(reservationUId);
         } catch (RuntimeException e) {
             model.addAttribute("errorMessage", "예약 정보가 없습니다.");
-            return "/accommodation/accommodations";
+            return "accommodation/accommodations";
         } catch (Exception e) {
             model.addAttribute("errorMessage", "예약 삭제 중 오류가 발생했습니다.");
-            return "/accommodation/accommodations";
+            return "accommodation/accommodations";
         }
 
         return "redirect:/home/homepage";
@@ -166,7 +166,7 @@ public class ReservationController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", reservationPage.getTotalPages());
 
-        return "/reservation/reservationConfirms";
+        return "reservation/reservationConfirms";
     }
 
 
@@ -186,7 +186,7 @@ public class ReservationController {
 
         model.addAttribute("reservationInfo", reservation);
 
-        return "/reservation/reservationUpdate";
+        return "reservation/reservationUpdate";
     }
 
     @PostMapping("/updateReservation")
@@ -247,7 +247,7 @@ public class ReservationController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
 
-        return "/reservation/reservationCancelConfirm";
+        return "reservation/reservationCancelConfirm";
     }
 
 

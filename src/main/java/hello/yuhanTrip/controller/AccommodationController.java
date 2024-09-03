@@ -5,7 +5,6 @@ import hello.yuhanTrip.dto.AccommodationRegisterDTO;
 import hello.yuhanTrip.dto.RoomDTO;
 import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.service.Accomodation.AccommodationServiceImpl;
-import hello.yuhanTrip.service.MemberLikeService;
 import hello.yuhanTrip.service.MemberService;
 import hello.yuhanTrip.service.ReviewService;
 import lombok.RequiredArgsConstructor;
@@ -83,7 +82,7 @@ public class AccommodationController {
 
         log.info("현재 페이지: {}, 전체 페이지: {}, 시작 페이지: {}, 끝 페이지: {}", currentPage, totalPages, startPage, endPage);
 
-        return "/accommodation/accommodations";
+        return "accommodation/accommodations";
     }
 
     private Page<Accommodation> fetchAccommodationsWithSortingAndFiltering(
@@ -169,7 +168,7 @@ public class AccommodationController {
 
         log.info("현재 페이지: {}, 전체 페이지: {}, 시작 페이지: {}, 끝 페이지: {}", currentPage, totalPages, startPage, endPage);
 
-        return "/accommodation/accommodations";
+        return "accommodation/accommodations";
     }
 
     @GetMapping("/info")
@@ -198,7 +197,7 @@ public class AccommodationController {
         model.addAttribute("accommodation", accommodation);
         model.addAttribute("reviews", reviews);
 
-        return "/accommodation/accommodationInfo";
+        return "accommodation/accommodationInfo";
     }
 
     @GetMapping("/reviews/{id}")
@@ -220,7 +219,7 @@ public class AccommodationController {
         model.addAttribute("accommodationRegisterDTO", new AccommodationRegisterDTO());
         model.addAttribute("roomDTO", new RoomDTO());
 
-        return "/accommodation/accommodationRegister";
+        return "accommodation/accommodationRegister";
     }
 
     @PostMapping("/register")

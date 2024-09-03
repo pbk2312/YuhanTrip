@@ -84,7 +84,7 @@ public class ReviewController {
             model.addAttribute("member", member);
             model.addAttribute("reservationDTO", reservationDTO);
 
-            return "/mypage/reviewWrite";
+            return "mypage/reviewWrite";
         } catch (Exception e) {
             log.error("리뷰 작성 페이지 로드 중 오류 발생", e);
             return "error"; // 오류 페이지로 리다이렉트
@@ -160,7 +160,7 @@ public class ReviewController {
             model.addAttribute("currentPage", page);
             model.addAttribute("totalPages", reviewsPage.getTotalPages());
 
-            return "/mypage/myReviews";
+            return "mypage/myReviews";
         } catch (Exception e) {
             log.error("내 리뷰 페이지 로드 중 오류 발생", e);
             return "error"; // 오류 페이지로 리다이렉트

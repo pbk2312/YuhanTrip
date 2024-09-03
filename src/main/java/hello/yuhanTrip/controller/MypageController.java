@@ -58,7 +58,7 @@ public class MypageController {
             return "redirect:/member/login";
         }
         log.info("마이페이지 접근 유저 : {}", userDetails.getUsername());
-        return "/mypage/mypageCheck";
+        return "mypage/mypageCheck";
     }
 
 
@@ -106,7 +106,7 @@ public class MypageController {
                 .name(member.getName())
                 .build();
         model.addAttribute("MypageMemberDTO", mypageMemberDTO);
-        return "/mypage/memberInfo";
+        return "mypage/memberInfo";
     }
 
 
@@ -131,7 +131,7 @@ public class MypageController {
                 .name(member.getName())
                 .build();
         model.addAttribute("MypageMemberDTO", mypageMemberDTO);
-        return "/mypage/editMemberInfo";
+        return "mypage/editMemberInfo";
     }
 
 
@@ -182,7 +182,7 @@ public class MypageController {
         Member member = findMemberByEmail(userDetails.getUsername());
         List<Accommodation> accommodations = memberService.getAccommodationsByMemberId(member.getId());
         model.addAttribute("accommodations", accommodations);
-        return "/mypage/accommodationByMember";
+        return "mypage/accommodationByMember";
     }
 
 
@@ -217,7 +217,7 @@ public class MypageController {
 
         model.addAttribute("accommodation", accommodation);
         model.addAttribute("roomReservationsMap", roomReservationsMap);
-        return "/mypage/reservationSituation";
+        return "mypage/reservationSituation";
     }
 
 
@@ -270,7 +270,7 @@ public class MypageController {
         }
 
         model.addAttribute("member", member);
-        return "/mypage/roleChangeRequestForm";
+        return "mypage/roleChangeRequestForm";
     }
 
 
@@ -333,7 +333,7 @@ public class MypageController {
 
         model.addAttribute("requestByMember", requestByMember);
 
-        return "/mypage/roleChangeRequestList";
+        return "mypage/roleChangeRequestList";
 
     }
 
@@ -367,7 +367,7 @@ public class MypageController {
             model.addAttribute("totalPages", likesByMember.getTotalPages());
             model.addAttribute("pageSize", size); // 페이지 사이즈 모델에 추가
 
-            return "/accommodation/likesByMember";
+            return "accommodation/likesByMember";
         } catch (Exception e) {
             log.error("Error processing /memberLikeHistory request", e);
             return "error"; // 오류 페이지로 리다이렉트

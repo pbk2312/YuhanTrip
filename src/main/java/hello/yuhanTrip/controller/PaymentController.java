@@ -153,7 +153,7 @@ public class PaymentController {
         model.addAttribute("paymentCancelDTO", paymentCancelDTO);
 
         // 6. 뷰로 반환
-        return "/reservation/reservationCancel";
+        return "reservation/reservationCancel";
     }
 
 
