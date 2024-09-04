@@ -1,36 +1,81 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>회원 탈퇴</title>
-    <link th:href="@{/css/styles.css}" rel="stylesheet">
-    <script th:src="@{/js/scripts.js}"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to bottom, #87CEFA, #FFFFFF);
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .card {
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background-color: #dc3545;
+            color: #fff;
+            font-size: 1.25rem;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .btn-primary:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+        }
+
+        .container {
+            margin-top: 5rem;
+        }
+
+        .form-label-group input {
+            border-radius: 0.375rem;
+        }
+
+        .form-label-group label {
+            font-weight: 500;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
-    <div class="card card-register mx-auto mt-5">
-        <div class="card-header">Delete Your Account</div>
-        <div class="card-body">
-            <form id="deleteAccountForm" action="/member/deleteAccount" method="post">
-                <div class="form-group">
-                    <div class="form-label-group">
-                        <input type="password" id="inputPassword" name="password" class="form-control"
-                               placeholder="Password" required autofocus>
-                        <label for="inputPassword">Password</label>
-                    </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card card-register mx-auto mt-5">
+                <div class="card-header">회원 탈퇴</div>
+                <div class="card-body">
+                    <form id="deleteAccountForm" action="/member/deleteAccount" method="post">
+                        <div class="form-group mb-3">
+                            <div class="form-label-group">
+                                <input type="password" id="inputPassword" name="password" class="form-control"
+                                       placeholder="비밀번호" required autofocus>
+                                <label for="inputPassword">비밀번호</label>
+                            </div>
+                        </div>
+                        <input type="hidden" id="inputEmail" name="email">
+                        <button type="submit" class="btn btn-primary btn-block">계정 삭제</button>
+                    </form>
                 </div>
-                <!-- 추가: email input hidden으로 추가 -->
-                <input type="hidden" id="inputEmail" name="email">
-                <button type="submit" class="btn btn-primary btn-block">Delete Account</button>
-            </form>
+            </div>
         </div>
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-
     document.addEventListener('DOMContentLoaded', () => {
         const deleteAccountForm = document.getElementById('deleteAccountForm');
         const emailInput = document.getElementById('inputEmail');
@@ -42,6 +87,8 @@
         emailInput.value = withdrawalMembershipDTO.email;
 
         deleteAccountForm.onsubmit = async (event) => {
+            event.preventDefault();
+
             const formData = new FormData(deleteAccountForm);
 
             const data = {};
@@ -65,14 +112,14 @@
                 if (response.ok) {
                     // 탈퇴 성공 시 localStorage에서 accessToken 삭제
                     localStorage.removeItem('accessToken');
-                    alert('Your account has been deleted successfully.');
+                    alert('계정이 성공적으로 삭제되었습니다.');
                     window.location.href = '/home/homepage'; // 성공적인 경우 리디렉션
                 } else {
-                    alert('Error deleting your account. Please try again.');
+                    alert('계정 삭제 중 오류가 발생했습니다. 다시 시도해 주세요.');
                 }
             } catch (error) {
-                console.error('Error deleting account:', error);
-                alert('Error deleting your account. Please try again.');
+                console.error('계정 삭제 중 오류 발생:', error);
+                alert('계정 삭제 중 오류가 발생했습니다. 다시 시도해 주세요.');
             }
         };
     });
