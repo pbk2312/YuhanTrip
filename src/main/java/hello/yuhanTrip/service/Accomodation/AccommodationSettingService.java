@@ -7,7 +7,6 @@ import hello.yuhanTrip.domain.AccommodationApplyStatus;
 import hello.yuhanTrip.domain.Review;
 import hello.yuhanTrip.domain.Room;
 import hello.yuhanTrip.repository.AccommodationRepository;
-import hello.yuhanTrip.repository.MemberRepository;
 import hello.yuhanTrip.repository.ReviewRepository;
 import hello.yuhanTrip.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
@@ -41,17 +40,13 @@ public class AccommodationSettingService {
     private final RoomRepository roomReposiotry;
 
     private final ReviewRepository reviewRepository;
-    private final MemberRepository memberRepository;
 
 
-    @Value("${upload.dir}")
-    private String uploadDir;
 
     private static final String[] IMAGE_URLS = {
-            "http://localhost:8080/villa-1737168_1280.jpg",
-            "http://localhost:8080/ai-generated-8856798_1280.jpg"
+            "/villa-1737168_1280.jpg",
+            "/ai-generated-8856798_1280.jpg"
     };
-
 
 
     // 서버 시작 시 모든 숙소의 평균 평점 및 평균 가격 초기화
