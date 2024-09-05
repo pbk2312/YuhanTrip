@@ -49,7 +49,7 @@ public class MemberController {
         try {
             String result = memberService.register(memberRequestDTO);
             log.info("Registration result: {}", result);
-            return "redirect:/member/login";
+            return "redirect:/home/homepage";
         } catch (Exception e) {
             log.error("Error registering member: {}", e.getMessage());
             return "redirect:/member/error";
