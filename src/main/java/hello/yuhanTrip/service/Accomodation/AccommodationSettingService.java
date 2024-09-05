@@ -182,18 +182,21 @@ public class AccommodationSettingService {
 
         return Collections.emptyList();
     }
-
     private List<Accommodation> parseResponse(String response) {
         try {
             Map<String, Object> map = objectMapper.readValue(response, Map.class);
             Map<String, Object> responseMap = (Map<String, Object>) map.get("response");
             Map<String, Object> bodyMap = (Map<String, Object>) responseMap.get("body");
-            Map<String, Object> itemsMap = (Map<String, Object>) bodyMap.get("items");
 
-            if (itemsMap == null) {
+            Object items = bodyMap.get("items");
+
+            // items가 빈 문자열이거나 null이면 빈 리스트 반환
+            if (items == null || items instanceof String && ((String) items).isEmpty()) {
                 return Collections.emptyList();
             }
 
+            // items가 Map일 때 처리
+            Map<String, Object> itemsMap = (Map<String, Object>) items;
             Object item = itemsMap.get("item");
             if (item instanceof List) {
                 List<Map<String, Object>> itemList = (List<Map<String, Object>>) item;
@@ -215,7 +218,6 @@ public class AccommodationSettingService {
 
         return Collections.emptyList();
     }
-
     private Accommodation mapToAccommodation(Map<String, Object> item) {
         try {
             Accommodation accommodation = new Accommodation();
