@@ -53,7 +53,7 @@ public class ReviewController {
         try {
 
             // 로그인한 사용자의 정보를 가져옴
-            Member member = getUserDetails(accessToken);
+            Member member = memberService.getUserDetails(accessToken);
             Reservation reservation = reservationService.findReservation(reservationId);
             Accommodation accommodationInfo = accommodationService.getAccommodationInfo(reservation.getAccommodationId());
 
@@ -104,8 +104,7 @@ public class ReviewController {
         try {
             log.info("리뷰 제출 요청: 예약ID={}, 평가={}, 내용={}, 이미지 개수={}", reservationId, rating, content, images != null ? images.size() : 0);
 
-            Member member = getUserDetails(accessToken);
-
+            Member member = memberService.getUserDetails(accessToken);
             Reservation reservation = reservationService.findReservation(reservationId);
             if (reservation == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -150,7 +149,7 @@ public class ReviewController {
     ) {
 
         try {
-            Member member = getUserDetails(accessToken);
+            Member member = memberService.getUserDetails(accessToken);
             Page<Review> reviewsPage = reviewService.getReviewsByMemberWithPagination(member.getId(), page, size);
 
 
@@ -167,15 +166,4 @@ public class ReviewController {
         }
     }
 
-    private Member getUserDetails(String accessToken) {
-        if (accessToken == null || !tokenProvider.validate(accessToken)) {
-            throw new UnauthorizedException("인증되지 않은 사용자입니다.");
-        }
-
-        Authentication authentication = tokenProvider.getAuthentication(accessToken);
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        log.info("리뷰 작성 시도 유저 : {}", userDetails.getUsername());
-
-        return memberService.findByEmail(userDetails.getUsername());
-    }
 }

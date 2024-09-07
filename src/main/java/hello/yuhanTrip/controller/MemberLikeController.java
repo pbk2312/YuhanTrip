@@ -37,12 +37,7 @@ public class MemberLikeController {
             @RequestParam Long accommodationId,
             @CookieValue(value = "accessToken", required = false) String accessToken) {
 
-        UserDetails userDetails = validateAndGetUserDetails(accessToken);
-        if (userDetails == null) {
-            return createErrorResponse("인증오류", HttpStatus.UNAUTHORIZED);
-        }
-
-        Member member = memberService.findByEmail(userDetails.getUsername());
+        Member member = memberService.getUserDetails(accessToken);
         memberLikeService.addLike(member, accommodationId);
 
         return createSuccessResponse("Like added successfully");
@@ -55,12 +50,7 @@ public class MemberLikeController {
             @RequestParam Long accommodationId,
             @CookieValue(value = "accessToken", required = false) String accessToken) {
 
-        UserDetails userDetails = validateAndGetUserDetails(accessToken);
-        if (userDetails == null) {
-            return createErrorResponse("인증오류", HttpStatus.UNAUTHORIZED);
-        }
-
-        Member member = memberService.findByEmail(userDetails.getUsername());
+        Member member = memberService.getUserDetails(accessToken);
         memberLikeService.removeLike(member, accommodationId);
 
         return createSuccessResponse("Like removed successfully");
@@ -73,12 +63,7 @@ public class MemberLikeController {
             @RequestParam Long accommodationId,
             @CookieValue(value = "accessToken", required = false) String accessToken) {
 
-        UserDetails userDetails = validateAndGetUserDetails(accessToken);
-        if (userDetails == null) {
-            return createErrorResponse("인증오류", HttpStatus.UNAUTHORIZED, false);
-        }
-
-        Member member = memberService.findByEmail(userDetails.getUsername());
+        Member member = memberService.getUserDetails(accessToken);
         boolean isLiked = memberLikeService.isLiked(member, accommodationId);
 
         Map<String, Object> response = new HashMap<>();
@@ -87,25 +72,6 @@ public class MemberLikeController {
         return ResponseEntity.ok(response);
     }
 
-
-
-    private UserDetails validateAndGetUserDetails(String accessToken) {
-        if (accessToken == null || !tokenProvider.validate(accessToken)) {
-            return null; // 인증 오류 시 null 반환
-        }
-        Authentication authentication = tokenProvider.getAuthentication(accessToken);
-        return (UserDetails) authentication.getPrincipal(); // 인증 성공 시 UserDetails 반환
-    }
-
-    private ResponseEntity<Map<String, Object>> createErrorResponse(String message, HttpStatus status) {
-        return ResponseEntity.status(status).body(createResponse("error", message));
-    }
-
-    private ResponseEntity<Map<String, Object>> createErrorResponse(String message, HttpStatus status, boolean isLiked) {
-        Map<String, Object> response = createResponse("error", message);
-        response.put("isLiked", isLiked);
-        return ResponseEntity.status(status).body(response);
-    }
 
     private ResponseEntity<Map<String, Object>> createSuccessResponse(String message) {
         return ResponseEntity.ok(createResponse("success", message));

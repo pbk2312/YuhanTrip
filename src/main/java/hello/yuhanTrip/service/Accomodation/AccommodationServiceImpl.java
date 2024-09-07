@@ -30,9 +30,10 @@ public class AccommodationServiceImpl implements AccommodationService {
 
     @JsonIgnore
     @Override
-    public Accommodation registerAccommodation(Long memberId, AccommodationRegisterDTO dto) throws IOException {
+    public Accommodation registerAccommodation(String accessToken, AccommodationRegisterDTO dto) throws IOException {
+
         // 호스트 검증
-        Member member = memberService.validateHost(memberId);
+        Member member = memberService.validateHost(accessToken);
 
         Accommodation accommodation = accommodationFactory.createAccommodationFromDTO(dto, member);
 

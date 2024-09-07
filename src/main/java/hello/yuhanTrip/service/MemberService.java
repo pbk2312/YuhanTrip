@@ -36,11 +36,13 @@ public interface MemberService {
     void updateMember(Member member);
 
     // 호스트로서 유효한 회원인지 확인하는 메서드
-    Member validateHost(Long memberId);
+    Member validateHost(String accessToken);
 
     // 특정 회원 ID에 의해 등록된 숙소 목록을 반환하는 메서드
     List<Accommodation> getAccommodationsByMemberId(Long memberId);
 
     // 이메일로 회원 정보를 조회하는 메서드
     Member findByEmail(String email);
+
+    Member getUserDetails(String accessToken);
 }

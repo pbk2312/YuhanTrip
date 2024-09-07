@@ -11,6 +11,7 @@ import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.repository.ReservationRepository;
 import hello.yuhanTrip.service.Accomodation.AccommodationServiceImpl;
 import hello.yuhanTrip.service.Accomodation.ReservationService;
+import hello.yuhanTrip.service.MemberService;
 import hello.yuhanTrip.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -33,6 +34,7 @@ public class PaymentController {
     private final PaymentService paymentService;
     private final ReservationService reservationService;
     private final AccommodationServiceImpl accommodationService;
+    private final MemberService memberService;
 
 
 
@@ -45,14 +47,8 @@ public class PaymentController {
             Model model
     ) {
 
-        // 인증 확인
-        if (accessToken == null || !tokenProvider.validate(accessToken)) {
-            return "redirect:/member/login"; // 로그인 페이지로 리다이렉트
-        }
-
-        Authentication authentication = tokenProvider.getAuthentication(accessToken);
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        log.info("예약 시도 유저 : {}", userDetails.getUsername());
+        Member member = memberService.getUserDetails(accessToken);
+        log.info("예약 시도 유저 : {}", member.getEmail());
 
         // 예약 정보 조회
         Reservation reservationInfo = reservationRepository.findById(reservationId).orElse(null);
@@ -64,11 +60,11 @@ public class PaymentController {
         String reservationUid = reservationInfo.getReservationUid();
         log.info("reservationUid: {}", reservationUid);
         PaymentDTO requestDto = paymentService.findRequestDto(reservationUid);
-        requestDto.setAddr(userDetails.getUsername());
+        requestDto.setAddr(member.getEmail());
 
 
         log.info("paymentRequest = {} ", requestDto);
-        log.info("예약자 이메일 : {}", userDetails.getUsername());
+        log.info("예약자 이메일 : {}", member.getEmail());
         log.info("숙소 예약자 : {}", reservationInfo.getName());
         log.info("총 가격 : {}", totalPrice);
 
@@ -104,15 +100,9 @@ public class PaymentController {
 
         log.info("환불 받을 예약 번호: {}", reservationId);
 
-        // 인증 확인
-        if (accessToken == null || !tokenProvider.validate(accessToken)) {
-            return "redirect:/member/login"; // 로그인 페이지로 리다이렉트
-        }
+        Member member = memberService.getUserDetails(accessToken);
 
-        Authentication authentication = tokenProvider.getAuthentication(accessToken);
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-
-        log.info("환불 신청 유저 : {}" ,userDetails.getUsername());
+        log.info("환불 신청 유저 : {}" ,member.getEmail());
         // 1. 예약 정보 조회
         Reservation reservation = reservationService.findReservation(reservationId);
         Accommodation accommodation = accommodationService.getAccommodationInfo(reservation.getAccommodationId());

@@ -140,6 +140,7 @@
     </style>
 </head>
 <body>
+
 <!-- Navigation-->
 <nav class="navbar navbar-expand-lg navbar-light">
     <div class="container px-4 px-lg-5">
@@ -209,6 +210,21 @@
 <!-- Core theme JS-->
 <script src="js/scripts.js"></script>
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // URL 파라미터 읽기
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // 'message' 파라미터 확인
+        const message = getQueryParam('message');
+
+        if (message === 'return') {
+            alert('로그인 후 이용해 주세요');
+        }
+    });
+
     document.getElementById('loginButton').addEventListener('click', function () {
         var email = document.getElementById('inputEmail').value;
         var password = document.getElementById('inputPassword').value;

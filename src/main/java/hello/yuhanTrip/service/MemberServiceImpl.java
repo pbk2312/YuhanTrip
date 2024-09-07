@@ -9,6 +9,9 @@ import hello.yuhanTrip.dto.register.MemberChangePasswordDTO;
 import hello.yuhanTrip.dto.register.MemberRequestDTO;
 import hello.yuhanTrip.dto.token.TokenDTO;
 import hello.yuhanTrip.email.EmailProvider;
+import hello.yuhanTrip.exception.InvalidHostException;
+import hello.yuhanTrip.exception.SpecificException;
+import hello.yuhanTrip.exception.UnauthorizedException;
 import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.repository.EmailRepository;
 import hello.yuhanTrip.repository.MemberRepository;
@@ -19,6 +22,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -114,8 +118,9 @@ public class MemberServiceImpl implements MemberService{
 
     public String sendPasswordResetEmail(EmailRequestDTO emailRequestDTO) {
 
+        // 회원 이메일 존재 여부 확인
         memberRepository.findByEmail(emailRequestDTO.getEmail())
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원 입니다."));
+                .orElseThrow(() -> new SpecificException("존재하지 않는 회원입니다."));
 
         // 임시 비밀번호 생성
         String resetToken = generateResetToken();
@@ -132,7 +137,7 @@ public class MemberServiceImpl implements MemberService{
         // 이메일 보내기
         boolean emailSent = emailProvider.sendPasswordResetEmail(emailRequestDTO, resetLink);
         if (!emailSent) {
-            throw new RuntimeException("이메일 발송에 실패했습니다.");
+            throw new SpecificException("이메일 발송에 실패했습니다.");
         }
 
         return "비밀번호 재설정 이메일 전송 성공";
@@ -192,11 +197,12 @@ public class MemberServiceImpl implements MemberService{
         );
     }
 
-    public Member validateHost(Long memberId) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found"));
+    public Member validateHost(String accessToken) {
+
+        Member member = getUserDetails(accessToken);
+
         if (member.getMemberRole() != MemberRole.ROLE_HOST) {
-            throw new IllegalStateException("Only HOST members can register accommodations");
+            throw new InvalidHostException("오직 호스트 등급만 숙소 등록을 할 수 있습니다.");
         }
         return member;
     }
@@ -228,5 +234,20 @@ public class MemberServiceImpl implements MemberService{
             sb.append(randomChar);
         }
         return sb.toString();
+    }
+
+    public Member getUserDetails(String accessToken) {
+        if (isInvalidToken(accessToken)) {
+            throw new UnauthorizedException("인증되지 않은 사용자입니다.");
+        }
+
+        Authentication authentication = tokenProvider.getAuthentication(accessToken);
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        return findByEmail(userDetails.getUsername());
+    }
+
+    private boolean isInvalidToken(String accessToken) {
+        return accessToken == null || !tokenProvider.validate(accessToken);
     }
 }

@@ -3,6 +3,7 @@ package hello.yuhanTrip.controller;
 import hello.yuhanTrip.domain.*;
 import hello.yuhanTrip.dto.AccommodationRegisterDTO;
 import hello.yuhanTrip.dto.RoomDTO;
+import hello.yuhanTrip.exception.UnauthorizedException;
 import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.service.Accomodation.AccommodationServiceImpl;
 import hello.yuhanTrip.service.MemberService;
@@ -239,9 +240,7 @@ public class AccommodationController {
             Model model,
             @CookieValue(value = "accessToken", required = false) String accessToken) {
 
-        if (accessToken == null || !tokenProvider.validate(accessToken)) {
-            return "redirect:/member/login";
-        }
+        Member member = memberService.validateHost(accessToken);
 
         model.addAttribute("accommodationRegisterDTO", new AccommodationRegisterDTO());
         model.addAttribute("roomDTO", new RoomDTO());
@@ -254,20 +253,11 @@ public class AccommodationController {
             @CookieValue(value = "accessToken", required = false) String accessToken,
             @ModelAttribute AccommodationRegisterDTO dto) throws IOException {
 
-        UserDetails userDetails = validateAndGetUserDetails(accessToken);
-        Member member = memberService.findByEmail(userDetails.getUsername());
-        accommodationService.registerAccommodation(member.getId(), dto);
+
+        accommodationService.registerAccommodation(accessToken, dto);
 
         log.info("숙소 저장 성공");
         return ResponseEntity.ok("숙소 저장 성공");
     }
 
-    private UserDetails validateAndGetUserDetails(String accessToken) {
-        if (accessToken == null || !tokenProvider.validate(accessToken)) {
-            return null;
-        }
-
-        Authentication authentication = tokenProvider.getAuthentication(accessToken);
-        return (UserDetails) authentication.getPrincipal();
-    }
 }

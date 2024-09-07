@@ -1,11 +1,14 @@
 package hello.yuhanTrip.controller;
 
+import hello.yuhanTrip.domain.Member;
 import hello.yuhanTrip.domain.ResetToken;
 import hello.yuhanTrip.dto.*;
 import hello.yuhanTrip.dto.email.EmailRequestDTO;
 import hello.yuhanTrip.dto.register.MemberChangePasswordDTO;
 import hello.yuhanTrip.dto.register.MemberRequestDTO;
 import hello.yuhanTrip.dto.token.TokenDTO;
+import hello.yuhanTrip.exception.SpecificException;
+import hello.yuhanTrip.exception.UnauthorizedException;
 import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.repository.ResetTokenRepository;
 import hello.yuhanTrip.service.MemberService;
@@ -35,7 +38,6 @@ public class MemberController {
 
     private final MemberService memberService;
     private final ResetTokenRepository resetTokenRepository;
-    private final TokenProvider tokenProvider;
 
     // 회원가입
     @GetMapping("/register")
@@ -92,14 +94,10 @@ public class MemberController {
     // 로그아웃
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@CookieValue(value = "accessToken", required = false) String accessToken, HttpServletResponse response) {
-        if (isInvalidToken(accessToken)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+        Member member = memberService.getUserDetails(accessToken);
+        log.info("로그아웃 요청 - 유저: {}", member.getEmail());
 
-        UserDetails userDetails = getUserDetails(accessToken);
-        log.info("로그아웃 요청 - 유저: {}", userDetails.getUsername());
-
-        memberService.logout(new LogoutDTO(userDetails.getUsername()));
+        memberService.logout(new LogoutDTO(member.getEmail()));
         removeCookie(response, "accessToken");
 
         log.info("로그아웃 완료");
@@ -116,17 +114,18 @@ public class MemberController {
 
     // 비밀번호 재설정 이메일
     @PostMapping("/sendResetPasswordEmail")
-    public String sendResetPasswordEmail(@RequestBody EmailRequestDTO emailRequestDTO, RedirectAttributes redirectAttributes) {
+    public ResponseEntity<String> sendResetPasswordEmail(@RequestBody EmailRequestDTO emailRequestDTO) {
         try {
             String message = memberService.sendPasswordResetEmail(emailRequestDTO);
-            redirectAttributes.addFlashAttribute("message", message);
-            return "redirect:/member/login";
+            return ResponseEntity.ok(message);
+        } catch (SpecificException e) {
+            // SpecificException 발생 시 400 Bad Request 상태와 메시지 반환
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이메일 전송 중 특정 오류 발생: " + e.getMessage());
         } catch (RuntimeException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/member/resetPasswordForm";
+            // 기타 런타임 예외 발생 시 500 Internal Server Error 상태와 메시지 반환
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이메일 전송 실패: " + e.getMessage());
         }
     }
-
 
     // 비밀번호 재설정
     @GetMapping("/updatePassword")
@@ -157,13 +156,8 @@ public class MemberController {
     // 회원 탈퇴
     @GetMapping("/withdrawalMembership")
     public String getWithdrawalMembershipForm(@CookieValue(value = "accessToken", required = false) String accessToken, Model model) {
-        if (isInvalidToken(accessToken)) {
-            return "redirect:/member/login";
-        }
-
-        UserDetails userDetails = getUserDetails(accessToken);
-        log.info("회원 탈퇴 시도 유저 : {}", userDetails.getUsername());
-
+        Member member = memberService.getUserDetails(accessToken);
+        log.info("탈퇴 시도 유저 : {}" ,member.getEmail());
         model.addAttribute("withdrawalMembershipDTO", new WithdrawalMembershipDTO());
 
         return "member/withdrawalMembership";
@@ -176,14 +170,8 @@ public class MemberController {
                                               @CookieValue(value = "accessToken", required = false) String accessToken,
                                               HttpServletResponse response) {
         log.info("회원 탈퇴를 진행합니다...");
-
-        if (isInvalidToken(accessToken)) {
-            log.info("사용자가 인증되지 않았습니다.");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        UserDetails userDetails = getUserDetails(accessToken);
-        withdrawalMembershipDTO.setEmail(userDetails.getUsername());
+        Member member = memberService.getUserDetails(accessToken);
+        withdrawalMembershipDTO.setEmail(member.getEmail());
 
         try {
             String message = memberService.deleteAccount(withdrawalMembershipDTO);
@@ -202,18 +190,9 @@ public class MemberController {
         }
     }
 
-    private boolean isInvalidToken(String accessToken) {
-        return accessToken == null || !tokenProvider.validate(accessToken);
-    }
-
-    private UserDetails getUserDetails(String accessToken) {
-        Authentication authentication = tokenProvider.getAuthentication(accessToken);
-        return (UserDetails) authentication.getPrincipal();
-    }
 
     private void addCookie(HttpServletResponse response, String name, String value, int maxAge) {
         Cookie cookie = new Cookie(name, value);
-        cookie.setDomain("pbk2312.shop");
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
         cookie.setPath("/");

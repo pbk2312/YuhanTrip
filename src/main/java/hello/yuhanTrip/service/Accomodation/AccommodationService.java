@@ -14,7 +14,7 @@ import java.util.List;
 public interface AccommodationService {
 
     // 숙소를 등록하는 메서드
-    Accommodation registerAccommodation(Long memberId, AccommodationRegisterDTO dto) throws IOException;
+    Accommodation registerAccommodation(String accessToken, AccommodationRegisterDTO dto) throws IOException;
 
     // 특정 ID를 가진 숙소 정보를 반환하는 메서드
     Accommodation getAccommodationInfo(Long id);

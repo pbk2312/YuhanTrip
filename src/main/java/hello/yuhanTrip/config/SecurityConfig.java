@@ -2,8 +2,8 @@ package hello.yuhanTrip.config;
 
 import hello.yuhanTrip.jwt.JwtSecurityConfig;
 import hello.yuhanTrip.jwt.TokenProvider;
-import hello.yuhanTrip.jwt.handler.JwtAccessDeniedHandler;
-import hello.yuhanTrip.jwt.handler.JwtAuthenticationEntryPoint;
+import hello.yuhanTrip.handler.JwtAccessDeniedHandler;
+import hello.yuhanTrip.handler.JwtAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;

@@ -6,6 +6,7 @@ import hello.yuhanTrip.domain.Reservation;
 import hello.yuhanTrip.domain.Room;
 import hello.yuhanTrip.domain.admin.RoleChangeRequest;
 import hello.yuhanTrip.dto.MypageMemberDTO;
+import hello.yuhanTrip.exception.UnauthorizedException;
 import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.service.Accomodation.AccommodationServiceImpl;
 import hello.yuhanTrip.service.Accomodation.ReservationService;
@@ -20,8 +21,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -39,7 +38,6 @@ import java.util.Map;
 @RequestMapping("/mypage")
 public class MypageController {
 
-    private final TokenProvider tokenProvider;
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
     private final ReservationService reservationService;
@@ -50,14 +48,8 @@ public class MypageController {
     // 비밀번호 확인
     @GetMapping("/check")
     public String mypageCheck(@CookieValue(value = "accessToken", required = false) String accessToken) {
-        if (validateAccessToken(accessToken) != null) {
-            return "redirect:/member/login";
-        }
-        UserDetails userDetails = getUserDetailsOrRedirect(accessToken);
-        if (userDetails == null) {
-            return "redirect:/member/login";
-        }
-        log.info("마이페이지 접근 유저 : {}", userDetails.getUsername());
+        Member member = memberService.getUserDetails(accessToken);
+        log.info("마이페이지 접근 유저 : {}", member.getName());
         return "mypage/mypageCheck";
     }
 
@@ -69,12 +61,7 @@ public class MypageController {
             @CookieValue(value = "accessToken", required = false) String accessToken,
             HttpSession session
     ) {
-        ResponseEntity<Void> validationResponse = validateAccessToken(accessToken);
-        if (validationResponse != null) {
-            return validationResponse;
-        }
-        UserDetails userDetails = getUserDetails(accessToken);
-        Member member = findMemberByEmail(userDetails.getUsername());
+        Member member = memberService.getUserDetails(accessToken);
         validatePassword(password, member.getPassword());
         session.setAttribute("passwordChecked", true);
         return ResponseEntity.ok().build();
@@ -88,15 +75,12 @@ public class MypageController {
             HttpSession session,
             Model model
     ) {
-        if (validateAccessToken(accessToken) != null) {
-            return "redirect:/member/login";
-        }
 
-        if (validateAccessToken(accessToken) != null || session.getAttribute("passwordChecked") == null) {
+        Member member = memberService.getUserDetails(accessToken);
+
+        if (session.getAttribute("passwordChecked") == null) {
             return "redirect:/mypage/check";
         }
-        UserDetails userDetails = getUserDetails(accessToken);
-        Member member = findMemberByEmail(userDetails.getUsername());
         MypageMemberDTO mypageMemberDTO = MypageMemberDTO.builder()
                 .email(member.getEmail())
                 .address(member.getAddress())
@@ -117,11 +101,11 @@ public class MypageController {
             HttpSession session,
             Model model
     ) {
-        if (validateAccessToken(accessToken) != null || session.getAttribute("passwordChecked") == null) {
+
+        Member member = memberService.getUserDetails(accessToken);
+        if (session.getAttribute("passwordChecked") == null) {
             return "redirect:/mypage/check";
         }
-        UserDetails userDetails = getUserDetails(accessToken);
-        Member member = findMemberByEmail(userDetails.getUsername());
         MypageMemberDTO mypageMemberDTO = MypageMemberDTO.builder()
                 .email(member.getEmail())
                 .address(member.getAddress())
@@ -145,12 +129,8 @@ public class MypageController {
             @RequestParam LocalDate dateOfBirth,
             @RequestParam String address
     ) {
-        ResponseEntity<Void> validationResponse = validateAccessToken(accessToken);
-        if (validationResponse != null) {
-            return validationResponse;
-        }
-        UserDetails userDetails = getUserDetails(accessToken);
-        Member member = findMemberByEmail(userDetails.getUsername());
+
+        Member member = memberService.getUserDetails(accessToken);
 
         member.setName(name);
         member.setNickname(nickname);
@@ -168,18 +148,17 @@ public class MypageController {
     }
 
     // 숙소 등록 리스트
-
     @GetMapping("/memberAccommodations")
     public String getAccommodationsByMembers(
             @CookieValue(value = "accessToken", required = false) String accessToken,
             HttpSession session,
             Model model
     ) {
-        if (validateAccessToken(accessToken) != null || session.getAttribute("passwordChecked") == null) {
+        log.info("숙소 조회");
+        Member member = memberService.validateHost(accessToken);
+        if (session.getAttribute("passwordChecked") == null) {
             return "redirect:/mypage/check";
         }
-        UserDetails userDetails = getUserDetails(accessToken);
-        Member member = findMemberByEmail(userDetails.getUsername());
         List<Accommodation> accommodations = memberService.getAccommodationsByMemberId(member.getId());
         model.addAttribute("accommodations", accommodations);
         return "mypage/accommodationByMember";
@@ -194,12 +173,10 @@ public class MypageController {
             HttpSession session,
             Model model
     ) {
-        if (validateAccessToken(accessToken) != null || session.getAttribute("passwordChecked") == null) {
+        Member member = memberService.getUserDetails(accessToken);
+        if (session.getAttribute("passwordChecked") == null) {
             return "redirect:/mypage/check";
         }
-        UserDetails userDetails = getUserDetails(accessToken);
-        Member member = findMemberByEmail(userDetails.getUsername());
-
         if (accommodationId == null) {
             return "redirect:/mypage/memberAccommodations";
         }
@@ -227,17 +204,8 @@ public class MypageController {
             @CookieValue(value = "accessToken", required = false) String accessToken,
             @RequestParam("reservationUid") String reservationUid
     ) {
-        if (validateAccessToken(accessToken) != null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("로그인이 필요합니다.");
-        }
 
-        UserDetails userDetails = getUserDetails(accessToken);
-        if (userDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("유효하지 않은 사용자입니다.");
-        }
-
+        Member member = memberService.getUserDetails(accessToken);
         try {
             log.info("예약 거절 요청 - reservationUid: {}", reservationUid);
             boolean isCancelled = reservationService.cancelReservation(reservationUid);
@@ -254,21 +222,12 @@ public class MypageController {
 
     // 호스트 승급 신청
     @GetMapping("/roleChangeRequestForm")
-    public String roleChangeRequestForm(@CookieValue(value = "accessToken", required = false) String accessToken, Model model) {
-        if (validateAccessToken(accessToken) != null) {
-            return "redirect:/login";
-        }
+    public String roleChangeRequestForm(@CookieValue(value = "accessToken", required = false) String accessToken, Model model,HttpSession session) {
 
-        UserDetails userDetails = getUserDetails(accessToken);
-        if (userDetails == null) {
-            return "redirect:/login";
+        Member member = memberService.getUserDetails(accessToken);
+        if (session.getAttribute("passwordChecked") == null) {
+            return "redirect:/mypage/check";
         }
-
-        Member member = findMemberByEmail(userDetails.getUsername());
-        if (member == null) {
-            return "redirect:/error";
-        }
-
         model.addAttribute("member", member);
         return "mypage/roleChangeRequestForm";
     }
@@ -281,20 +240,8 @@ public class MypageController {
             @RequestParam("file") MultipartFile file,
             @RequestParam("accommodationTitle") String accommodationTitle,
             @RequestParam("accommodationDescription") String accommodationDescription) {
-        if (validateAccessToken(accessToken) != null) {
-            return "redirect:/login"; // 로그인 페이지로 리다이렉트
-        }
 
-        UserDetails userDetails = getUserDetails(accessToken);
-        if (userDetails == null) {
-            return "redirect:/login"; // 로그인 페이지로 리다이렉트
-        }
-
-        Member member = findMemberByEmail(userDetails.getUsername());
-        if (member == null) {
-            return "redirect:/error"; // 오류 페이지로 리다이렉트
-        }
-
+        Member member = memberService.getUserDetails(accessToken);
         try {
             roleChangeRequestService.requestRoleChange(member, file, accommodationTitle, accommodationDescription);
             return "redirect:/mypage/roleChangeRequestList"; // 성공 시 리스트 페이지로 리다이렉트
@@ -310,24 +257,13 @@ public class MypageController {
     // 호스트 승급 신청 리스트
     @GetMapping("/roleChangeRequestList")
     public String roleChangeRequestList(
-            @CookieValue(value = "accessToken", required = false) String accessToken,
+            @CookieValue(value = "accessToken", required = false) String accessToken,HttpSession session,
             Model model
     ) {
-        if (validateAccessToken(accessToken) != null) {
-            return "redirect:/login";
+        Member member = memberService.getUserDetails(accessToken);
+        if (session.getAttribute("passwordChecked") == null) {
+            return "redirect:/mypage/check";
         }
-
-        UserDetails userDetails = getUserDetails(accessToken);
-        if (userDetails == null) {
-            return "redirect:/login";
-        }
-
-        Member member = findMemberByEmail(userDetails.getUsername());
-        if (member == null) {
-            return "redirect:/error";
-        }
-
-
         List<RoleChangeRequest> requestByMember = roleChangeRequestService.getRequestByMember(member);
 
 
@@ -345,19 +281,12 @@ public class MypageController {
             @RequestParam(value = "size", defaultValue = "3") int size,
             Model model
     ) {
-        // 인증 확인
-        if (accessToken == null || !tokenProvider.validate(accessToken)) {
-            return "redirect:/member/login"; // 로그인 페이지로 리다이렉트
-        }
+        Member member = memberService.getUserDetails(accessToken);
 
         try {
             // 페이지 번호와 사이즈 검증
             page = Math.max(page, 0); // 페이지 번호는 음수일 수 없음
             size = Math.max(size, 1); // 페이지 사이즈는 1 이상이어야 함
-
-            Authentication authentication = tokenProvider.getAuthentication(accessToken);
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            Member member = memberService.findByEmail(userDetails.getUsername());
 
             Pageable pageable = PageRequest.of(page, size);
             Page<Accommodation> likesByMember = memberLikeService.getLikesByMember(member, pageable);
@@ -380,31 +309,8 @@ public class MypageController {
         }
     }
 
-    // 토큰 유효성 검사 및 사용자 세부정보 가져오기
-    private UserDetails getUserDetailsOrRedirect(String accessToken) {
-        if (isInvalidToken(accessToken)) {
-            return null; // 토큰이 유효하지 않으면 null 반환
-        }
-        return getUserDetails(accessToken);
-    }
 
-    private boolean isInvalidToken(String accessToken) {
-        return accessToken == null || !tokenProvider.validate(accessToken);
-    }
 
-    private UserDetails getUserDetails(String accessToken) {
-        Authentication authentication = tokenProvider.getAuthentication(accessToken);
-        return (UserDetails) authentication.getPrincipal();
-    }
 
-    private Member findMemberByEmail(String email) {
-        return memberService.findByEmail(email);
-    }
 
-    private ResponseEntity<Void> validateAccessToken(String accessToken) {
-        if (isInvalidToken(accessToken)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        return null;
-    }
 }

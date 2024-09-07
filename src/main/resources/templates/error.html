@@ -3,8 +3,56 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>오류 발생</title>
+  <title>서비스 오류</title>
   <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #343a40;
+      color: #ffffff;
+      padding: 20px;
+      text-align: center;
+    }
+    main {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    h1, h2 {
+      margin: 0;
+      padding: 0;
+      color: #343a40;
+    }
+    p {
+      color: #495057;
+      line-height: 1.6;
+    }
+    a {
+      color: #007bff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    footer {
+      background-color: #343a40;
+      color: #ffffff;
+      text-align: center;
+      padding: 10px;
+      position: fixed;
+      width: 100%;
+      bottom: 0;
+    }
+  </style>
 </head>
 <body>
 <header>
@@ -13,7 +61,7 @@
 <main>
   <section>
     <h2>죄송합니다, 문제가 발생했습니다.</h2>
-    <p>요청을 처리하는 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.</p>
+    <p id="error-message">요청을 처리하는 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.</p>
     <p>문제가 지속되면, 관리자에게 문의해 주세요.</p>
     <a href="/home/homepage">홈으로 돌아가기</a>
   </section>
@@ -21,5 +69,15 @@
 <footer>
   <p>&copy; 2024 Your Company. All rights reserved.</p>
 </footer>
+
+<script>
+  // URL 쿼리 파라미터에서 메시지 추출
+  const params = new URLSearchParams(window.location.search);
+  const message = params.get('message');
+  if (message) {
+    // 메시지가 존재하면 페이지에 표시
+    document.getElementById('error-message').innerText = decodeURIComponent(message);
+  }
+</script>
 </body>
 </html>

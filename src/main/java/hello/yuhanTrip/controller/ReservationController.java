@@ -49,7 +49,7 @@ public class ReservationController {
             @RequestParam(value = "checkout", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkout,
             @CookieValue(value = "accessToken", required = false) String accessToken) {
 
-        Member member = getUserDetails(accessToken);
+        Member member = memberService.getUserDetails(accessToken);
         Room room = accommodationService.getRoomInfo(roomId);
 
         ReservationDTO reservationDTO = createReservationDTO(room, checkin, checkout, member);
@@ -85,8 +85,7 @@ public class ReservationController {
 
         log.info("예약 요청을 처리합니다...");
 
-        Member member = getUserDetails(accessToken);
-
+        Member member = memberService.getUserDetails(accessToken);
         try {
             Room room = accommodationService.getRoomInfo(reservationDTO.getRoomId());
             if (room == null) {
@@ -151,7 +150,7 @@ public class ReservationController {
             @RequestParam(value = "page", defaultValue = "0") int page,
             Model model) {
 
-        Member member = getUserDetails(accessToken);
+        Member member = memberService.getUserDetails(accessToken);
         log.info("예약 확정 확인 유저 : {}", member.getName());
 
         Pageable pageable = PageRequest.of(page, 4);
@@ -177,8 +176,7 @@ public class ReservationController {
             @RequestParam("reservationId") Long id,
             Model model) {
 
-        Member member = getUserDetails(accessToken);
-
+        Member member = memberService.getUserDetails(accessToken);
         Reservation reservation = reservationService.findReservation(id);
         if (!reservation.getMember().getEmail().equals(member.getEmail())) {
             return "redirect:/accessDenied";
@@ -194,8 +192,7 @@ public class ReservationController {
             @RequestBody ReservationUpdateDTO reservationUpdateDTO,
             @CookieValue(value = "accessToken", required = false) String accessToken) {
 
-        Member member = getUserDetails(accessToken);
-
+        Member member = memberService.getUserDetails(accessToken);
         try {
             validateReservationUpdateDates(reservationUpdateDTO);
 
@@ -227,8 +224,7 @@ public class ReservationController {
             @CookieValue(value = "accessToken", required = false) String accessToken,
             Model model) {
 
-        Member member = getUserDetails(accessToken);
-
+        Member member = memberService.getUserDetails(accessToken);
         List<Reservation> cancelledReservations = member.getReservations().stream()
                 .filter(reservation -> ReservationStatus.CANCELLED.equals(reservation.getReservationStatus()))
                 .collect(Collectors.toList());
@@ -256,18 +252,6 @@ public class ReservationController {
     @GetMapping("/fail-payment")
     public String failPaymentPage() {
         return "error";
-    }
-
-    private Member getUserDetails(String accessToken) {
-        if (accessToken == null || !tokenProvider.validate(accessToken)) {
-            throw new UnauthorizedException("인증되지 않은 사용자입니다.");
-        }
-
-        Authentication authentication = tokenProvider.getAuthentication(accessToken);
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        log.info("예약 시도 유저 : {}", userDetails.getUsername());
-
-        return memberService.findByEmail(userDetails.getUsername());
     }
 
     private ReservationDTO createReservationDTO(Room room, LocalDate checkin, LocalDate checkout, Member member) {
@@ -319,4 +303,5 @@ public class ReservationController {
         return ResponseEntity.status(status)
                 .body(Map.of("message", message));
     }
+
 }
