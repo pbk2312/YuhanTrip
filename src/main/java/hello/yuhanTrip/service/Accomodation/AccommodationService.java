@@ -1,8 +1,8 @@
 package hello.yuhanTrip.service.Accomodation;
 
-import hello.yuhanTrip.domain.Accommodation;
-import hello.yuhanTrip.domain.AccommodationType;
-import hello.yuhanTrip.domain.Room;
+import hello.yuhanTrip.domain.accommodation.Accommodation;
+import hello.yuhanTrip.domain.accommodation.AccommodationType;
+import hello.yuhanTrip.domain.accommodation.Room;
 import hello.yuhanTrip.dto.AccommodationRegisterDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

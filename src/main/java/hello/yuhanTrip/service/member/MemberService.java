@@ -1,6 +1,6 @@
-package hello.yuhanTrip.service;
+package hello.yuhanTrip.service.member;
 
-import hello.yuhanTrip.domain.Accommodation;
+import hello.yuhanTrip.domain.accommodation.Accommodation;
 import hello.yuhanTrip.domain.Member;
 import hello.yuhanTrip.dto.LoginDTO;
 import hello.yuhanTrip.dto.LogoutDTO;

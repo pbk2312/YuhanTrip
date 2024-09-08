@@ -1,14 +1,18 @@
 package hello.yuhanTrip.controller;
 
 import hello.yuhanTrip.domain.*;
+import hello.yuhanTrip.domain.accommodation.Room;
+import hello.yuhanTrip.domain.reservation.Payment;
+import hello.yuhanTrip.domain.reservation.PaymentStatus;
+import hello.yuhanTrip.domain.reservation.Reservation;
+import hello.yuhanTrip.domain.reservation.ReservationStatus;
 import hello.yuhanTrip.dto.ReservationDTO;
 import hello.yuhanTrip.dto.ReservationUpdateDTO;
-import hello.yuhanTrip.exception.UnauthorizedException;
 import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.repository.PaymentRepository;
 import hello.yuhanTrip.service.Accomodation.AccommodationServiceImpl;
 import hello.yuhanTrip.service.Accomodation.ReservationService;
-import hello.yuhanTrip.service.MemberService;
+import hello.yuhanTrip.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -17,8 +21,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +35,6 @@ import java.util.stream.Collectors;
 @Log4j2
 public class ReservationController {
 
-    private final TokenProvider tokenProvider;
     private final MemberService memberService;
     private final AccommodationServiceImpl accommodationService;
     private final ReservationService reservationService;
@@ -54,7 +55,10 @@ public class ReservationController {
 
         ReservationDTO reservationDTO = createReservationDTO(room, checkin, checkout, member);
 
+        List<Coupon> coupons = member.getCoupons();
+
         model.addAttribute("reservation", reservationDTO);
+        model.addAttribute("coupons",coupons);
         model.addAttribute("room", room);
         return "reservation/reservation";
     }
@@ -106,6 +110,8 @@ public class ReservationController {
             long numberOfNights = ChronoUnit.DAYS.between(reservationDTO.getCheckInDate(), reservationDTO.getCheckOutDate());
             Long totalPrice = reservationDTO.getPrice() * numberOfNights;
 
+
+
             Payment payment = new Payment(totalPrice, PaymentStatus.PENDING);
             Payment savedPayment = paymentRepository.save(payment);
 
@@ -124,6 +130,7 @@ public class ReservationController {
                     .numberOfGuests(reservationDTO.getNumberOfGuests())
                     .accommodationId(room.getAccommodation().getId())
                     .reservationStatus(ReservationStatus.RESERVED)
+                    .couponId(reservationDTO.getCouponId())
                     .build();
 
             reservationService.reservationRegister(reservation);

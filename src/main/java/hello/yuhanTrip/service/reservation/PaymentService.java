@@ -1,8 +1,8 @@
-package hello.yuhanTrip.service;
+package hello.yuhanTrip.service.reservation;
 
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
-import hello.yuhanTrip.domain.PaymentStatus;
+import hello.yuhanTrip.domain.reservation.PaymentStatus;
 import hello.yuhanTrip.dto.payment.PaymentCallbackRequest;
 import hello.yuhanTrip.dto.payment.PaymentCancelDTO;
 import hello.yuhanTrip.dto.payment.PaymentDTO;
@@ -17,7 +17,7 @@ public interface PaymentService {
 
 
     // 결제 조회
-    hello.yuhanTrip.domain.Payment findPayment(String paymentUid);
+    hello.yuhanTrip.domain.reservation.Payment findPayment(String paymentUid);
 
     // 결제 삭제
     void remove(String paymentUid);

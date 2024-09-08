@@ -1,8 +1,8 @@
 package hello.yuhanTrip.repository;
 
 
-import hello.yuhanTrip.domain.Payment;
-import hello.yuhanTrip.domain.PaymentStatus;
+import hello.yuhanTrip.domain.reservation.Payment;
+import hello.yuhanTrip.domain.reservation.PaymentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

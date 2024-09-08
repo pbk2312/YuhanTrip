@@ -1,17 +1,22 @@
-package hello.yuhanTrip.service;
+package hello.yuhanTrip.service.reservation;
 
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.request.CancelData;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
-import hello.yuhanTrip.domain.PaymentStatus;
-import hello.yuhanTrip.domain.Reservation;
+import hello.yuhanTrip.domain.Coupon;
+import hello.yuhanTrip.domain.Member;
+import hello.yuhanTrip.domain.reservation.PaymentStatus;
+import hello.yuhanTrip.domain.reservation.Reservation;
 import hello.yuhanTrip.dto.payment.PaymentCallbackRequest;
 import hello.yuhanTrip.dto.payment.PaymentCancelDTO;
 import hello.yuhanTrip.dto.payment.PaymentDTO;
 import hello.yuhanTrip.repository.PaymentRepository;
 import hello.yuhanTrip.repository.ReservationRepository;
+import hello.yuhanTrip.service.discount.CouponService;
+import hello.yuhanTrip.service.member.MemberService;
+import hello.yuhanTrip.service.reservation.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -30,12 +35,32 @@ public class PaymentServiceImpl implements PaymentService {
     private final ReservationRepository reservationRepository;
     private final PaymentRepository paymentRepository;
     private final IamportClient iamportClient;
+    private final CouponService couponService;
 
     @Override
     public PaymentDTO findRequestDto(String reservationUid) {
+        // 예약 정보를 가져오기
         Reservation reservation = reservationRepository.findReservationAndPaymentAndMember(reservationUid)
                 .orElseThrow(() -> new IllegalArgumentException("예약이 존재하지 않아요"));
 
+        // 결제 금액 가져오기
+        hello.yuhanTrip.domain.reservation.Payment payment = reservation.getPayment();
+        Long totalPrice = payment.getPrice();
+        Double totalPriceAsDouble = totalPrice.doubleValue(); // Long을 Double로 변환
+
+        // 쿠폰 적용 여부 확인 및 처리
+        Double discountedPriceAsDouble = totalPriceAsDouble;
+        if (reservation.getCouponId() != null) {
+            Coupon coupon = couponService.findCouponById(reservation.getCouponId());
+            discountedPriceAsDouble = coupon.applyDiscount(totalPriceAsDouble); // 쿠폰이 있는 경우 할인 적용
+        }
+
+        Long discountedPrice = Math.round(discountedPriceAsDouble); // 할인된 가격을 Long으로 변환
+
+        payment.setPrice(discountedPrice);
+        paymentRepository.save(payment);
+
+        // 결제 DTO 생성 및 반환
         return PaymentDTO.builder()
                 .buyerName(reservation.getName())
                 .roomId(reservation.getRoom().getId())
@@ -44,11 +69,12 @@ public class PaymentServiceImpl implements PaymentService {
                 .specialRequests(reservation.getSpecialRequests())
                 .reservationDate(reservation.getReservationDate())
                 .checkInDate(reservation.getCheckInDate())
-                .totalPrice(reservation.getPayment().getPrice())
+                .totalPrice(totalPrice) // 원래 가격
                 .checkOutDate(reservation.getCheckOutDate())
                 .accommodationId(reservation.getId())
                 .phoneNumber(reservation.getPhoneNumber())
                 .reservationUid(reservationUid)
+                .discountedPrice(discountedPrice) // 할인된 가격
                 .numberOfGuests(reservation.getNumberOfGuests())
                 .build();
     }
@@ -94,7 +120,8 @@ public class PaymentServiceImpl implements PaymentService {
             // 결제 상태 변경
             reservation.getPayment().changePaymentBySuccess(PaymentStatus.COMPLETED, iamportResponse.getResponse().getImpUid());
 
-
+            // 쿠폰 삭제
+            couponService.deleteCoupon(reservation.getCouponId());
             log.info("결제 완료...");
             return iamportResponse;
 
@@ -106,17 +133,16 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public hello.yuhanTrip.domain.Payment findPayment(String paymentUid) {
-        hello.yuhanTrip.domain.Payment byPaymentUid = paymentRepository.findByPaymentUid(paymentUid);
+    public hello.yuhanTrip.domain.reservation.Payment findPayment(String paymentUid) {
+        hello.yuhanTrip.domain.reservation.Payment byPaymentUid = paymentRepository.findByPaymentUid(paymentUid);
         return byPaymentUid;
     }
 
     @Override
     public void remove(String paymentUid) {
-        hello.yuhanTrip.domain.Payment payment = findPayment(paymentUid);
+        hello.yuhanTrip.domain.reservation.Payment payment = findPayment(paymentUid);
         paymentRepository.delete(payment);
     }
-
 
 
     public void cancelReservation(PaymentCancelDTO paymentCancelDTO) {

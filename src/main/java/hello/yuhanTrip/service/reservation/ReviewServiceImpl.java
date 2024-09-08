@@ -1,11 +1,16 @@
-package hello.yuhanTrip.service;
+package hello.yuhanTrip.service.reservation;
 
 import hello.yuhanTrip.domain.*;
+import hello.yuhanTrip.domain.accommodation.Accommodation;
+import hello.yuhanTrip.domain.accommodation.Review;
+import hello.yuhanTrip.domain.accommodation.ReviewImage;
+import hello.yuhanTrip.domain.reservation.Reservation;
 import hello.yuhanTrip.repository.AccommodationRepository;
 import hello.yuhanTrip.repository.ReviewImageRepository;
 import hello.yuhanTrip.repository.ReviewRepository;
 import hello.yuhanTrip.service.Accomodation.AccommodationServiceImpl;
 import hello.yuhanTrip.service.Accomodation.ReservationService;
+import hello.yuhanTrip.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,7 +34,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Log4j2
 @Service
-public class ReviewServiceImpl implements ReviewService{
+public class ReviewServiceImpl implements ReviewService {
 
 
     private final ReviewRepository reviewRepository;

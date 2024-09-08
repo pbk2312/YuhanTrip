@@ -1,4 +1,4 @@
-package hello.yuhanTrip.domain;
+package hello.yuhanTrip.domain.accommodation;
 
 import java.util.HashMap;
 import java.util.Map;

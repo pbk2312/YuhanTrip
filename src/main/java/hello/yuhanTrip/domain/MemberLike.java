@@ -1,6 +1,7 @@
 package hello.yuhanTrip.domain;
 
 
+import hello.yuhanTrip.domain.accommodation.Accommodation;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

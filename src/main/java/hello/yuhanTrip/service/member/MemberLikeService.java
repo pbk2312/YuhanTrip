@@ -1,7 +1,7 @@
-package hello.yuhanTrip.service;
+package hello.yuhanTrip.service.member;
 
 
-import hello.yuhanTrip.domain.Accommodation;
+import hello.yuhanTrip.domain.accommodation.Accommodation;
 import hello.yuhanTrip.domain.Member;
 import hello.yuhanTrip.domain.MemberLike;
 import hello.yuhanTrip.repository.MemberLikeRepository;

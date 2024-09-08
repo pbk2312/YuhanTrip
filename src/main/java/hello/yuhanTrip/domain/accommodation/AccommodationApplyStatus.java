@@ -1,4 +1,4 @@
-package hello.yuhanTrip.domain;
+package hello.yuhanTrip.domain.accommodation;
 
 public enum AccommodationApplyStatus {
     PENDING,   // 승인 대기 중인 상태

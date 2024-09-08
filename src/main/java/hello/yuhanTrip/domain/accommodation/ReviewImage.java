@@ -1,6 +1,7 @@
-package hello.yuhanTrip.domain;
+package hello.yuhanTrip.domain.accommodation;
 
 
+import hello.yuhanTrip.domain.accommodation.Review;
 import jakarta.persistence.*;
 import lombok.*;
 

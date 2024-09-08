@@ -1,8 +1,8 @@
 package hello.yuhanTrip.service.Accomodation;
 
 import hello.yuhanTrip.domain.Member;
-import hello.yuhanTrip.domain.Reservation;
-import hello.yuhanTrip.domain.Room;
+import hello.yuhanTrip.domain.reservation.Reservation;
+import hello.yuhanTrip.domain.accommodation.Room;
 import hello.yuhanTrip.dto.ReservationDTO;
 import hello.yuhanTrip.dto.ReservationUpdateDTO;
 import org.springframework.data.domain.Page;

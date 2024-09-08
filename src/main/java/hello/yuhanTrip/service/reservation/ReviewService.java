@@ -1,6 +1,6 @@
-package hello.yuhanTrip.service;
+package hello.yuhanTrip.service.reservation;
 
-import hello.yuhanTrip.domain.Review;
+import hello.yuhanTrip.domain.accommodation.Review;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 

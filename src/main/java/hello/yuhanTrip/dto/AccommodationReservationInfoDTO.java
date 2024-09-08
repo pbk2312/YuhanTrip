@@ -1,8 +1,8 @@
 package hello.yuhanTrip.dto;
 
-import hello.yuhanTrip.domain.Accommodation;
-import hello.yuhanTrip.domain.Reservation;
-import hello.yuhanTrip.domain.Room;
+import hello.yuhanTrip.domain.accommodation.Accommodation;
+import hello.yuhanTrip.domain.reservation.Reservation;
+import hello.yuhanTrip.domain.accommodation.Room;
 import lombok.Getter;
 import lombok.Setter;
 

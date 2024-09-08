@@ -1,5 +1,8 @@
-package hello.yuhanTrip.domain;
+package hello.yuhanTrip.domain.reservation;
 
+import hello.yuhanTrip.domain.Member;
+import hello.yuhanTrip.domain.accommodation.Review;
+import hello.yuhanTrip.domain.accommodation.Room;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -71,6 +74,9 @@ public class Reservation {
     @OneToOne(mappedBy = "reservation", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
     private Review review;
 
+    // 쿠폰 ID 추가
+    @Column(name = "coupon_id")
+    private Long couponId; // 쿠폰 ID를 저장하는 필드 추가
 
 
 

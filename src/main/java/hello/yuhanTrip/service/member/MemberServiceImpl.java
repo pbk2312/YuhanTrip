@@ -1,6 +1,7 @@
-package hello.yuhanTrip.service;
+package hello.yuhanTrip.service.member;
 
 import hello.yuhanTrip.domain.*;
+import hello.yuhanTrip.domain.accommodation.Accommodation;
 import hello.yuhanTrip.dto.LoginDTO;
 import hello.yuhanTrip.dto.LogoutDTO;
 import hello.yuhanTrip.dto.WithdrawalMembershipDTO;
@@ -17,6 +18,7 @@ import hello.yuhanTrip.repository.EmailRepository;
 import hello.yuhanTrip.repository.MemberRepository;
 import hello.yuhanTrip.repository.RefreshTokenRepository;
 import hello.yuhanTrip.repository.ResetTokenRepository;
+import hello.yuhanTrip.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -34,7 +36,7 @@ import java.util.Random;
 @Service
 @Log4j2
 @RequiredArgsConstructor
-public class MemberServiceImpl implements MemberService{
+public class MemberServiceImpl implements MemberService {
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final MemberRepository memberRepository;

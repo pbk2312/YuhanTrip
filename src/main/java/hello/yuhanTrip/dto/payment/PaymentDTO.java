@@ -32,6 +32,7 @@ public class PaymentDTO {
     private String phoneNumber; // 고객 전화번호
     private String specialRequests; // 특별 요청 사항
     private Long totalPrice; // 총 가격
+    private Long discountedPrice; // 쿠폰 적용된 가격
     private int numberOfGuests; // 숙박 인원수
 
 

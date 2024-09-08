@@ -1,6 +1,6 @@
 package hello.yuhanTrip.repository;
 
-import hello.yuhanTrip.domain.ReviewImage;
+import hello.yuhanTrip.domain.accommodation.ReviewImage;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 

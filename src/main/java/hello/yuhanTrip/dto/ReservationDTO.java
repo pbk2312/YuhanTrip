@@ -28,6 +28,7 @@ public class ReservationDTO {
     private Long price; //  1박 가격
     private String addr; // 예약자 주소
     private int numberOfGuests; // 숙박 인원수
+    private Long couponId;
 
 
 }

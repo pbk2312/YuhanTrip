@@ -1,7 +1,7 @@
 package hello.yuhanTrip.repository;
 
-import hello.yuhanTrip.domain.ReservationStatus;
-import hello.yuhanTrip.domain.Room;
+import hello.yuhanTrip.domain.reservation.ReservationStatus;
+import hello.yuhanTrip.domain.accommodation.Room;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

@@ -1,17 +1,15 @@
 package hello.yuhanTrip.controller;
 
-import hello.yuhanTrip.domain.Accommodation;
+import hello.yuhanTrip.domain.accommodation.Accommodation;
 import hello.yuhanTrip.domain.Member;
-import hello.yuhanTrip.domain.Reservation;
-import hello.yuhanTrip.domain.Room;
+import hello.yuhanTrip.domain.reservation.Reservation;
+import hello.yuhanTrip.domain.accommodation.Room;
 import hello.yuhanTrip.domain.admin.RoleChangeRequest;
 import hello.yuhanTrip.dto.MypageMemberDTO;
-import hello.yuhanTrip.exception.UnauthorizedException;
-import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.service.Accomodation.AccommodationServiceImpl;
 import hello.yuhanTrip.service.Accomodation.ReservationService;
-import hello.yuhanTrip.service.MemberLikeService;
-import hello.yuhanTrip.service.MemberService;
+import hello.yuhanTrip.service.member.MemberLikeService;
+import hello.yuhanTrip.service.member.MemberService;
 import hello.yuhanTrip.service.RoleChangeRequestService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;

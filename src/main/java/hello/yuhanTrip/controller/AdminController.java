@@ -1,6 +1,6 @@
 package hello.yuhanTrip.controller;
 
-import hello.yuhanTrip.domain.Accommodation;
+import hello.yuhanTrip.domain.accommodation.Accommodation;
 import hello.yuhanTrip.domain.admin.RoleChangeRequest;
 import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.service.Accomodation.AccommodationService;

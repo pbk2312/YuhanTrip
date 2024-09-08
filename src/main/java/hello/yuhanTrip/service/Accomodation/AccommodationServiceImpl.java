@@ -2,10 +2,15 @@ package hello.yuhanTrip.service.Accomodation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import hello.yuhanTrip.domain.*;
+import hello.yuhanTrip.domain.accommodation.Accommodation;
+import hello.yuhanTrip.domain.accommodation.AccommodationApplyStatus;
+import hello.yuhanTrip.domain.accommodation.AccommodationType;
+import hello.yuhanTrip.domain.accommodation.Room;
+import hello.yuhanTrip.domain.reservation.ReservationStatus;
 import hello.yuhanTrip.dto.AccommodationRegisterDTO;
 import hello.yuhanTrip.repository.AccommodationRepository;
 import hello.yuhanTrip.repository.RoomRepository;
-import hello.yuhanTrip.service.MemberService;
+import hello.yuhanTrip.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;

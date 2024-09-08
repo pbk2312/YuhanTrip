@@ -337,12 +337,6 @@
                 <p><strong>결제 금액:</strong> <span th:text="${reservation.getPayment().price}">결제 금액</span> 원</p>
                 <p><strong>투숙 인원:</strong> <span th:text="${reservation.getNumberOfGuests()}">투숙 인원</span> 명</p>
 
-                <!-- 전화번호가 있는 경우만 표시 -->
-                <div class="contact-info" th:if="${reservation.reservationStatus == T(hello.yuhanTrip.domain.ReservationStatus).REJECTED}">
-                    <p><strong>숙소 전화번호:</strong> <span th:text="${reservation.room.getAccommodation().getTel()}">전화번호</span></p>
-                    <p>예약이 거절되었습니다. 숙소에 직접 연락하여 추가 정보를 확인해 주세요.</p>
-                </div>
-
                 <div class="reservation-actions">
                     <a th:href="@{/reservationUpdate(reservationId=${reservation.id})}"
                        class="btn btn-primary update-button">예약 수정</a>
@@ -352,8 +346,16 @@
                     <a href="#" class="btn btn-info review-button" style="display: none;"
                        th:data-id="${reservation.id}">후기 작성</a>
                 </div>
+
+                <div class="contact-info" th:if="${reservation.reservationStatus == T(hello.yuhanTrip.domain.reservation.Reservation.reservationStatus).REJECTED}">
+                    <p><strong>숙소 전화번호:</strong> <span th:text="${reservation.room.getAccommodation().getTel()}">전화번호</span></p>
+                    <p>예약이 거절되었습니다. 숙소에 직접 연락하여 추가 정보를 확인해 주세요.</p>
+                </div>
             </div>
         </div>
+
+
+
 
         <!-- 예약 내역이 없는 경우 -->
         <div class="no-reservations" th:if="${#lists.isEmpty(reservations)}">

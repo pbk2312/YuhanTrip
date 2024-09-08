@@ -2,10 +2,10 @@ package hello.yuhanTrip.service.Accomodation;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import hello.yuhanTrip.domain.Accommodation;
-import hello.yuhanTrip.domain.AccommodationApplyStatus;
-import hello.yuhanTrip.domain.Review;
-import hello.yuhanTrip.domain.Room;
+import hello.yuhanTrip.domain.accommodation.Accommodation;
+import hello.yuhanTrip.domain.accommodation.AccommodationApplyStatus;
+import hello.yuhanTrip.domain.accommodation.Review;
+import hello.yuhanTrip.domain.accommodation.Room;
 import hello.yuhanTrip.repository.AccommodationRepository;
 import hello.yuhanTrip.repository.ReviewRepository;
 import hello.yuhanTrip.repository.RoomRepository;

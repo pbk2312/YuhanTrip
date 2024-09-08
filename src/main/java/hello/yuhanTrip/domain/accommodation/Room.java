@@ -1,6 +1,7 @@
-package hello.yuhanTrip.domain;
+package hello.yuhanTrip.domain.accommodation;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import hello.yuhanTrip.domain.reservation.Reservation;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

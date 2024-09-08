@@ -2,7 +2,10 @@ package hello.yuhanTrip.domain;
 
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import hello.yuhanTrip.domain.accommodation.Accommodation;
+import hello.yuhanTrip.domain.accommodation.Review;
 import hello.yuhanTrip.domain.admin.RoleChangeRequest;
+import hello.yuhanTrip.domain.reservation.Reservation;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -56,6 +59,9 @@ public class Member {
 
     @OneToMany(mappedBy = "member")
     private List<RoleChangeRequest> roleChangeRequests;  // 추가된 부분
+
+    @OneToMany(mappedBy = "member")
+    private List<Coupon> coupons;
 
 }
 

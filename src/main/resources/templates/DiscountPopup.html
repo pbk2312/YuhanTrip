@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discount Popup</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        .coupon-container {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px auto;
+            width: 80%;
+            max-width: 500px;
+            background-color: #f9f9f9;
+        }
+        .coupon-container h2 {
+            color: #333;
+        }
+        .coupon-container p {
+            font-size: 18px;
+        }
+        .coupon-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .coupon-button:hover {
+            background-color: #0056b3;
+        }
+        .none-message {
+            font-size: 20px;
+            color: #888;
+        }
+        .hide-today {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #555;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<h1>이벤트 쿠폰</h1>
+
+<div class="coupon-container" id="coupon-popup">
+    <!-- 고정 금액 할인 쿠폰 -->
+    <div id="fixed-coupon" style="display: none;">
+        <h2>🎉 자정 이벤트! 고정 금액 할인 쿠폰을 받으세요! 🎉</h2>
+        <p>할인 금액: <strong id="fixed-discount"></strong></p>
+        <button class="coupon-button" onclick="requestCoupon('fixed', 10000)">쿠폰 받기</button>
+    </div>
+
+    <!-- 비율 할인 쿠폰 -->
+    <div id="percentage-coupon" style="display: none;">
+        <h2>🎉 저녁 6시 이벤트! 비율 할인 쿠폰을 받으세요! 🎉</h2>
+        <p>할인 비율: <strong id="percentage-discount"></strong></p>
+        <button class="coupon-button" onclick="requestCoupon('percentage', 0.2)">쿠폰 받기</button>
+    </div>
+
+    <!-- 이벤트가 없는 경우 -->
+    <div id="no-event" style="display: none;">
+        <p class="none-message">현재 이벤트가 없습니다.</p>
+    </div>
+
+    <div class="hide-today" onclick="hidePopupForToday()">오늘 하루 보지 않기</div>
+</div>
+
+<script>
+    // 오늘 날짜를 'YYYY-MM-DD' 형식으로 반환하는 함수
+    function getTodayDate() {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    // "오늘 하루 보지 않기"를 선택했을 때 실행되는 함수
+    function hidePopupForToday() {
+        const todayDate = getTodayDate();
+        localStorage.setItem('hidePopupDate', todayDate);
+        document.getElementById('coupon-popup').style.display = 'none';
+
+        // 팝업 창을 닫음
+        if (window.opener && !window.opener.closed) {
+            window.close();  // 팝업 창을 닫음
+        }
+    }
+
+    // 페이지가 로드될 때 팝업 표시 여부를 결정하는 함수
+    document.addEventListener('DOMContentLoaded', () => {
+        const hidePopupDate = localStorage.getItem('hidePopupDate');
+        const todayDate = getTodayDate();
+
+        if (hidePopupDate === todayDate) {
+            // 오늘 하루 보지 않기를 선택한 경우 팝업을 표시하지 않음
+            document.getElementById('coupon-popup').style.display = 'none';
+            return;
+        }
+
+        // 이벤트 종류에 따라 쿠폰 영역을 표시합니다.
+        const discountType = /*[[${discountType}]]*/ 'fixed'; // 예시로 'fixed'로 설정
+        if (discountType === 'fixed') {
+            document.getElementById('fixed-coupon').style.display = 'block';
+            document.getElementById('fixed-discount').innerText = '10,000원';
+        } else if (discountType === 'percentage') {
+            document.getElementById('percentage-coupon').style.display = 'block';
+            document.getElementById('percentage-discount').innerText = '20%';
+        } else {
+            document.getElementById('no-event').style.display = 'block';
+        }
+    });
+
+    async function requestCoupon(discountType, discountValue) {
+        const accessToken = localStorage.getItem('accessToken');
+
+        if (!accessToken) {
+            alert('로그인이 필요합니다. 로그인 후 쿠폰을 받으세요.');
+            return;
+        }
+
+        let endpoint = '';
+        if (discountType === 'fixed') {
+            endpoint = `/api/coupons/fixed?discountAmount=${discountValue}`;
+        } else if (discountType === 'percentage') {
+            endpoint = `/api/coupons/percentage?discountRate=${discountValue}`;
+        }
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+            });
+            if (!response.ok) {
+                alert('쿠폰 발급에 성공하였습니다.쿠폰은 1회만 발급 가능합니다');
+                window.close();  // 팝업 창 닫기
+            }
+        } catch (error) {
+            console.error('Error fetching coupon:', error);
+            alert('쿠폰 발급 중 오류가 발생하였습니다.');
+        }
+    }
+</script>
+</body>
+</html>

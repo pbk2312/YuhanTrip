@@ -1,11 +1,16 @@
 package hello.yuhanTrip.service.Accomodation;
 
 import hello.yuhanTrip.domain.*;
+import hello.yuhanTrip.domain.accommodation.Room;
+import hello.yuhanTrip.domain.reservation.Payment;
+import hello.yuhanTrip.domain.reservation.PaymentStatus;
+import hello.yuhanTrip.domain.reservation.Reservation;
+import hello.yuhanTrip.domain.reservation.ReservationStatus;
 import hello.yuhanTrip.dto.ReservationDTO;
 import hello.yuhanTrip.dto.ReservationUpdateDTO;
 import hello.yuhanTrip.repository.PaymentRepository;
 import hello.yuhanTrip.repository.ReservationRepository;
-import hello.yuhanTrip.service.PaymentService;
+import hello.yuhanTrip.service.reservation.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;

@@ -3,22 +3,22 @@ package hello.yuhanTrip.controller;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
 import hello.yuhanTrip.domain.*;
+import hello.yuhanTrip.domain.accommodation.Accommodation;
+import hello.yuhanTrip.domain.reservation.PaymentStatus;
+import hello.yuhanTrip.domain.reservation.Reservation;
+import hello.yuhanTrip.domain.reservation.ReservationStatus;
 import hello.yuhanTrip.dto.ReservationDTO;
 import hello.yuhanTrip.dto.payment.PaymentCallbackRequest;
 import hello.yuhanTrip.dto.payment.PaymentCancelDTO;
 import hello.yuhanTrip.dto.payment.PaymentDTO;
-import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.repository.ReservationRepository;
 import hello.yuhanTrip.service.Accomodation.AccommodationServiceImpl;
 import hello.yuhanTrip.service.Accomodation.ReservationService;
-import hello.yuhanTrip.service.MemberService;
-import hello.yuhanTrip.service.PaymentService;
+import hello.yuhanTrip.service.member.MemberService;
+import hello.yuhanTrip.service.reservation.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.*;
 public class PaymentController {
 
     private final ReservationRepository reservationRepository;
-    private final TokenProvider tokenProvider;
     private final PaymentService paymentService;
     private final ReservationService reservationService;
     private final AccommodationServiceImpl accommodationService;
@@ -59,18 +58,17 @@ public class PaymentController {
         }
         String reservationUid = reservationInfo.getReservationUid();
         log.info("reservationUid: {}", reservationUid);
+
         PaymentDTO requestDto = paymentService.findRequestDto(reservationUid);
         requestDto.setAddr(member.getEmail());
 
 
         log.info("paymentRequest = {} ", requestDto);
-        log.info("예약자 이메일 : {}", member.getEmail());
-        log.info("숙소 예약자 : {}", reservationInfo.getName());
-        log.info("총 가격 : {}", totalPrice);
 
         // 예약 정보를 PaymentDTO에 담기
         // 모델에 PaymentDTO 추가
         model.addAttribute("requestDto", requestDto);
+
 
         // 결제 페이지로 이동
         return "paymentPage";
@@ -109,7 +107,7 @@ public class PaymentController {
 
         // 2. 결제 정보 조회
         String paymentUid = reservation.getPayment().getPaymentUid();
-        hello.yuhanTrip.domain.Payment payment = paymentService.findPayment(paymentUid);
+        hello.yuhanTrip.domain.reservation.Payment payment = paymentService.findPayment(paymentUid);
 
         // 3. PaymentCancelDTO 생성
         PaymentCancelDTO paymentCancelDTO = new PaymentCancelDTO();
@@ -160,7 +158,7 @@ public class PaymentController {
             reservationService.updateReservationStatus(reservation);
 
 
-            hello.yuhanTrip.domain.Payment payment = paymentService.findPayment(paymentCancelDTO.getPaymentUid());
+            hello.yuhanTrip.domain.reservation.Payment payment = paymentService.findPayment(paymentCancelDTO.getPaymentUid());
 
 
 

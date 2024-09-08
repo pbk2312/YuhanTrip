@@ -1,4 +1,4 @@
-package hello.yuhanTrip.domain;
+package hello.yuhanTrip.domain.reservation;
 
 public enum PaymentStatus {
 

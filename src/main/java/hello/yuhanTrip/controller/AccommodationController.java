@@ -1,13 +1,13 @@
 package hello.yuhanTrip.controller;
 
 import hello.yuhanTrip.domain.*;
+import hello.yuhanTrip.domain.accommodation.*;
 import hello.yuhanTrip.dto.AccommodationRegisterDTO;
 import hello.yuhanTrip.dto.RoomDTO;
-import hello.yuhanTrip.exception.UnauthorizedException;
 import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.service.Accomodation.AccommodationServiceImpl;
-import hello.yuhanTrip.service.MemberService;
-import hello.yuhanTrip.service.ReviewService;
+import hello.yuhanTrip.service.member.MemberService;
+import hello.yuhanTrip.service.reservation.ReviewService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -15,8 +15,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
