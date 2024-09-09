@@ -551,6 +551,12 @@
         window.open("/discountPopup", "popup", "width=400,height=400");
     }
 
+    // 오늘 날짜를 반환하는 함수
+    function getTodayDate() {
+        const today = new Date();
+        return today.toISOString().split('T')[0]; // yyyy-mm-dd 형식의 날짜 반환
+    }
+
     // 페이지 로드 시 팝업 표시 여부를 결정하는 로직
     document.addEventListener('DOMContentLoaded', () => {
         const hidePopupDate = localStorage.getItem('hidePopupDate');
@@ -561,8 +567,18 @@
             return;
         }
 
-        // 팝업을 자동으로 띄우고 싶다면
-        setTimeout(openPopup, 1000); // 페이지 로드 후 1초 뒤 팝업 자동 오픈
+        // 서버에 현재 할인 이벤트가 있는지 확인
+        fetch('/discountPopup', { method: 'GET' })
+            .then(response => response.text())
+            .then(html => {
+                // 이벤트 시간이 아니면 팝업을 띄우지 않음
+                if (!html.includes("discountType") || html.includes('none')) {
+                    return;
+                }
+                // 이벤트 시간일 경우 팝업 띄우기
+                setTimeout(openPopup, 1000); // 페이지 로드 후 1초 뒤 팝업 자동 오픈
+            })
+            .catch(error => console.error('Error fetching discount popup:', error));
     });
 </script>
 
