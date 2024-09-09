@@ -123,8 +123,7 @@ public class PaymentServiceImpl implements PaymentService {
             // 쿠폰 삭제
             Long couponId = reservation.getCouponId();
             if (couponId == null) {
-                log.error("Coupon ID is null. Cannot proceed with coupon deletion.");
-                throw new IllegalArgumentException("Coupon ID must not be null for deletion.");
+                log.info("쿠폰 미적용");
             } else {
                 log.info("Deleting coupon with ID: {}", couponId);
                 couponService.deleteCoupon(couponId);

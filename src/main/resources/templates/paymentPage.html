@@ -109,7 +109,7 @@
         function requestPay() {
             var reservationUid = '[[${requestDto.reservationUid}]]';
             var roomId = '[[${requestDto.roomId}]]';
-            var totalPrice = [[${requestDto.discountedPrice}]];
+            var totalPrice = [[${requestDto.totalPrice}]];
             var buyerName = '[[${requestDto.buyerName}]]';
             var phoneNumber = '[[${requestDto.phoneNumber}]]';
             var addr = '[[${requestDto.addr}]]';
@@ -149,7 +149,12 @@
             });
         }
 
-        // 예약 취소 요청 함수
+        // 뒤로 가기 버튼 감지
+        window.addEventListener('popstate', function (event) {
+            cancelReservation();
+        });
+
+        // 예약 취소 요청
         function cancelReservation() {
             var reservationUid = '[[${requestDto.reservationUid}]]';
             fetch('/reservation/fail?reservationId=' + reservationUid, {
@@ -168,13 +173,9 @@
             });
         }
 
-        // 페이지를 떠나기 전 예약 취소 요청
-        window.addEventListener('beforeunload', function (event) {
-            cancelReservation();
-        });
-
         // 페이지 로드 시 브라우저 히스토리 관리
         window.history.pushState({page: "paymentPage"}, "", window.location.href);
+
     </script>
 </head>
 <body>
@@ -226,7 +227,6 @@
         <p><strong class="highlight">체크인 날짜:</strong> <span class="highlight" th:text="${requestDto.checkInDate}">체크인 날짜</span></p>
         <p><strong class="highlight">체크아웃 날짜:</strong> <span class="highlight" th:text="${requestDto.checkOutDate}">체크아웃 날짜</span></p>
         <p><strong>숙박 인원수:</strong> <span class="price"><span class="amount" th:text="${requestDto.numberOfGuests}">1</span>명</span></p>
-        <p><strong>쿠폰 적용된 금액</strong> <span class="price"><span class="amount" th:text="${requestDto.discountedPrice}">1</span>원</span></p>
     </div>
     <button class="btn btn-primary" onclick="requestPay()">
         결제하기
