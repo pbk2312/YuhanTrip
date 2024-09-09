@@ -121,7 +121,14 @@ public class PaymentServiceImpl implements PaymentService {
             reservation.getPayment().changePaymentBySuccess(PaymentStatus.COMPLETED, iamportResponse.getResponse().getImpUid());
 
             // 쿠폰 삭제
-            couponService.deleteCoupon(reservation.getCouponId());
+            Long couponId = reservation.getCouponId();
+            if (couponId == null) {
+                log.error("Coupon ID is null. Cannot proceed with coupon deletion.");
+                throw new IllegalArgumentException("Coupon ID must not be null for deletion.");
+            } else {
+                log.info("Deleting coupon with ID: {}", couponId);
+                couponService.deleteCoupon(couponId);
+            }
             log.info("결제 완료...");
             return iamportResponse;
 
