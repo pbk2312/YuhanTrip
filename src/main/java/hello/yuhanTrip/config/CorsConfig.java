@@ -17,9 +17,9 @@ public class CorsConfig implements WebMvcConfigurer {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-         config.addAllowedOrigin("http://pbk2312.shop");
-         config.addAllowedOrigin("https://pbk2312.shop");
-        //config.addAllowedOrigin("*");
+         //config.addAllowedOrigin("http://pbk2312.shop");
+       //  config.addAllowedOrigin("https://pbk2312.shop");
+        config.addAllowedOrigin("*");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         source.registerCorsConfiguration("/**", config);
