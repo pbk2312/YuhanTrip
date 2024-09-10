@@ -347,10 +347,7 @@
                        th:data-id="${reservation.id}">후기 작성</a>
                 </div>
 
-                <div class="contact-info" th:if="${reservation.reservationStatus == T(hello.yuhanTrip.domain.reservation.Reservation.reservationStatus).REJECTED}">
-                    <p><strong>숙소 전화번호:</strong> <span th:text="${reservation.room.getAccommodation().getTel()}">전화번호</span></p>
-                    <p>예약이 거절되었습니다. 숙소에 직접 연락하여 추가 정보를 확인해 주세요.</p>
-                </div>
+
             </div>
         </div>
 
