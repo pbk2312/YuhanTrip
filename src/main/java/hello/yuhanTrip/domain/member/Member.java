@@ -1,10 +1,13 @@
-package hello.yuhanTrip.domain;
+package hello.yuhanTrip.domain.member;
 
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import hello.yuhanTrip.domain.Coupon;
 import hello.yuhanTrip.domain.accommodation.Accommodation;
 import hello.yuhanTrip.domain.accommodation.Review;
 import hello.yuhanTrip.domain.admin.RoleChangeRequest;
+import hello.yuhanTrip.domain.member.MemberLike;
+import hello.yuhanTrip.domain.member.MemberRole;
 import hello.yuhanTrip.domain.reservation.Reservation;
 import jakarta.persistence.*;
 import lombok.*;
@@ -33,6 +36,8 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private MemberRole memberRole;
 
+    @Enumerated(EnumType.STRING)
+    private AuthProvider authProvider;  // 일반 회원 또는 카카오 로그인 회원 구분
 
     // 추가된 필드들
     private String name;

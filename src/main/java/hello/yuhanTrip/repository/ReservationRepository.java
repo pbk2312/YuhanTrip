@@ -1,6 +1,6 @@
 package hello.yuhanTrip.repository;
 
-import hello.yuhanTrip.domain.Member;
+import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.domain.reservation.Reservation;
 import hello.yuhanTrip.domain.reservation.ReservationStatus;
 import org.springframework.data.domain.Page;

@@ -1,6 +1,6 @@
 package hello.yuhanTrip.domain.reservation;
 
-import hello.yuhanTrip.domain.Member;
+import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.domain.accommodation.Review;
 import hello.yuhanTrip.domain.accommodation.Room;
 import jakarta.persistence.*;

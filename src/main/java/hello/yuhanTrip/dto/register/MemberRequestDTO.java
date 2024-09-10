@@ -1,7 +1,7 @@
 package hello.yuhanTrip.dto.register;
 
-import hello.yuhanTrip.domain.Member;
-import hello.yuhanTrip.domain.MemberRole;
+import hello.yuhanTrip.domain.member.Member;
+import hello.yuhanTrip.domain.member.MemberRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -3,7 +3,8 @@ package hello.yuhanTrip.domain.accommodation;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import hello.yuhanTrip.domain.*;
+import hello.yuhanTrip.domain.member.Member;
+import hello.yuhanTrip.domain.member.MemberLike;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

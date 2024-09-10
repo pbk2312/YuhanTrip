@@ -1,5 +1,6 @@
 package hello.yuhanTrip.domain;
 
+import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.service.discount.DiscountStrategy;
 import hello.yuhanTrip.service.discount.FixedAmountDiscount;
 import hello.yuhanTrip.service.discount.PercentageDiscount;

@@ -2,13 +2,13 @@ package hello.yuhanTrip.controller;
 
 import hello.yuhanTrip.domain.*;
 import hello.yuhanTrip.domain.accommodation.Room;
+import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.domain.reservation.Payment;
 import hello.yuhanTrip.domain.reservation.PaymentStatus;
 import hello.yuhanTrip.domain.reservation.Reservation;
 import hello.yuhanTrip.domain.reservation.ReservationStatus;
 import hello.yuhanTrip.dto.ReservationDTO;
 import hello.yuhanTrip.dto.ReservationUpdateDTO;
-import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.repository.PaymentRepository;
 import hello.yuhanTrip.service.Accomodation.AccommodationServiceImpl;
 import hello.yuhanTrip.service.Accomodation.ReservationService;

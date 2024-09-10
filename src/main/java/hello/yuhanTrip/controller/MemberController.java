@@ -1,6 +1,6 @@
 package hello.yuhanTrip.controller;
 
-import hello.yuhanTrip.domain.Member;
+import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.domain.ResetToken;
 import hello.yuhanTrip.dto.*;
 import hello.yuhanTrip.dto.email.EmailRequestDTO;

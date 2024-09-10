@@ -1,11 +1,11 @@
 package hello.yuhanTrip.service.Accomodation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import hello.yuhanTrip.domain.*;
 import hello.yuhanTrip.domain.accommodation.Accommodation;
 import hello.yuhanTrip.domain.accommodation.AccommodationApplyStatus;
 import hello.yuhanTrip.domain.accommodation.AccommodationType;
 import hello.yuhanTrip.domain.accommodation.Room;
+import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.domain.reservation.ReservationStatus;
 import hello.yuhanTrip.dto.AccommodationRegisterDTO;
 import hello.yuhanTrip.repository.AccommodationRepository;

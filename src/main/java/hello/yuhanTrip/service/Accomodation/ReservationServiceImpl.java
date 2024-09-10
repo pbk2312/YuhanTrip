@@ -1,7 +1,7 @@
 package hello.yuhanTrip.service.Accomodation;
 
-import hello.yuhanTrip.domain.*;
 import hello.yuhanTrip.domain.accommodation.Room;
+import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.domain.reservation.Payment;
 import hello.yuhanTrip.domain.reservation.PaymentStatus;
 import hello.yuhanTrip.domain.reservation.Reservation;

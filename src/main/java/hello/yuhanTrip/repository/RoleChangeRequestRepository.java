@@ -1,14 +1,12 @@
 package hello.yuhanTrip.repository;
 
-import hello.yuhanTrip.domain.Member;
-import hello.yuhanTrip.domain.MemberRole;
+import hello.yuhanTrip.domain.member.Member;
+import hello.yuhanTrip.domain.member.MemberRole;
 import hello.yuhanTrip.domain.admin.RequestStatus;
 import hello.yuhanTrip.domain.admin.RoleChangeRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.List;
 
 public interface RoleChangeRequestRepository extends JpaRepository<RoleChangeRequest, Long> {
 

@@ -1,7 +1,7 @@
 package hello.yuhanTrip.repository;
 
 
-import hello.yuhanTrip.domain.Member;
+import hello.yuhanTrip.domain.member.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

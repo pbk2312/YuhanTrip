@@ -1,9 +1,9 @@
 package hello.yuhanTrip.service.reservation;
 
-import hello.yuhanTrip.domain.*;
 import hello.yuhanTrip.domain.accommodation.Accommodation;
 import hello.yuhanTrip.domain.accommodation.Review;
 import hello.yuhanTrip.domain.accommodation.ReviewImage;
+import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.domain.reservation.Reservation;
 import hello.yuhanTrip.repository.AccommodationRepository;
 import hello.yuhanTrip.repository.ReviewImageRepository;

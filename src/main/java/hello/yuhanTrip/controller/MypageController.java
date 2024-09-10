@@ -1,7 +1,7 @@
 package hello.yuhanTrip.controller;
 
 import hello.yuhanTrip.domain.accommodation.Accommodation;
-import hello.yuhanTrip.domain.Member;
+import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.domain.reservation.Reservation;
 import hello.yuhanTrip.domain.accommodation.Room;
 import hello.yuhanTrip.domain.admin.RoleChangeRequest;

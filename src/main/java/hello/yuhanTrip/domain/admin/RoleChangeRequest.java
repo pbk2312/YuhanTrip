@@ -1,7 +1,7 @@
 package hello.yuhanTrip.domain.admin;
 
-import hello.yuhanTrip.domain.Member;
-import hello.yuhanTrip.domain.MemberRole;
+import hello.yuhanTrip.domain.member.Member;
+import hello.yuhanTrip.domain.member.MemberRole;
 import jakarta.persistence.*;
 import lombok.*;
 

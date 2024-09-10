@@ -2,7 +2,7 @@ package hello.yuhanTrip.controller;
 
 import hello.yuhanTrip.domain.Coupon;
 import hello.yuhanTrip.domain.DiscountType;
-import hello.yuhanTrip.domain.Member;
+import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.service.discount.CouponService;
 import hello.yuhanTrip.service.member.MemberService;
 import lombok.RequiredArgsConstructor;

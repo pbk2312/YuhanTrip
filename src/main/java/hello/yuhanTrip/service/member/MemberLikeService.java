@@ -2,8 +2,8 @@ package hello.yuhanTrip.service.member;
 
 
 import hello.yuhanTrip.domain.accommodation.Accommodation;
-import hello.yuhanTrip.domain.Member;
-import hello.yuhanTrip.domain.MemberLike;
+import hello.yuhanTrip.domain.member.Member;
+import hello.yuhanTrip.domain.member.MemberLike;
 import hello.yuhanTrip.repository.MemberLikeRepository;
 import hello.yuhanTrip.service.Accomodation.AccommodationServiceImpl;
 import lombok.RequiredArgsConstructor;

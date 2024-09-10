@@ -1,6 +1,6 @@
 package hello.yuhanTrip.controller;
 
-import hello.yuhanTrip.domain.Member;
+import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.service.member.MemberLikeService;
 import hello.yuhanTrip.service.member.MemberService;

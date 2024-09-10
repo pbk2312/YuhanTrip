@@ -1,7 +1,7 @@
 package hello.yuhanTrip.controller;
 
-import hello.yuhanTrip.domain.*;
 import hello.yuhanTrip.domain.accommodation.*;
+import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.dto.AccommodationRegisterDTO;
 import hello.yuhanTrip.dto.RoomDTO;
 import hello.yuhanTrip.jwt.TokenProvider;

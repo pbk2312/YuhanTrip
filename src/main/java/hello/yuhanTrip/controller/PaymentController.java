@@ -2,8 +2,8 @@ package hello.yuhanTrip.controller;
 
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
-import hello.yuhanTrip.domain.*;
 import hello.yuhanTrip.domain.accommodation.Accommodation;
+import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.domain.reservation.PaymentStatus;
 import hello.yuhanTrip.domain.reservation.Reservation;
 import hello.yuhanTrip.domain.reservation.ReservationStatus;

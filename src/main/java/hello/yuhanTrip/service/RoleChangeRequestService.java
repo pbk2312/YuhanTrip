@@ -1,7 +1,7 @@
 package hello.yuhanTrip.service;
 
-import hello.yuhanTrip.domain.Member;
-import hello.yuhanTrip.domain.MemberRole;
+import hello.yuhanTrip.domain.member.Member;
+import hello.yuhanTrip.domain.member.MemberRole;
 import hello.yuhanTrip.domain.admin.RequestStatus;
 import hello.yuhanTrip.domain.admin.RoleChangeRequest;
 import hello.yuhanTrip.repository.RoleChangeRequestRepository;
@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;

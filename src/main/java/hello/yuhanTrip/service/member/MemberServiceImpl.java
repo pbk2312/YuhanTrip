@@ -2,10 +2,14 @@ package hello.yuhanTrip.service.member;
 
 import hello.yuhanTrip.domain.*;
 import hello.yuhanTrip.domain.accommodation.Accommodation;
+import hello.yuhanTrip.domain.member.AuthProvider;
+import hello.yuhanTrip.domain.member.Member;
+import hello.yuhanTrip.domain.member.MemberRole;
 import hello.yuhanTrip.dto.LoginDTO;
 import hello.yuhanTrip.dto.LogoutDTO;
 import hello.yuhanTrip.dto.WithdrawalMembershipDTO;
 import hello.yuhanTrip.dto.email.EmailRequestDTO;
+import hello.yuhanTrip.dto.kakao.KakaoUserInfoResponseDto;
 import hello.yuhanTrip.dto.register.MemberChangePasswordDTO;
 import hello.yuhanTrip.dto.register.MemberRequestDTO;
 import hello.yuhanTrip.dto.token.TokenDTO;
@@ -18,7 +22,6 @@ import hello.yuhanTrip.repository.EmailRepository;
 import hello.yuhanTrip.repository.MemberRepository;
 import hello.yuhanTrip.repository.RefreshTokenRepository;
 import hello.yuhanTrip.repository.ResetTokenRepository;
-import hello.yuhanTrip.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -73,11 +76,39 @@ public class MemberServiceImpl implements MemberService {
                 .orElseThrow(() -> new RuntimeException("인증번호를 찾을 수 없습니다."));
 
         emailRepository.delete(emailCertification);
+        member.setAuthProvider(AuthProvider.LOCAL);
 
         memberRepository.save(member);
 
 
         return "회원가입 성공"; // 회원가입 성공 시 로그인 페이지로 리다이렉트
+    }
+
+    // 카카오 회원가입
+    public String registerKakaoUser(KakaoUserInfoResponseDto kakaoUserInfo) {
+        String email = kakaoUserInfo.getKakaoAccount().getEmail();
+        String nickname = kakaoUserInfo.getKakaoAccount().getProfile().getNickName();
+
+        log.info("카카오 회원가입 진행...");
+
+        if (email == null || email.isEmpty()) {
+            throw new RuntimeException("이메일 정보가 필요합니다.");
+        }
+
+        boolean emailExists = memberRepository.existsByEmail(email);
+        if (emailExists) {
+            return "이미 가입된 이메일입니다.";
+        }
+
+        Member member = Member.builder()
+                .email(email)
+                .nickname(nickname)
+                .authProvider(AuthProvider.KAKAO)
+                .build();
+
+        memberRepository.save(member);
+
+        return "카카오 회원가입 성공";
     }
 
     @Transactional

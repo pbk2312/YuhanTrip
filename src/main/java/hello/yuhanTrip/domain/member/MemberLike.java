@@ -1,4 +1,4 @@
-package hello.yuhanTrip.domain;
+package hello.yuhanTrip.domain.member;
 
 
 import hello.yuhanTrip.domain.accommodation.Accommodation;

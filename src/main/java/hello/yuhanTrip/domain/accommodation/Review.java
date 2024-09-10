@@ -1,7 +1,7 @@
 package hello.yuhanTrip.domain.accommodation;
 
 
-import hello.yuhanTrip.domain.Member;
+import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.domain.reservation.Reservation;
 import jakarta.persistence.*;
 import lombok.*;

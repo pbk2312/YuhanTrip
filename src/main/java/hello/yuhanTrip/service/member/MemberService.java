@@ -1,7 +1,7 @@
 package hello.yuhanTrip.service.member;
 
 import hello.yuhanTrip.domain.accommodation.Accommodation;
-import hello.yuhanTrip.domain.Member;
+import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.dto.LoginDTO;
 import hello.yuhanTrip.dto.LogoutDTO;
 import hello.yuhanTrip.dto.WithdrawalMembershipDTO;
