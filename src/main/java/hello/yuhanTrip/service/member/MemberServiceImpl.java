@@ -1,13 +1,10 @@
 package hello.yuhanTrip.service.member;
 
-import hello.yuhanTrip.domain.*;
 import hello.yuhanTrip.domain.accommodation.Accommodation;
-import hello.yuhanTrip.domain.member.AuthProvider;
-import hello.yuhanTrip.domain.member.Member;
-import hello.yuhanTrip.domain.member.MemberRole;
-import hello.yuhanTrip.dto.LoginDTO;
-import hello.yuhanTrip.dto.LogoutDTO;
-import hello.yuhanTrip.dto.WithdrawalMembershipDTO;
+import hello.yuhanTrip.domain.member.*;
+import hello.yuhanTrip.dto.member.LoginDTO;
+import hello.yuhanTrip.dto.member.LogoutDTO;
+import hello.yuhanTrip.dto.member.WithdrawalMembershipDTO;
 import hello.yuhanTrip.dto.email.EmailRequestDTO;
 import hello.yuhanTrip.dto.kakao.KakaoUserInfoResponseDto;
 import hello.yuhanTrip.dto.register.MemberChangePasswordDTO;
@@ -76,7 +73,6 @@ public class MemberServiceImpl implements MemberService {
                 .orElseThrow(() -> new RuntimeException("인증번호를 찾을 수 없습니다."));
 
         emailRepository.delete(emailCertification);
-        member.setAuthProvider(AuthProvider.LOCAL);
 
         memberRepository.save(member);
 
@@ -84,32 +80,36 @@ public class MemberServiceImpl implements MemberService {
         return "회원가입 성공"; // 회원가입 성공 시 로그인 페이지로 리다이렉트
     }
 
-    // 카카오 회원가입
-    public String registerKakaoUser(KakaoUserInfoResponseDto kakaoUserInfo) {
+    public String registerKakaoUserOrLogin(KakaoUserInfoResponseDto kakaoUserInfo) {
+        String kakaoId = kakaoUserInfo.getId().toString();
         String email = kakaoUserInfo.getKakaoAccount().getEmail();
-        String nickname = kakaoUserInfo.getKakaoAccount().getProfile().getNickName();
 
-        log.info("카카오 회원가입 진행...");
 
-        if (email == null || email.isEmpty()) {
-            throw new RuntimeException("이메일 정보가 필요합니다.");
+        boolean existsByAuthProviderId = memberRepository.existsByAuthProviderId(kakaoId);
+
+        // 1. 카카오 사용자 확인 (이미 존재하는지 확인)
+        if (existsByAuthProviderId) {
+            // 회원이 이미 존재하면 로그인 처리
+            return "이미 가입된 회원입니다. 로그인 처리 중...";
         }
 
-        boolean emailExists = memberRepository.existsByEmail(email);
-        if (emailExists) {
-            return "이미 가입된 이메일입니다.";
-        }
-
-        Member member = Member.builder()
+        // 2. 존재하지 않으면 새로 회원가입 처리
+        Member newMember = Member.builder()
+                .authProviderId(kakaoId)
                 .email(email)
-                .nickname(nickname)
+                .name(kakaoUserInfo.getKakaoAccount().getProfile().getNickName()) // 카카오 프로필 닉네임 사용
                 .authProvider(AuthProvider.KAKAO)
+                .memberRole(MemberRole.ROLE_MEMBER)
+                .password(passwordEncoder.encode("0000"))
                 .build();
 
-        memberRepository.save(member);
+        // 회원 정보 저장
+        memberRepository.save(newMember);
 
-        return "카카오 회원가입 성공";
+        return "카카오 회원가입 및 로그인 성공";
     }
+
+
 
     @Transactional
     public TokenDTO login(LoginDTO loginDTO) {
@@ -246,7 +246,6 @@ public class MemberServiceImpl implements MemberService {
                 .orElseThrow(() -> new IllegalArgumentException("Member not found with id: " + memberId));
         return member.getAccommodations();
     }
-
 
 
     // 회원 찾기

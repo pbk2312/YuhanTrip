@@ -19,6 +19,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     // 존재 여부
     boolean existsByEmail(String email);
 
+    boolean existsByAuthProviderId(String authProviderId);
+
+    Member findByAuthProviderId(String authProviderId);
+
     @Modifying
     @Transactional
     @Query("UPDATE Member m SET m.password = :newPassword WHERE m.email = :email")

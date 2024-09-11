@@ -670,7 +670,6 @@
 
 
         // 예약 버튼 클릭 이벤트 처리
-        // 예약 버튼 클릭 이벤트 처리
         document.querySelectorAll('.reservation-button').forEach(button => {
             button.addEventListener('click', function (event) {
                 const token = localStorage.getItem('accessToken');
@@ -708,7 +707,7 @@
     }
 
     function logout() {
-        fetch('/member/logout', {
+        fetch('/api/member/logout', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

@@ -2,12 +2,10 @@ package hello.yuhanTrip.domain.member;
 
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import hello.yuhanTrip.domain.Coupon;
+import hello.yuhanTrip.domain.coupon.Coupon;
 import hello.yuhanTrip.domain.accommodation.Accommodation;
 import hello.yuhanTrip.domain.accommodation.Review;
 import hello.yuhanTrip.domain.admin.RoleChangeRequest;
-import hello.yuhanTrip.domain.member.MemberLike;
-import hello.yuhanTrip.domain.member.MemberRole;
 import hello.yuhanTrip.domain.reservation.Reservation;
 import jakarta.persistence.*;
 import lombok.*;
@@ -29,6 +27,9 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
     private Long id;
+
+    @Column(name = "auth_provider_id")
+    private String authProviderId; // 카카오 또는 다른 소셜 로그인에서 제공하는 고유 식별자
 
     private String email;
     private String password;

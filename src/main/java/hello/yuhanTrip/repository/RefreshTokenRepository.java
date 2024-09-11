@@ -1,7 +1,7 @@
 package hello.yuhanTrip.repository;
 
 
-import hello.yuhanTrip.domain.RefreshToken;
+import hello.yuhanTrip.domain.member.RefreshToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 

@@ -1,5 +1,6 @@
 package hello.yuhanTrip.dto.register;
 
+import hello.yuhanTrip.domain.member.AuthProvider;
 import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.domain.member.MemberRole;
 import lombok.AllArgsConstructor;
@@ -67,18 +68,10 @@ public class MemberRequestDTO {
                 .address(address)  // 추가된 필드 반영
                 .dateOfBirth(dateOfBirth)  // 추가된 필드 반영
                 .memberRole(MemberRole.ROLE_MEMBER)  // role도 DTO에서 직접 설정하도록 변경
+                .authProvider(AuthProvider.LOCAL)
                 .build();
     }
 
 
-    public UsernamePasswordAuthenticationToken toAuthentication() {
-        return new UsernamePasswordAuthenticationToken(email, password);
-        // 사용자 로그인 기능 처리하기 위한 메서드
-    }
-
-    // 추가: 인증번호를 DTO에 포함시키는 메서드
-    public void setCertificationNumber(String certificationNumber) {
-        this.certificationNumber = certificationNumber;
-    }
 
 }

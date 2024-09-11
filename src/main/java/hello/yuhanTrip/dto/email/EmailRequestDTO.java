@@ -1,6 +1,6 @@
 package hello.yuhanTrip.dto.email;
 
-import hello.yuhanTrip.domain.EmailCertification;
+import hello.yuhanTrip.domain.member.EmailCertification;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

@@ -5,7 +5,7 @@ import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.request.CancelData;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
-import hello.yuhanTrip.domain.Coupon;
+import hello.yuhanTrip.domain.coupon.Coupon;
 import hello.yuhanTrip.domain.reservation.PaymentStatus;
 import hello.yuhanTrip.domain.reservation.Reservation;
 import hello.yuhanTrip.dto.payment.PaymentCallbackRequest;

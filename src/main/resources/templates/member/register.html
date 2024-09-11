@@ -89,7 +89,7 @@
                                     <h3 class="text-center font-weight-light my-4">회원가입</h3>
                                 </div>
                                 <div class="card-body">
-                                    <form th:action="@{/member/register}" th:object="${memberRequestDTO}" method="post">
+                                    <form th:action="@{/api/member/register}" th:object="${memberRequestDTO}" method="post">
                                         <div class="row">
                                             <div class="col-md-8">
                                                 <div class="form-floating mb-3">
@@ -274,6 +274,35 @@
                 alert(error.message); // 실패 메시지 표시
             });
     }
+    document.querySelector('form').addEventListener('submit', function (event) {
+        event.preventDefault(); // 기본 폼 제출 방지
 
+        const formData = new FormData(event.target);
+        const data = Object.fromEntries(formData.entries());
 
+        fetch('/api/member/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(text);
+                    });
+                }
+                return response.text();
+            })
+            .then(data => {
+                console.log(data);
+                alert('회원가입이 성공적으로 완료되었습니다.');
+                window.location.href = '/member/login'; // 로그인 페이지로 리디렉션
+            })
+            .catch(error => {
+                console.error('에러:', error);
+                alert('회원가입 중 오류가 발생했습니다.');
+            });
+    });
 </script>

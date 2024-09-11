@@ -1,6 +1,6 @@
 package hello.yuhanTrip.repository;
 
-import hello.yuhanTrip.domain.Coupon;
+import hello.yuhanTrip.domain.coupon.Coupon;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CouponRepository extends JpaRepository<Coupon,Long> {

@@ -245,7 +245,7 @@
     }
 
     function logout() {
-        fetch('/member/logout', {
+        fetch('/api/member/logout', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -269,20 +269,7 @@
         localStorage.removeItem('accessToken');
     }
 
-    function checkAccessTokenAndRedirect() {
-        const accessToken = localStorage.getItem('accessToken');
-        if (accessToken) {
-            if (!isTokenExpired(accessToken)) {
-                window.location.href = '/reservationConfirm';
-            } else {
-                alert('세션이 만료되었습니다. 다시 로그인 해주세요.');
-                window.location.href = '/member/login';
-            }
-        } else {
-            alert('이 페이지에 접근하려면 로그인 해주세요.');
-            window.location.href = '/member/login';
-        }
-    }
+
 </script>
 
 

@@ -7,7 +7,7 @@ import hello.yuhanTrip.domain.accommodation.AccommodationType;
 import hello.yuhanTrip.domain.accommodation.Room;
 import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.domain.reservation.ReservationStatus;
-import hello.yuhanTrip.dto.AccommodationRegisterDTO;
+import hello.yuhanTrip.dto.accommodation.AccommodationRegisterDTO;
 import hello.yuhanTrip.repository.AccommodationRepository;
 import hello.yuhanTrip.repository.RoomRepository;
 import hello.yuhanTrip.service.member.MemberService;

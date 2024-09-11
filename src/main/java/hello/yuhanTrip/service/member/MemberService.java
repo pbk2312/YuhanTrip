@@ -2,10 +2,11 @@ package hello.yuhanTrip.service.member;
 
 import hello.yuhanTrip.domain.accommodation.Accommodation;
 import hello.yuhanTrip.domain.member.Member;
-import hello.yuhanTrip.dto.LoginDTO;
-import hello.yuhanTrip.dto.LogoutDTO;
-import hello.yuhanTrip.dto.WithdrawalMembershipDTO;
+import hello.yuhanTrip.dto.member.LoginDTO;
+import hello.yuhanTrip.dto.member.LogoutDTO;
+import hello.yuhanTrip.dto.member.WithdrawalMembershipDTO;
 import hello.yuhanTrip.dto.email.EmailRequestDTO;
+import hello.yuhanTrip.dto.kakao.KakaoUserInfoResponseDto;
 import hello.yuhanTrip.dto.register.MemberChangePasswordDTO;
 import hello.yuhanTrip.dto.register.MemberRequestDTO;
 import hello.yuhanTrip.dto.token.TokenDTO;
@@ -45,4 +46,8 @@ public interface MemberService {
     Member findByEmail(String email);
 
     Member getUserDetails(String accessToken);
+
+    String registerKakaoUserOrLogin(KakaoUserInfoResponseDto kakaoUserInfo);
+
+
 }

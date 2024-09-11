@@ -152,7 +152,7 @@
 
     // 예약 취소 확인 대화 상자
     if (confirm("정말로 이 예약을 취소하시겠습니까?")) {
-      fetch('/mypage/cancelReservation', {
+      fetch('/api/mypage/cancelReservation', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'

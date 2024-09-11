@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>이메일 인증</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      max-width: 400px;
+      width: 100%;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    form {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #555;
+    }
+
+    input[type="email"],
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #007bff;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #registerButton {
+      display: none;
+      margin-top: 20px;
+      background-color: #28a745;
+    }
+
+    #registerButton:hover {
+      background-color: #218838;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .alert {
+      padding: 10px;
+      background-color: #f44336;
+      color: white;
+      margin-bottom: 15px;
+      border-radius: 5px;
+    }
+
+    .success {
+      background-color: #4CAF50;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>이메일 인증</h2>
+
+  <!-- 이메일 입력 폼 -->
+  <form id="emailForm">
+    <p>회원가입을 위해 이메일을 입력해주세요.</p> <!-- 설명문 추가 -->
+    <label for="email">이메일 입력</label>
+    <input type="email" id="email" name="email" required placeholder="이메일을 입력하세요">
+    <button type="submit">인증 이메일 보내기</button>
+  </form>
+
+  <!-- 인증번호 입력 폼 -->
+  <form id="verificationForm" class="hidden">
+    <label for="certificationNumber">인증번호 입력:</label>
+    <input type="text" id="certificationNumber" name="certificationNumber" required placeholder="인증번호를 입력하세요">
+    <button type="submit">인증번호 확인</button>
+  </form>
+
+  <!-- 회원가입 완료 버튼 -->
+  <button id="registerButton">회원가입 완료</button>
+</div>
+
+<script>
+  let emailForVerification = '';
+  let codeFromCallback = '';
+  let userInfoId = '';
+
+  window.onload = function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    codeFromCallback = urlParams.get('code') || '';
+    userInfoId = urlParams.get('id') || '';
+  };
+
+  document.getElementById('emailForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const email = document.getElementById('email').value;
+    emailForVerification = email;
+
+    fetch('/email/sendCertificationMail', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email: email })
+    })
+            .then(response => response.text())
+            .then(data => {
+              alert(data);
+              document.getElementById('verificationForm').classList.remove('hidden');
+            })
+            .catch(error => {
+              alert('이메일 전송에 실패했습니다.');
+              console.error('Error:', error);
+            });
+  });
+
+  document.getElementById('verificationForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const certificationNumber = document.getElementById('certificationNumber').value;
+
+    fetch('/email/verifyEmail', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email: emailForVerification, certificationNumber: certificationNumber })
+    })
+            .then(response => response.text())
+            .then(data => {
+              alert(data);
+              if (data.includes("인증번호 인증이 완료되었습니다.")) {
+                document.getElementById('registerButton').style.display = 'block';
+              }
+            })
+            .catch(error => {
+              alert('인증번호 확인에 실패했습니다.');
+              console.error('Error:', error);
+            });
+  });
+
+  document.getElementById('registerButton').addEventListener('click', function() {
+    fetch('/kakaoRegister', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ id: userInfoId, email: emailForVerification })
+    })
+            .then(response => response.text())
+            .then(data => {
+              alert(data);
+              window.location.href = '/member/login';
+            })
+            .catch(error => {
+              alert('회원가입에 실패했습니다.');
+              console.error('Error:', error);
+            });
+  });
+</script>
+
+</body>
+</html>

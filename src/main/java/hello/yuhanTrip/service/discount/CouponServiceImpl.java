@@ -1,7 +1,7 @@
 package hello.yuhanTrip.service.discount;
 
-import hello.yuhanTrip.domain.Coupon;
-import hello.yuhanTrip.domain.DiscountType;
+import hello.yuhanTrip.domain.coupon.Coupon;
+import hello.yuhanTrip.domain.coupon.DiscountType;
 import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.repository.CouponRepository;
 import hello.yuhanTrip.repository.MemberRepository;

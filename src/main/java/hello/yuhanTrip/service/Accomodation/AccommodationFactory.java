@@ -4,9 +4,9 @@ import hello.yuhanTrip.domain.accommodation.Accommodation;
 import hello.yuhanTrip.domain.accommodation.AccommodationApplyStatus;
 import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.domain.accommodation.Room;
-import hello.yuhanTrip.dto.AccommodationRegisterDTO;
-import hello.yuhanTrip.dto.RoomDTO;
-import hello.yuhanTrip.service.ImageService;
+import hello.yuhanTrip.dto.accommodation.AccommodationRegisterDTO;
+import hello.yuhanTrip.dto.accommodation.RoomDTO;
+import hello.yuhanTrip.service.member.ImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

@@ -144,7 +144,7 @@
         <p>신청 후 사업자 등록증 및 숙소 서류를 제출해 주셔야 합니다. 제출된 서류는 심사를 거쳐 등급 승급 여부가 결정됩니다.</p>
     </div>
 
-    <form id="hostRequestForm" action="/mypage/roleChangeRequest" method="post" enctype="multipart/form-data">
+    <form id="hostRequestForm" action="/api/mypage/roleChangeRequest" method="post" enctype="multipart/form-data">
         <label for="email">이메일</label>
         <input type="email" id="email" name="email" th:value="${member.email}" readonly />
 

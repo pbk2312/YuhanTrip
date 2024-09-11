@@ -494,6 +494,8 @@
     });
 
 
+
+
     function isTokenExpired(token) {
         try {
             const payload = JSON.parse(atob(token.split('.')[1]));
@@ -512,7 +514,7 @@
     }
 
     function logout() {
-        fetch('/member/logout', {
+        fetch('/api/member/logout', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -537,14 +539,6 @@
     }
 
 
-    // 오늘 날짜를 'YYYY-MM-DD' 형식으로 반환하는 함수
-    function getTodayDate() {
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        const day = String(today.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
 
     // 팝업 열기 함수
     function openPopup() {
@@ -580,6 +574,8 @@
             })
             .catch(error => console.error('Error fetching discount popup:', error));
     });
+
+
 </script>
 
 </body>

@@ -4,7 +4,7 @@ import hello.yuhanTrip.domain.accommodation.Accommodation;
 import hello.yuhanTrip.domain.admin.RoleChangeRequest;
 import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.service.Accomodation.AccommodationService;
-import hello.yuhanTrip.service.RoleChangeRequestService;
+import hello.yuhanTrip.service.member.RoleChangeRequestService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.io.FileSystemResource;

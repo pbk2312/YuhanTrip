@@ -3,8 +3,8 @@ package hello.yuhanTrip.service.Accomodation;
 import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.domain.reservation.Reservation;
 import hello.yuhanTrip.domain.accommodation.Room;
-import hello.yuhanTrip.dto.ReservationDTO;
-import hello.yuhanTrip.dto.ReservationUpdateDTO;
+import hello.yuhanTrip.dto.accommodation.ReservationDTO;
+import hello.yuhanTrip.dto.accommodation.ReservationUpdateDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

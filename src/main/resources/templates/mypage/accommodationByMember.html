@@ -77,69 +77,7 @@
       position: relative;
     }
 
-    .accommodation-item.pending {
-      border-left: 5px solid #ffc107;
-    }
-    .accommodation-item.pending::before {
-      content: '승인 대기 중';
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background-color: #ffc107;
-      color: #fff;
-      padding: 5px 10px;
-      border-radius: 5px;
-      font-weight: bold;
-      font-size: 14px;
-    }
 
-    .accommodation-item.approved {
-      border-left: 5px solid #28a745;
-    }
-    .accommodation-item.approved::before {
-      content: '신청 승인됨';
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background-color: #28a745;
-      color: #fff;
-      padding: 5px 10px;
-      border-radius: 5px;
-      font-weight: bold;
-      font-size: 14px;
-    }
-
-    .accommodation-item.rejected {
-      border-left: 5px solid #dc3545;
-    }
-    .accommodation-item.rejected::before {
-      content: '신청 거부됨';
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background-color: #dc3545;
-      color: #fff;
-      padding: 5px 10px;
-      border-radius: 5px;
-      font-weight: bold;
-      font-size: 14px;
-    }
-
-    .accommodation-item.canceled {
-      border-left: 5px solid #6c757d;
-    }
-    .accommodation-item.canceled::before {
-      content: '신청 취소됨';
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background-color: #6c757d;
-      color: #fff;
-      padding: 5px 10px;
-      border-radius: 5px;
-      font-weight: bold;
-      font-size: 14px;
-    }
 
     /* Room Info Grid */
     .room-info {
@@ -158,28 +96,7 @@
       text-align: right;
       margin-top: 20px;
     }
-    .update-button {
-      background-color: #007bff;
-      border: none;
-      color: #fff;
-      padding: 10px 20px;
-      border-radius: 5px;
-      transition: background-color 0.3s ease;
-    }
-    .update-button:hover {
-      background-color: #0056b3;
-    }
-    .cancel-button {
-      background-color: #dc3545;
-      border: none;
-      color: #fff;
-      padding: 10px 20px;
-      border-radius: 5px;
-      transition: background-color 0.3s ease;
-    }
-    .cancel-button:hover {
-      background-color: #c82333;
-    }
+
 
     /* No Accommodations Notice */
     .no-accommodations {
@@ -385,7 +302,7 @@
   }
 
   function logout() {
-    fetch('/member/logout', {
+    fetch('/api/member/logout', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
