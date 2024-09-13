@@ -21,6 +21,11 @@ public class CouponServiceImpl implements CouponService {
     private final CouponRepository couponRepository;
     private final MemberRepository memberRepository;
 
+
+    public boolean hasCoupon(Member member, DiscountType discountType) {
+        return couponRepository.existsByMemberAndDiscountTypeAndUsed(member, discountType, false);
+    }
+
     @Override
     @Transactional
     public Coupon generateCoupon(Member member, DiscountType discountType, Double discountValue) {

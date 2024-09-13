@@ -19,15 +19,15 @@ public class EventController {
     public String discountPopup(Model model) {
         LocalTime now = LocalTime.now();
 
-        if ((now.isAfter(LocalTime.of(22, 59)) && now.isBefore(LocalTime.of(23, 59))) || now.isBefore(LocalTime.of(0, 0))) {
+        if (now.isAfter(LocalTime.of(0, 0)) && now.isBefore(LocalTime.of(0, 10))) {
+            // 자정부터 10분까지 고정 금액 할인 쿠폰
             model.addAttribute("discountType", "fixed");
             model.addAttribute("discountPrice", 10000); // 10000원 고정 할인 쿠폰
-        }
-        else if (now.isAfter(LocalTime.of(16, 0)) && now.isBefore(LocalTime.of(19, 0))) {
+        } else if (now.isAfter(LocalTime.of(18, 0)) && now.isBefore(LocalTime.of(18, 10))) {
+            // 18시부터 10분까지 비율 할인 쿠폰
             model.addAttribute("discountType", "percentage");
             model.addAttribute("discountPrice", 0.2); // 20% 할인 쿠폰
-        }
-        else {
+        } else {
             model.addAttribute("discountType", "none");
         }
 

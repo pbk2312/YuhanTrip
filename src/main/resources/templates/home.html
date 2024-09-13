@@ -549,19 +549,24 @@
             .catch(error => console.error('로그아웃 요청 중 오류 발생:', error));
     }
 
+
+
+    // 오늘 날짜를 'YYYY-MM-DD' 형식으로 반환하는 함수
+    function getTodayDate() {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
     // 팝업 열기 함수
     function openPopup() {
         window.open("/discountPopup", "popup", "width=400,height=400");
     }
 
-    // 오늘 날짜를 반환하는 함수
-    function getTodayDate() {
-        const today = new Date();
-        return today.toISOString().split('T')[0]; // yyyy-mm-dd 형식의 날짜 반환
-    }
-
     // 페이지 로드 시 팝업 표시 여부를 결정하는 로직
-    function checkPopup() {
+    document.addEventListener('DOMContentLoaded', () => {
         const hidePopupDate = localStorage.getItem('hidePopupDate');
         const todayDate = getTodayDate();
 
@@ -570,24 +575,13 @@
             return;
         }
 
-        // 서버에 현재 할인 이벤트가 있는지 확인
-        fetch('/discountPopup', { method: 'GET' })
-            .then(response => response.text())
-            .then(html => {
-                // 이벤트 시간이 아니면 팝업을 띄우지 않음
-                if (!html.includes("discountType") || html.includes('none')) {
-                    return;
-                }
-                // 이벤트 시간일 경우 팝업 띄우기
-                setTimeout(openPopup, 1000); // 페이지 로드 후 1초 뒤 팝업 자동 오픈
-            })
-            .catch(error => console.error('할인 팝업 요청 중 오류 발생:', error));
-    }
+        // 팝업을 자동으로 띄우고 싶다면
+        setTimeout(openPopup, 1000); // 페이지 로드 후 1초 뒤 팝업 자동 오픈
+    });
 
     // 페이지 로드 시 인증 상태 및 팝업 표시 확인
     window.onload = function () {
         checkAuth();
-        checkPopup();
     };
 </script>
 </body>

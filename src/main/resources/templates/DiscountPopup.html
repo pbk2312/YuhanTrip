@@ -49,6 +49,11 @@
             cursor: pointer;
             text-decoration: underline;
         }
+        .event-info {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #555;
+        }
     </style>
 </head>
 <body>
@@ -57,14 +62,14 @@
 <div class="coupon-container" id="coupon-popup">
     <!-- 고정 금액 할인 쿠폰 -->
     <div id="fixed-coupon" style="display: none;">
-        <h2>🎉 자정 이벤트! 고정 금액 할인 쿠폰을 받으세요! 🎉</h2>
+        <h2>🎉 자정 이벤트! 할인 쿠폰을 받으세요! 🎉</h2>
         <p>할인 금액: <strong id="fixed-discount"></strong></p>
         <button class="coupon-button" onclick="requestCoupon('fixed', 10000)">쿠폰 받기</button>
     </div>
 
     <!-- 비율 할인 쿠폰 -->
     <div id="percentage-coupon" style="display: none;">
-        <h2>🎉 저녁 6시 이벤트! 비율 할인 쿠폰을 받으세요! 🎉</h2>
+        <h2>🎉 저녁 6시 이벤트! 할인 쿠폰을 받으세요! 🎉</h2>
         <p>할인 비율: <strong id="percentage-discount"></strong></p>
         <button class="coupon-button" onclick="requestCoupon('percentage', 0.2)">쿠폰 받기</button>
     </div>
@@ -72,6 +77,11 @@
     <!-- 이벤트가 없는 경우 -->
     <div id="no-event" style="display: none;">
         <p class="none-message">현재 이벤트가 없습니다.</p>
+        <div class="event-info">
+            <p>하지만 걱정 마세요! 매일 자정과 저녁 6시에 특별 할인 쿠폰을 발급합니다.</p>
+            <p>자정: 만원 할인 쿠폰</p>
+            <p>저녁 6시: 20% 할인 쿠폰</p>
+        </div>
     </div>
 
     <div class="hide-today" onclick="hidePopupForToday()">오늘 하루 보지 않기</div>
@@ -111,7 +121,7 @@
         }
 
         // 이벤트 종류에 따라 쿠폰 영역을 표시합니다.
-        const discountType = /*[[${discountType}]]*/ 'fixed'; // 예시로 'fixed'로 설정
+        const discountType = /*[[${discountType}]]*/ 'none'; // 예시로 'none'으로 설정
         if (discountType === 'fixed') {
             document.getElementById('fixed-coupon').style.display = 'block';
             document.getElementById('fixed-discount').innerText = '10,000원';
@@ -123,10 +133,32 @@
         }
     });
 
-    async function requestCoupon(discountType, discountValue) {
-        const accessToken = localStorage.getItem('accessToken');
+    // 쿠키에서 특정 이름의 쿠키 값을 가져오는 함수
+    function getCookie(name) {
+        const cookieArray = document.cookie.split('; ');
+        for (let cookie of cookieArray) {
+            const [key, value] = cookie.split('=');
+            if (key === name) {
+                return decodeURIComponent(value);
+            }
+        }
+        return null;
+    }
 
-        if (!accessToken) {
+    function isTokenExpired(token) {
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const currentTime = Math.floor(Date.now() / 1000);
+            return payload.exp < currentTime;
+        } catch (e) {
+            console.error('토큰 파싱 중 오류 발생:', e);
+            return true;
+        }
+    }
+
+    async function requestCoupon(discountType, discountValue) {
+        const accessToken = getCookie('accessToken'); // 쿠키에서 accessToken 가져오기
+        if (!accessToken || isTokenExpired(accessToken)) {
             alert('로그인이 필요합니다. 로그인 후 쿠폰을 받으세요.');
             return;
         }
@@ -137,13 +169,16 @@
         } else if (discountType === 'percentage') {
             endpoint = `/api/coupons/percentage?discountRate=${discountValue}`;
         }
+
         try {
             const response = await fetch(endpoint, {
                 method: 'POST',
             });
-            if (!response.ok) {
-                alert('쿠폰 발급에 성공하였습니다.쿠폰은 1회만 발급 가능합니다');
-                window.close();  // 팝업 창 닫기
+
+            if (response.ok) {
+                alert('쿠폰 발급이 완료되었습니다.');
+            } else {
+                alert('쿠폰 발급에 실패하였습니다. 계정 한 개당 1회 발급이 가능합니다.');
             }
         } catch (error) {
             console.error('Error fetching coupon:', error);

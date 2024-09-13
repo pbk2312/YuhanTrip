@@ -12,4 +12,6 @@ public interface CouponService {
     Coupon findCouponById(Long couponId);
 
     void deleteCoupon(Long couponId); // 쿠폰 삭제 메서드 추가
+
+    boolean hasCoupon(Member member, DiscountType discountType);
 }
