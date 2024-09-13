@@ -7,6 +7,7 @@ import hello.yuhanTrip.dto.member.LogoutDTO;
 import hello.yuhanTrip.dto.member.WithdrawalMembershipDTO;
 import hello.yuhanTrip.dto.email.EmailRequestDTO;
 import hello.yuhanTrip.dto.kakao.KakaoUserInfoResponseDto;
+import hello.yuhanTrip.dto.payment.MypageMemberDTO;
 import hello.yuhanTrip.dto.register.MemberChangePasswordDTO;
 import hello.yuhanTrip.dto.register.MemberRequestDTO;
 import hello.yuhanTrip.dto.token.TokenDTO;
@@ -34,7 +35,7 @@ public interface MemberService {
     String deleteAccount(WithdrawalMembershipDTO withdrawalMembershipDTO);
 
     // 회원 정보를 업데이트하는 메서드
-    void updateMember(Member member);
+    void updateMember(Member member, MypageMemberDTO mypageMemberDTO);
 
     // 호스트로서 유효한 회원인지 확인하는 메서드
     Member validateHost(String accessToken);

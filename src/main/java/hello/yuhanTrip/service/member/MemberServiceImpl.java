@@ -7,6 +7,7 @@ import hello.yuhanTrip.dto.member.LogoutDTO;
 import hello.yuhanTrip.dto.member.WithdrawalMembershipDTO;
 import hello.yuhanTrip.dto.email.EmailRequestDTO;
 import hello.yuhanTrip.dto.kakao.KakaoUserInfoResponseDto;
+import hello.yuhanTrip.dto.payment.MypageMemberDTO;
 import hello.yuhanTrip.dto.register.MemberChangePasswordDTO;
 import hello.yuhanTrip.dto.register.MemberRequestDTO;
 import hello.yuhanTrip.dto.token.TokenDTO;
@@ -219,15 +220,16 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Transactional
-    public void updateMember(Member member) {
-        memberRepository.updateMemberInfo(
-                member.getEmail(),
-                member.getName(),
-                member.getNickname(),
-                member.getPhoneNumber(),
-                member.getDateOfBirth(),
-                member.getAddress()
-        );
+    public void updateMember(Member member, MypageMemberDTO mypageMemberDTO) {
+        // 개인정보 수정
+        member.setName(mypageMemberDTO.getName());
+        member.setNickname(mypageMemberDTO.getNickname());
+        member.setPhoneNumber(mypageMemberDTO.getPhoneNumber());
+        member.setDateOfBirth(mypageMemberDTO.getDateOfBirth());
+        member.setAddress(mypageMemberDTO.getAddress());
+
+        // 저장 (업데이트)
+        memberRepository.save(member);
     }
 
     public Member validateHost(String accessToken) {

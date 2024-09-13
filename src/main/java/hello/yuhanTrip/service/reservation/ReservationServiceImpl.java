@@ -1,4 +1,4 @@
-package hello.yuhanTrip.service.Accomodation;
+package hello.yuhanTrip.service.reservation;
 
 import hello.yuhanTrip.domain.accommodation.Room;
 import hello.yuhanTrip.domain.member.Member;
@@ -11,6 +11,7 @@ import hello.yuhanTrip.dto.accommodation.ReservationUpdateDTO;
 import hello.yuhanTrip.repository.PaymentRepository;
 import hello.yuhanTrip.repository.ReservationRepository;
 import hello.yuhanTrip.service.reservation.PaymentService;
+import hello.yuhanTrip.service.reservation.ReservationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -19,14 +20,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 
 @Service
 @Log4j2
 @RequiredArgsConstructor
-public class ReservationServiceImpl implements ReservationService{
+public class ReservationServiceImpl implements ReservationService {
 
     private final ReservationRepository reservationRepository;
     private final PaymentService paymentService;
@@ -166,5 +169,31 @@ public class ReservationServiceImpl implements ReservationService{
             log.error("예약 취소 중 오류 발생: ", e);
             return false;
         }
+    }
+
+    public Reservation createReservation(Member member, Room room, ReservationDTO reservationDTO) {
+        long numberOfNights = ChronoUnit.DAYS.between(reservationDTO.getCheckInDate(), reservationDTO.getCheckOutDate());
+        Long totalPrice = reservationDTO.getPrice() * numberOfNights;
+
+        Payment payment = new Payment(totalPrice, PaymentStatus.PENDING);
+        Payment savedPayment = paymentRepository.save(payment);
+
+        return Reservation.builder()
+                .addr(reservationDTO.getAddr())
+                .reservationUid(UUID.randomUUID().toString())
+                .member(member)
+                .room(room)
+                .checkInDate(reservationDTO.getCheckInDate())
+                .checkOutDate(reservationDTO.getCheckOutDate())
+                .reservationDate(LocalDate.now())
+                .specialRequests(reservationDTO.getSpecialRequests())
+                .name(reservationDTO.getName())
+                .phoneNumber(reservationDTO.getPhoneNumber())
+                .payment(savedPayment)
+                .numberOfGuests(reservationDTO.getNumberOfGuests())
+                .accommodationId(room.getAccommodation().getId())
+                .reservationStatus(ReservationStatus.RESERVED)
+                .couponId(reservationDTO.getCouponId())
+                .build();
     }
 }

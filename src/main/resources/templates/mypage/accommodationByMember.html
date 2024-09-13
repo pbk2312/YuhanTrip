@@ -263,58 +263,81 @@
 <!-- Core theme JS -->
 <script src="js/scripts.js"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const accessToken = localStorage.getItem('accessToken');
+  // 쿠키에서 특정 이름의 쿠키 값을 가져오는 함수
+  function getCookie(name) {
+    const cookieArray = document.cookie.split('; ');
+    for (let cookie of cookieArray) {
+      const [key, value] = cookie.split('=');
+      if (key === name) {
+        return decodeURIComponent(value);
+      }
+    }
+    return null;
+  }
+
+
+  function isTokenExpired(token) {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const currentTime = Math.floor(Date.now() / 1000);
+      return payload.exp < currentTime;
+    } catch (e) {
+      console.error('토큰 파싱 중 오류 발생:', e);
+      return true;
+    }
+  }
+
+  // accessToken을 가져와서 페이지 상태를 변경하는 함수
+  function checkAuth() {
+    const accessToken = getCookie('accessToken'); // 쿠키에서 accessToken 가져오기
     const authButton = document.getElementById('authButton');
     const mypageButton = document.getElementById('mypageButton');
 
     if (accessToken) {
-      if (isTokenExpired(accessToken)) {
-        deleteAccessToken();
+      if (isTokenExpired(accessToken)){
         logout();
-      } else {
-        authButton.textContent = 'Logout';
-        authButton.onclick = confirmLogout;
-        mypageButton.style.display = 'block';
-        mypageButton.onclick = () => {
-          window.location.href = '/mypage/check';
-        };
+        window.location.reload();
+      }
+      else {
+        // 로그인 상태: 로그아웃 버튼으로 전환 및 마이페이지 버튼 활성화
+        authButton.innerText = '로그아웃';
+        authButton.addEventListener('click', confirmLogout); // 로그아웃 확인
+        mypageButton.style.display = 'block'; // 마이페이지 버튼 표시
+        mypageButton.addEventListener('click', () => {
+          window.location.href = '/mypage/check'; // 마이페이지로 이동
+        });
       }
     } else {
-      authButton.textContent = 'Login';
-      authButton.onclick = () => window.location.href = '/member/login';
-      if (window.location.pathname === '/member/withdrawalMembership') {
-        window.location.href = '/member/login';
-      }
+      // 로그아웃 상태: 로그인 버튼으로 전환
+      authButton.innerText = '로그인';
+      authButton.addEventListener('click', function () {
+        window.location.href = '/member/login'; // 로그인 페이지로 이동
+      });
+      mypageButton.style.display = 'none'; // 마이페이지 버튼 숨기기
     }
-  });
-
-  function isTokenExpired(token) {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    const currentTime = Math.floor(Date.now() / 1000);
-    return payload.exp < currentTime;
   }
 
+  // 로그아웃 확인 후 처리
   function confirmLogout() {
-    if (confirm("로그아웃 하시겠습니까?")) {
+    if (confirm('로그아웃 하시겠습니까?')) {
       logout();
     }
   }
 
+  // 로그아웃 처리 함수
   function logout() {
+    // 서버에 로그아웃 요청
     fetch('/api/member/logout', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({})
+      }
     })
             .then(response => {
               if (response.ok) {
-                deleteAccessToken();
-                document.getElementById('authButton').textContent = 'Login';
-                document.getElementById('mypageButton').style.display = 'none';
-                window.location.href = '/home/homepage';
+                // 쿠키에서 accessToken 삭제
+                document.cookie = "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                window.location.reload(); // 페이지 새로고침
               } else {
                 console.error('로그아웃 요청 실패');
               }
@@ -322,9 +345,11 @@
             .catch(error => console.error('로그아웃 요청 중 오류 발생:', error));
   }
 
-  function deleteAccessToken() {
-    localStorage.removeItem('accessToken');
-  }
+  window.onload = function () {
+    checkAuth();
+  };
+
+
 </script>
 </body>
 </html>

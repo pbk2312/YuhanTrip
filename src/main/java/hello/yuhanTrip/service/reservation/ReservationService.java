@@ -1,4 +1,4 @@
-package hello.yuhanTrip.service.Accomodation;
+package hello.yuhanTrip.service.reservation;
 
 import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.domain.reservation.Reservation;
@@ -42,4 +42,6 @@ public interface ReservationService {
 
     // 예약 UID를 사용하여 예약을 취소하는 메서드
     boolean cancelReservation(String reservationUid);
+
+    Reservation createReservation(Member member, Room room, ReservationDTO reservationDTO);
 }

@@ -5,7 +5,6 @@ import hello.yuhanTrip.dto.kakao.KakaoRegisterRequest;
 import hello.yuhanTrip.dto.kakao.KakaoUserInfoResponseDto;
 import hello.yuhanTrip.dto.member.LoginDTO;
 import hello.yuhanTrip.dto.token.TokenDTO;
-import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.repository.MemberRepository;
 import hello.yuhanTrip.service.member.KakaoService;
 import hello.yuhanTrip.service.member.MemberService;
@@ -16,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -34,7 +32,7 @@ public class KakaoLoginController {
 
 
     @GetMapping("/callback")
-    public ResponseEntity<Map<String, String>> callback(@RequestParam("code") String code, HttpServletResponse response, HttpServletRequest request) {
+    public ResponseEntity<?> callback(@RequestParam("code") String code, HttpServletResponse response, HttpServletRequest request) {
         try {
             // 1. 카카오에서 AccessToken 가져오기
             String accessToken = kakaoService.getAccessTokenFromKakao(code);
@@ -55,51 +53,42 @@ public class KakaoLoginController {
             // 5. 이메일 정보가 없으면 이메일 입력 페이지로 리다이렉트
             if (existingMember.getEmail() == null) {
                 String redirectUrl = String.format("/member/email/input?id=%s", kakaoId);
-                Map<String, String> responseMap = new HashMap<>();
-                responseMap.put("redirectUrl", redirectUrl);
                 return ResponseEntity.status(HttpStatus.FOUND)
                         .header("Location", redirectUrl)
-                        .body(responseMap);  // 리다이렉트 URL을 Map 형태로 반환
+                        .build();
             }
 
-            // 6. 로그인 처리
             LoginDTO loginDTO = new LoginDTO();
             LoginDTO loginDTO1 = loginDTO.builder()
                     .email(existingMember.getEmail())
-                    .password("0000")  // 임의의 비밀번호
+                    .password("0000")
                     .build();
-
             TokenDTO tokenDTO = memberService.login(loginDTO1);
 
-            // 7. AccessToken과 RefreshToken 쿠키에 저장
-            addCookie(response, "accessToken", tokenDTO.getAccessToken(), 3600); // 1시간 유효
-            addCookie(response, "refreshToken", tokenDTO.getRefreshToken(), 3600 * 24 * 7); // 7일 유효
+            // 6. 이메일 정보가 있으면 로그인 처리
+            addCookie(response, "accessToken", tokenDTO.getAccessToken(), 3600);
+            addCookie(response,"refreshToken",tokenDTO.getRefreshToken(),600*600);
 
-            // 8. 이전 URL 확인 및 리다이렉트 처리
+            // 로그인 후 리다이렉트할 URL을 세션에 저장
             String previousUrl = (String) request.getSession().getAttribute("redirectUrl");
-            request.getSession().removeAttribute("redirectUrl");
+            if (previousUrl != null) {
+                return ResponseEntity.status(HttpStatus.FOUND)
+                        .header("Location", previousUrl)
+                        .build();
+            }
 
-            // 9. 클라이언트로 응답할 데이터 구성
-            Map<String, String> responseMap = new HashMap<>();
-            responseMap.put("accessToken", tokenDTO.getAccessToken());
-            responseMap.put("redirectUrl", previousUrl != null ? previousUrl : "/home/homepage");
-
-            return ResponseEntity.ok(responseMap);
+            return ResponseEntity.ok(tokenDTO.getAccessToken());
 
         } catch (Exception e) {
             log.error("카카오 로그인 실패: {}", e.getMessage());
-
-            // 에러 발생 시에도 Map을 반환
-            Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "카카오 로그인 실패");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("카카오 로그인 실패");
         }
     }
 
 
     private void addCookie(HttpServletResponse response, String name, String value, int maxAge) {
         Cookie cookie = new Cookie(name, value);
-        cookie.setHttpOnly(true);
+        cookie.setHttpOnly(false); // https에서 작동하게 하려면 true로
         cookie.setSecure(true);
         cookie.setPath("/");
         cookie.setMaxAge(maxAge);

@@ -8,7 +8,7 @@ import hello.yuhanTrip.dto.payment.PaymentCancelDTO;
 import hello.yuhanTrip.dto.payment.PaymentDTO;
 import hello.yuhanTrip.repository.ReservationRepository;
 import hello.yuhanTrip.service.Accomodation.AccommodationServiceImpl;
-import hello.yuhanTrip.service.Accomodation.ReservationService;
+import hello.yuhanTrip.service.reservation.ReservationService;
 import hello.yuhanTrip.service.member.MemberService;
 import hello.yuhanTrip.service.reservation.PaymentService;
 import lombok.RequiredArgsConstructor;

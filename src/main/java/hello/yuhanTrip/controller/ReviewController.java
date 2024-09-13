@@ -7,7 +7,7 @@ import hello.yuhanTrip.domain.accommodation.Review;
 import hello.yuhanTrip.dto.accommodation.ReservationDTO;
 import hello.yuhanTrip.dto.accommodation.ReviewWriteDTO;
 import hello.yuhanTrip.service.Accomodation.AccommodationServiceImpl;
-import hello.yuhanTrip.service.Accomodation.ReservationService;
+import hello.yuhanTrip.service.reservation.ReservationService;
 import hello.yuhanTrip.service.member.MemberService;
 import hello.yuhanTrip.service.reservation.ReviewService;
 import lombok.RequiredArgsConstructor;

@@ -69,6 +69,13 @@ dependencies {
 
     //Webflux
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    implementation 'org.mapstruct:mapstruct:1.5.3.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
+
+    implementation 'com.querydsl:querydsl-jpa:5.0.0' // 최신 버전으로 변경
+    annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jpa' // 최신 버전으로 변경
+
 }
 
 tasks.named('test') {

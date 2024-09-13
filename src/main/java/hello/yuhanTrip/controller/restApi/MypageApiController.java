@@ -2,7 +2,7 @@ package hello.yuhanTrip.controller.restApi;
 
 import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.dto.payment.MypageMemberDTO;
-import hello.yuhanTrip.service.Accomodation.ReservationService;
+import hello.yuhanTrip.service.reservation.ReservationService;
 import hello.yuhanTrip.service.member.RoleChangeRequestService;
 import hello.yuhanTrip.service.member.MemberService;
 import jakarta.servlet.http.HttpSession;
@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 
 
 @RestController
@@ -44,20 +45,26 @@ public class MypageApiController {
     @PostMapping("/editMemberInfoSubmit")
     public ResponseEntity<String> editMemberInfoSubmit(
             @CookieValue(value = "accessToken", required = false) String accessToken,
-            @RequestBody MypageMemberDTO mypageMemberDTO
+            @RequestParam("email") String email,
+            @RequestParam("name") String name,
+            @RequestParam("nickname") String nickname,
+            @RequestParam("phoneNumber") String phoneNumber,
+            @RequestParam("dateOfBirth") String dateOfBirth,
+            @RequestParam("address") String address
     ) {
+        if (accessToken == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
 
         try {
             Member member = memberService.getUserDetails(accessToken);
+            if (member == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("회원 정보를 찾을 수 없습니다.");
+            }
+            LocalDate Birth = LocalDate.parse(dateOfBirth); // String을 LocalDate로 변환
+            MypageMemberDTO mypageMemberDTO = new MypageMemberDTO(email, name, nickname, phoneNumber,address, Birth);
+            memberService.updateMember(member, mypageMemberDTO);
 
-            // 개인정보 수정
-            member.setName(mypageMemberDTO.getName());
-            member.setNickname(mypageMemberDTO.getNickname());
-            member.setPhoneNumber(mypageMemberDTO.getPhoneNumber());
-            member.setDateOfBirth(mypageMemberDTO.getDateOfBirth());
-            member.setAddress(mypageMemberDTO.getAddress());
-
-            memberService.updateMember(member);
             return ResponseEntity.ok("회원 정보가 성공적으로 수정되었습니다.");
         } catch (Exception e) {
             log.error("회원 정보 수정 중 오류 발생: {}", e.getMessage());

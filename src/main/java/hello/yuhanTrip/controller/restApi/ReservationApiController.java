@@ -10,7 +10,7 @@ import hello.yuhanTrip.dto.accommodation.ReservationDTO;
 import hello.yuhanTrip.dto.accommodation.ReservationUpdateDTO;
 import hello.yuhanTrip.repository.PaymentRepository;
 import hello.yuhanTrip.service.Accomodation.AccommodationService;
-import hello.yuhanTrip.service.Accomodation.ReservationService;
+import hello.yuhanTrip.service.reservation.ReservationService;
 import hello.yuhanTrip.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -36,7 +36,6 @@ public class ReservationApiController {
     private final MemberService memberService;
     private final AccommodationService accommodationService;
     private final ReservationService reservationService;
-    private final PaymentRepository paymentRepository;
 
 
     // 예약 신청
@@ -47,65 +46,40 @@ public class ReservationApiController {
 
         log.info("예약 요청을 처리합니다...");
 
-        Member member = memberService.getUserDetails(accessToken);
         try {
+            Member member = memberService.getUserDetails(accessToken);
             Room room = accommodationService.getRoomInfo(reservationDTO.getRoomId());
+
             if (room == null) {
                 return createErrorResponse("숙소를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
             }
 
             reservationService.validateReservationDates(reservationDTO, room);
-            boolean dateOverlapping = reservationService.isDateOverlapping(
-                    reservationDTO.getRoomId(),
-                    reservationDTO.getCheckInDate(),
-                    reservationDTO.getCheckOutDate()
-            );
 
-            if (dateOverlapping) {
+            if (reservationService.isDateOverlapping(reservationDTO.getRoomId(), reservationDTO.getCheckInDate(), reservationDTO.getCheckOutDate())) {
                 return createErrorResponse("선택한 날짜에 이미 예약이 있습니다.", HttpStatus.CONFLICT);
             }
 
-            long numberOfNights = ChronoUnit.DAYS.between(reservationDTO.getCheckInDate(), reservationDTO.getCheckOutDate());
-            Long totalPrice = reservationDTO.getPrice() * numberOfNights;
-
-
-            Payment payment = new Payment(totalPrice, PaymentStatus.PENDING);
-            Payment savedPayment = paymentRepository.save(payment);
-
-            Reservation reservation = Reservation.builder()
-                    .addr(reservationDTO.getAddr())
-                    .reservationUid(UUID.randomUUID().toString())
-                    .member(member)
-                    .room(room)
-                    .checkInDate(reservationDTO.getCheckInDate())
-                    .checkOutDate(reservationDTO.getCheckOutDate())
-                    .reservationDate(LocalDate.now())
-                    .specialRequests(reservationDTO.getSpecialRequests())
-                    .name(reservationDTO.getName())
-                    .phoneNumber(reservationDTO.getPhoneNumber())
-                    .payment(savedPayment)
-                    .numberOfGuests(reservationDTO.getNumberOfGuests())
-                    .accommodationId(room.getAccommodation().getId())
-                    .reservationStatus(ReservationStatus.RESERVED)
-                    .couponId(reservationDTO.getCouponId())
-                    .build();
-
+            // 예약 생성 및 저장 로직을 서비스로 이동
+            Reservation reservation = reservationService.createReservation(member, room, reservationDTO);
             reservationService.reservationRegister(reservation);
 
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "예약이 성공적으로 완료되었습니다.");
-            response.put("reservationId", reservation.getId());
-            response.put("totalPrice", totalPrice);
+            // 성공적인 응답
+            Map<String, Object> response = Map.of(
+                    "message", "예약이 성공적으로 완료되었습니다.",
+                    "reservationId", reservation.getId(),
+                    "totalPrice", reservation.getPayment().getPrice()
+            );
 
             return ResponseEntity.ok(response);
 
         } catch (IllegalArgumentException e) {
             return createErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
+            log.error("예약 처리 중 오류 발생", e);
             return createErrorResponse("예약 처리 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
     @PostMapping("/updateReservation")
     public ResponseEntity<Map<String, Object>> updateReservation(
             @RequestBody ReservationUpdateDTO reservationUpdateDTO,

@@ -23,7 +23,7 @@ public class EventController {
             model.addAttribute("discountType", "fixed");
             model.addAttribute("discountPrice", 10000); // 10000원 고정 할인 쿠폰
         }
-        else if (now.isAfter(LocalTime.of(18, 0)) && now.isBefore(LocalTime.of(19, 0))) {
+        else if (now.isAfter(LocalTime.of(16, 0)) && now.isBefore(LocalTime.of(19, 0))) {
             model.addAttribute("discountType", "percentage");
             model.addAttribute("discountPrice", 0.2); // 20% 할인 쿠폰
         }

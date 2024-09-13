@@ -13,6 +13,20 @@ import java.util.List;
 
 public interface AccommodationService {
 
+
+    Page<Accommodation> fetchAccommodationsWithSortingAndFiltering(
+            AccommodationType type,
+            Integer areaCode,
+            boolean isFilteringEnabled,
+            LocalDate checkin,
+            LocalDate checkout,
+            Integer numGuests,
+            int page,
+            int size,
+            String sort
+    );
+
+
     // 숙소를 등록하는 메서드
     Accommodation registerAccommodation(String accessToken, AccommodationRegisterDTO dto) throws IOException;
 
@@ -23,10 +37,10 @@ public interface AccommodationService {
     Room getRoomInfo(Long id);
 
     // 페이지 번호와 사이즈를 기준으로 숙소 목록을 반환하는 메서드
-    Page<Accommodation> getAccommodations(int page, int size);
+    Page<Accommodation> getAccommodations(Pageable pageable);
 
     // 지역 코드에 따라 숙소 목록을 반환하는 메서드
-    Page<Accommodation> getAccommodationsByAreaCode(String areaCode, int page, int size);
+    Page<Accommodation> getAccommodationsByAreaCode(String areaCode, Pageable pageable);
 
     // 평점 및 리뷰 기준으로 정렬된 사용 가능한 숙소 목록을 반환하는 메서드
     Page<Accommodation> getAvailableAccommodationsSortedByRatingAndReview(Pageable pageable);
@@ -35,10 +49,10 @@ public interface AccommodationService {
     List<Room> getAvailableRoomsByAccommodation(Long accommodationId, LocalDate checkInDate, LocalDate checkOutDate);
 
     // 가격을 기준으로 내림차순 정렬된 모든 숙소 목록을 반환하는 메서드
-    Page<Accommodation> getAllAccommodationsOrderByPriceDesc(int page, int size);
+    Page<Accommodation> getAllAccommodationsOrderByPriceDesc(Pageable pageable);
 
     // 가격을 기준으로 오름차순 정렬된 모든 숙소 목록을 반환하는 메서드
-    Page<Accommodation> getAllAccommodationsOrderByPriceAsc(int page, int size);
+    Page<Accommodation> getAllAccommodationsOrderByPriceAsc(Pageable pageable);
 
     // 제목을 기준으로 숙소를 검색하여 결과를 반환하는 메서드
     Page<Accommodation> searchByTitle(String title, Pageable pageable);
@@ -51,8 +65,7 @@ public interface AccommodationService {
             LocalDate checkOutDate,
             int numGuests,
             String sortBy,
-            int page,
-            int size
+            Pageable pageable
     );
 
     // 대기 중인 숙소 목록을 반환하는 메서드
@@ -65,8 +78,8 @@ public interface AccommodationService {
     Page<Accommodation> getAccommodationsByTypeSortedByRatingAndReview(AccommodationType type, Pageable pageable);
 
     // 유형에 따라 가격을 기준으로 내림차순 정렬된 숙소 목록을 반환하는 메서드
-    Page<Accommodation> getAccommodationsByTypeOrderByPriceDesc(AccommodationType type, int page, int size);
+    Page<Accommodation> getAccommodationsByTypeOrderByPriceDesc(AccommodationType type, Pageable pageable);
 
     // 유형에 따라 가격을 기준으로 오름차순 정렬된 숙소 목록을 반환하는 메서드
-    Page<Accommodation> getAccommodationsByTypeOrderByPriceAsc(AccommodationType type, int page, int size);
+    Page<Accommodation> getAccommodationsByTypeOrderByPriceAsc(AccommodationType type, Pageable pageable);
 }

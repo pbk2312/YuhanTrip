@@ -10,6 +10,7 @@ import hello.yuhanTrip.dto.register.MemberChangePasswordDTO;
 import hello.yuhanTrip.dto.register.MemberRequestDTO;
 import hello.yuhanTrip.dto.token.TokenDTO;
 import hello.yuhanTrip.exception.SpecificException;
+import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.repository.ResetTokenRepository;
 import hello.yuhanTrip.service.member.MemberService;
 import jakarta.servlet.http.Cookie;
@@ -33,6 +34,7 @@ public class MemberApiController {
 
     private final MemberService memberService;
     private final ResetTokenRepository resetTokenRepository;
+    private final TokenProvider tokenProvider;
 
     // 회원가입
     @PostMapping("/register")
@@ -139,6 +141,10 @@ public class MemberApiController {
         }
     }
 
+
+
+
+
     private void addCookie(HttpServletResponse response, String name, String value, int maxAge) {
         Cookie cookie = createCookie(name, value, maxAge);
         response.addCookie(cookie);
@@ -151,7 +157,7 @@ public class MemberApiController {
 
     private Cookie createCookie(String name, String value, int maxAge) {
         Cookie cookie = new Cookie(name, value);
-        cookie.setHttpOnly(true);
+        cookie.setHttpOnly(false); // https 환경에서 사용하려면 true로
         cookie.setSecure(true);
         cookie.setPath("/");
         cookie.setMaxAge(maxAge);

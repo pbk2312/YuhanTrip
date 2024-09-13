@@ -3,7 +3,7 @@ package hello.yuhanTrip.controller.restApi;
 import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.domain.reservation.Reservation;
 import hello.yuhanTrip.exception.UnauthorizedException;
-import hello.yuhanTrip.service.Accomodation.ReservationService;
+import hello.yuhanTrip.service.reservation.ReservationService;
 import hello.yuhanTrip.service.member.MemberService;
 import hello.yuhanTrip.service.reservation.ReviewService;
 import lombok.RequiredArgsConstructor;

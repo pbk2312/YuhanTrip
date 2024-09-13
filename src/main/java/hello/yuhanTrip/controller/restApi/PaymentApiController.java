@@ -7,7 +7,7 @@ import hello.yuhanTrip.domain.reservation.Reservation;
 import hello.yuhanTrip.domain.reservation.ReservationStatus;
 import hello.yuhanTrip.dto.payment.PaymentCallbackRequest;
 import hello.yuhanTrip.dto.payment.PaymentCancelDTO;
-import hello.yuhanTrip.service.Accomodation.ReservationService;
+import hello.yuhanTrip.service.reservation.ReservationService;
 import hello.yuhanTrip.service.reservation.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;

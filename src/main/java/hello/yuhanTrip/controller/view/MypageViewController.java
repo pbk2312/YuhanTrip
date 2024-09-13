@@ -1,13 +1,17 @@
 package hello.yuhanTrip.controller.view;
 
 import hello.yuhanTrip.domain.accommodation.Accommodation;
+import hello.yuhanTrip.domain.member.AuthProvider;
 import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.domain.reservation.Reservation;
 import hello.yuhanTrip.domain.accommodation.Room;
 import hello.yuhanTrip.domain.admin.RoleChangeRequest;
-import hello.yuhanTrip.dto.payment.MypageMemberDTO;
+import hello.yuhanTrip.dto.accommodation.AccommodationDTO;
+import hello.yuhanTrip.dto.member.MemberDTO;
+import hello.yuhanTrip.mapper.AccommodationMapper;
+import hello.yuhanTrip.mapper.MemberMapper;
 import hello.yuhanTrip.service.Accomodation.AccommodationServiceImpl;
-import hello.yuhanTrip.service.Accomodation.ReservationService;
+import hello.yuhanTrip.service.reservation.ReservationService;
 import hello.yuhanTrip.service.member.MemberLikeService;
 import hello.yuhanTrip.service.member.MemberService;
 import hello.yuhanTrip.service.member.RoleChangeRequestService;
@@ -17,7 +21,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +36,6 @@ import java.util.Map;
 public class MypageViewController {
 
     private final MemberService memberService;
-    private final PasswordEncoder passwordEncoder;
     private final ReservationService reservationService;
     private final AccommodationServiceImpl accommodationService;
     private final RoleChangeRequestService roleChangeRequestService;
@@ -43,35 +45,42 @@ public class MypageViewController {
     @GetMapping("/check")
     public String mypageCheck(@CookieValue(value = "accessToken", required = false) String accessToken) {
         Member member = memberService.getUserDetails(accessToken);
+
+        // AuthProvider가 KAKAO인 경우 바로 /memberInfo로 리다이렉트
+        if (member.getAuthProvider() == AuthProvider.KAKAO) {
+            return "redirect:/mypage/memberInfo";
+        }
+
         log.info("마이페이지 접근 유저 : {}", member.getName());
         return "mypage/mypageCheck";
     }
 
 
-
     // 개인 정보 보기
-
     @GetMapping("/memberInfo")
     public String memberInfo(
             @CookieValue(value = "accessToken", required = false) String accessToken,
             HttpSession session,
             Model model
     ) {
-
+        // Member 엔티티를 가져옵니다.
         Member member = memberService.getUserDetails(accessToken);
 
-        if (session.getAttribute("passwordChecked") == null) {
-            return "redirect:/mypage/check";
+        // AuthProvider가 KAKAO인 경우 비밀번호 확인 생략
+        if (member.getAuthProvider() != AuthProvider.KAKAO) {
+            // 세션에서 passwordChecked 속성을 확인합니다.
+            if (session.getAttribute("passwordChecked") == null) {
+                return "redirect:/mypage/check";
+            }
         }
-        MypageMemberDTO mypageMemberDTO = MypageMemberDTO.builder()
-                .email(member.getEmail())
-                .address(member.getAddress())
-                .nickname(member.getNickname())
-                .phoneNumber(member.getPhoneNumber())
-                .dateOfBirth(member.getDateOfBirth())
-                .name(member.getName())
-                .build();
-        model.addAttribute("MypageMemberDTO", mypageMemberDTO);
+
+        // Member 엔티티를 MemberDTO로 변환합니다.
+        MemberDTO memberDTO = MemberMapper.INSTANCE.toMemberDTO(member);
+
+        // 모델에 MemberDTO를 추가합니다.
+        model.addAttribute("MypageMemberDTO", memberDTO);
+
+        // 뷰를 반환합니다.
         return "mypage/memberInfo";
     }
 
@@ -85,18 +94,19 @@ public class MypageViewController {
     ) {
 
         Member member = memberService.getUserDetails(accessToken);
-        if (session.getAttribute("passwordChecked") == null) {
-            return "redirect:/mypage/check";
+
+        // AuthProvider가 KAKAO인 경우 비밀번호 확인 생략
+        if (member.getAuthProvider() != AuthProvider.KAKAO) {
+            // 세션에서 passwordChecked 속성을 확인합니다.
+            if (session.getAttribute("passwordChecked") == null) {
+                return "redirect:/mypage/check";
+            }
         }
-        MypageMemberDTO mypageMemberDTO = MypageMemberDTO.builder()
-                .email(member.getEmail())
-                .address(member.getAddress())
-                .nickname(member.getNickname())
-                .phoneNumber(member.getPhoneNumber())
-                .dateOfBirth(member.getDateOfBirth())
-                .name(member.getName())
-                .build();
-        model.addAttribute("MypageMemberDTO", mypageMemberDTO);
+
+        // Member 엔티티를 MemberDTO로 변환합니다.
+        MemberDTO memberDTO = MemberMapper.INSTANCE.toMemberDTO(member);
+
+        model.addAttribute("MypageMemberDTO", memberDTO);
         return "mypage/editMemberInfo";
     }
 
@@ -111,11 +121,16 @@ public class MypageViewController {
     ) {
         log.info("숙소 조회");
         Member member = memberService.validateHost(accessToken);
-        if (session.getAttribute("passwordChecked") == null) {
-            return "redirect:/mypage/check";
+        // AuthProvider가 KAKAO인 경우 비밀번호 확인 생략
+        if (member.getAuthProvider() != AuthProvider.KAKAO) {
+            // 세션에서 passwordChecked 속성을 확인합니다.
+            if (session.getAttribute("passwordChecked") == null) {
+                return "redirect:/mypage/check";
+            }
         }
         List<Accommodation> accommodations = memberService.getAccommodationsByMemberId(member.getId());
-        model.addAttribute("accommodations", accommodations);
+        List<AccommodationDTO> dtoList = AccommodationMapper.INSTANCE.toDTOList(accommodations);
+        model.addAttribute("accommodations", dtoList);
         return "mypage/accommodationByMember";
     }
 
@@ -129,8 +144,12 @@ public class MypageViewController {
             Model model
     ) {
         Member member = memberService.getUserDetails(accessToken);
-        if (session.getAttribute("passwordChecked") == null) {
-            return "redirect:/mypage/check";
+        // AuthProvider가 KAKAO인 경우 비밀번호 확인 생략
+        if (member.getAuthProvider() != AuthProvider.KAKAO) {
+            // 세션에서 passwordChecked 속성을 확인합니다.
+            if (session.getAttribute("passwordChecked") == null) {
+                return "redirect:/mypage/check";
+            }
         }
         if (accommodationId == null) {
             return "redirect:/mypage/memberAccommodations";
@@ -147,7 +166,8 @@ public class MypageViewController {
             roomReservationsMap.put(room, reservations);
         }
 
-        model.addAttribute("accommodation", accommodation);
+        AccommodationDTO dto = AccommodationMapper.INSTANCE.toDTO(accommodation);
+        model.addAttribute("accommodation", dto);
         model.addAttribute("roomReservationsMap", roomReservationsMap);
         return "mypage/reservationSituation";
     }
@@ -158,10 +178,15 @@ public class MypageViewController {
     public String roleChangeRequestForm(@CookieValue(value = "accessToken", required = false) String accessToken, Model model, HttpSession session) {
 
         Member member = memberService.getUserDetails(accessToken);
-        if (session.getAttribute("passwordChecked") == null) {
-            return "redirect:/mypage/check";
+        // AuthProvider가 KAKAO인 경우 비밀번호 확인 생략
+        if (member.getAuthProvider() != AuthProvider.KAKAO) {
+            // 세션에서 passwordChecked 속성을 확인합니다.
+            if (session.getAttribute("passwordChecked") == null) {
+                return "redirect:/mypage/check";
+            }
         }
-        model.addAttribute("member", member);
+        MemberDTO memberDTO = MemberMapper.INSTANCE.toMemberDTO(member);
+        model.addAttribute("member", memberDTO);
         return "mypage/roleChangeRequestForm";
     }
 
@@ -174,8 +199,12 @@ public class MypageViewController {
             Model model
     ) {
         Member member = memberService.getUserDetails(accessToken);
-        if (session.getAttribute("passwordChecked") == null) {
-            return "redirect:/mypage/check";
+        // AuthProvider가 KAKAO인 경우 비밀번호 확인 생략
+        if (member.getAuthProvider() != AuthProvider.KAKAO) {
+            // 세션에서 passwordChecked 속성을 확인합니다.
+            if (session.getAttribute("passwordChecked") == null) {
+                return "redirect:/mypage/check";
+            }
         }
         List<RoleChangeRequest> requestByMember = roleChangeRequestService.getRequestByMember(member);
 
@@ -213,12 +242,6 @@ public class MypageViewController {
         } catch (Exception e) {
             log.error("Error processing /memberLikeHistory request", e);
             return "error"; // 오류 페이지로 리다이렉트
-        }
-    }
-
-    private void validatePassword(String rawPassword, String encodedPassword) {
-        if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
-            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
     }
 

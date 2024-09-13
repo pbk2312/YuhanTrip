@@ -27,8 +27,9 @@ import java.util.*;
 @Log4j2
 @RequiredArgsConstructor
 public class AccommodationServiceImpl implements AccommodationService {
-    private final AccommodationRepository accommodationRepository;
 
+
+    private final AccommodationRepository accommodationRepository;
     private final RoomRepository roomRepository;
     private final MemberService memberService;
     private final AccommodationFactory accommodationFactory;
@@ -46,7 +47,61 @@ public class AccommodationServiceImpl implements AccommodationService {
 
     }
 
+    public Page<Accommodation> fetchAccommodationsWithSortingAndFiltering(
+            AccommodationType type,
+            Integer areaCode,
+            boolean filterByAvailability,
+            LocalDate checkin,
+            LocalDate checkout,
+            Integer numGuests,
+            int page,
+            int size,
+            String sort) {
+        Pageable pageable = PageRequest.of(page, size);
 
+        if (type != null) {
+            // 숙소 유형이 제공된 경우
+            switch (sort != null ? sort.toLowerCase() : "default") {
+                case "averagerating":
+                    return getAccommodationsByTypeSortedByRatingAndReview(type, pageable);
+                case "pricedesc":
+                    return getAccommodationsByTypeOrderByPriceDesc(type, pageable);
+                case "priceasc":
+                    return getAccommodationsByTypeOrderByPriceAsc(type, pageable);
+                default:
+                    return getAccommodationsByTypeSortedByRatingAndReview(type, pageable);
+            }
+        } else if (filterByAvailability) {
+            // 체크인, 체크아웃, 게스트 수, 숙소 유형이 제공된 경우
+            return findAvailableAccommodationsByType(
+                    type,
+                    areaCode != null ? String.valueOf(areaCode) : null,
+                    checkin,
+                    checkout,
+                    numGuests,
+                    sort != null ? sort.toUpperCase() : "DEFAULT",
+                    pageable
+            );
+        } else {
+            // 필터링 없이 조회 (정렬 적용)
+            switch (sort != null ? sort.toLowerCase() : "default") {
+                case "averagerating":
+                    return getAvailableAccommodationsSortedByRatingAndReview(pageable);
+                case "pricedesc":
+                    return areaCode != null
+                            ? getAllAccommodationsOrderByPriceDesc(pageable)
+                            : getAllAccommodationsOrderByPriceDesc(pageable);
+                case "priceasc":
+                    return areaCode != null
+                            ? getAllAccommodationsOrderByPriceAsc(pageable)
+                            : getAllAccommodationsOrderByPriceAsc(pageable);
+                default:
+                    return areaCode != null
+                            ? getAccommodationsByAreaCode(String.valueOf(areaCode), pageable)
+                            : getAccommodations(pageable);
+            }
+        }
+    }
     @Override
     public Accommodation getAccommodationInfo(Long id) {
         return accommodationRepository.findById(id)
@@ -63,15 +118,13 @@ public class AccommodationServiceImpl implements AccommodationService {
 
 
     @Override
-    public Page<Accommodation> getAccommodations(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public Page<Accommodation> getAccommodations(Pageable pageable) {
         return accommodationRepository.findAllByStatus(AccommodationApplyStatus.APPROVED, pageable);
     }
 
 
     @Override
-    public Page<Accommodation> getAccommodationsByAreaCode(String areaCode, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public Page<Accommodation> getAccommodationsByAreaCode(String areaCode,Pageable pageable) {
         return accommodationRepository.findByAreacode(areaCode, pageable);
     }
 
@@ -99,8 +152,7 @@ public class AccommodationServiceImpl implements AccommodationService {
 
 
     @Override
-    public Page<Accommodation> getAllAccommodationsOrderByPriceDesc(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public Page<Accommodation> getAllAccommodationsOrderByPriceDesc(Pageable pageable) {
         return accommodationRepository.findAllByStatusOrderByAveragePriceDesc(
                 AccommodationApplyStatus.APPROVED, pageable
         );
@@ -109,8 +161,7 @@ public class AccommodationServiceImpl implements AccommodationService {
 
 
     @Override
-    public Page<Accommodation> getAllAccommodationsOrderByPriceAsc(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public Page<Accommodation> getAllAccommodationsOrderByPriceAsc(Pageable pageable) {
         return accommodationRepository.findAllByStatusOrderByAveragePriceAsc(
                 AccommodationApplyStatus.APPROVED, pageable
         );
@@ -132,10 +183,8 @@ public class AccommodationServiceImpl implements AccommodationService {
             LocalDate checkOutDate,
             int numGuests,
             String sortBy,
-            int page,
-            int size
+            Pageable pageable
     ) {
-        Pageable pageable = PageRequest.of(page, size);
         return accommodationRepository.findAvailableAccommodationsByType(
                 AccommodationApplyStatus.APPROVED,
                 type,
@@ -166,13 +215,13 @@ public class AccommodationServiceImpl implements AccommodationService {
         return accommodationRepository.findByStatusAndTypeOrderByAverageRatingDesc(AccommodationApplyStatus.APPROVED,type, pageable);
     }
 
-    public Page<Accommodation> getAccommodationsByTypeOrderByPriceDesc(AccommodationType type, int page, int size) {
+    public Page<Accommodation> getAccommodationsByTypeOrderByPriceDesc(AccommodationType type, Pageable pageable) {
         // `type` 필터링과 동시에 가격 내림차순 정렬된 결과 반환
-        return accommodationRepository.findByStatusAndTypeOrderByPriceDesc(AccommodationApplyStatus.APPROVED,type, PageRequest.of(page, size));
+        return accommodationRepository.findByStatusAndTypeOrderByPriceDesc(AccommodationApplyStatus.APPROVED,type, pageable);
     }
 
-    public Page<Accommodation> getAccommodationsByTypeOrderByPriceAsc(AccommodationType type, int page, int size) {
+    public Page<Accommodation> getAccommodationsByTypeOrderByPriceAsc(AccommodationType type, Pageable pageable) {
         // `type` 필터링과 동시에 가격 오름차순 정렬된 결과 반환
-        return accommodationRepository.findByStatusAndTypeOrderByPriceAsc(AccommodationApplyStatus.APPROVED,type, PageRequest.of(page, size));
+        return accommodationRepository.findByStatusAndTypeOrderByPriceAsc(AccommodationApplyStatus.APPROVED,type, pageable);
     }
 }
