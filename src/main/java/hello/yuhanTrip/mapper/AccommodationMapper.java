@@ -13,19 +13,9 @@ public interface AccommodationMapper {
 
     AccommodationMapper INSTANCE = Mappers.getMapper(AccommodationMapper.class);
 
-    @Mapping(target = "roomImg", ignore = true)
     AccommodationDTO toDTO(Accommodation accommodation);
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "roomImgUrl", ignore = true)
-    @Mapping(target = "accommodation", ignore = true)
-    @Mapping(target = "reservations", ignore = true)
-    @Mapping(target = "member", ignore = true)
-    @Mapping(target = "memberLikes", ignore = true)
-    @Mapping(target = "reviews", ignore = true)
-    Accommodation toEntity(AccommodationDTO accommodationDTO);
 
     // List mappings can remain as is
     List<AccommodationDTO> toDTOList(List<Accommodation> accommodations);
-    List<Accommodation> toEntityList(List<AccommodationDTO> accommodationDTOs);
 }
