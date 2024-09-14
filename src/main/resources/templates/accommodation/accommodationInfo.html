@@ -698,47 +698,6 @@
         checkAuth();
     };
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const likeButtons = document.querySelectorAll('.like-button');
-
-        likeButtons.forEach(button => {
-            button.addEventListener('click', event => {
-                event.preventDefault();
-                event.stopPropagation();
-
-                const accommodationId = button.getAttribute('data-id');
-                const icon = button.querySelector('i');
-                const isLiked = icon.classList.contains('bi-heart-fill');
-                const action = isLiked ? 'remove' : 'add';
-
-                fetch(`/api/likes/${action}?accommodationId=${encodeURIComponent(accommodationId)}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-                    },
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok.');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.status === 'success') {
-                            // 하트 아이콘을 토글
-                            icon.classList.toggle('bi-heart-fill', !isLiked);
-                            icon.classList.toggle('bi-heart', isLiked);
-                        } else {
-                            alert(data.message || '좋아요 요청이 실패했습니다. 다시 시도해 주세요.');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('로그인 후 이용해주세요');
-                    });
-            });
-        });
 
     document.addEventListener('DOMContentLoaded', () => {
         const prevButton = document.querySelector('.slider-prev');
@@ -771,12 +730,12 @@
 
         // 예약 버튼 클릭 이벤트 처리
         document.querySelectorAll('.reservation-button').forEach(button => {
+            const accessToken = getCookie('accessToken'); // 쿠키에서 accessToken 가져오기
             button.addEventListener('click', function (event) {
-                const token = localStorage.getItem('accessToken');
                 const roomCard = this.closest('.room-card'); // 클릭한 버튼의 가장 가까운 room-card 요소 찾기
                 const loginMessage = roomCard.querySelector('.login-message'); // 해당 room-card 내의 로그인 메시지 찾기
 
-                if (!token) {
+                if (!accessToken) {
                     loginMessage.style.display = 'block'; // 로그인 메시지 표시
                     event.preventDefault(); // 클릭 이벤트 중단
                     return;
@@ -792,7 +751,6 @@
                 window.location.href = url;
             });
         });
-    });
 
 
 

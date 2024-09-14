@@ -18,6 +18,7 @@
             margin: 0;
             padding: 0;
             color: #333;
+            font-family: 'Arial', sans-serif;
         }
 
         /* Header Styles */
@@ -57,28 +58,62 @@
             max-width: 800px;
         }
 
-        .info p {
-            margin: 0 0 10px 0;
-            line-height: 1.6;
+        /* No Reservations Notice */
+        .no-reservations {
+            text-align: center;
+            padding: 40px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            margin: 20px auto;
+            max-width: 600px;
+            color: #ff6f61;
         }
 
-        .info .btn {
-            margin-top: 10px;
-            border-radius: 20px;
-            font-weight: 600;
+        .no-reservations h2 {
+            font-size: 22px;
+            color: #333;
         }
 
-        /* Footer Styles */
-        .footer a {
-            color: #007bff;
-            text-decoration: none;
+        .no-reservations p {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .no-reservations a {
+            color: #ff6f61;
             font-weight: bold;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            background-color: #ffebec;
+            transition: background-color 0.3s ease;
         }
 
-        .footer a:hover {
-            text-decoration: underline;
+        .no-reservations a:hover {
+            background-color: #ff6f61;
+            color: white;
         }
 
+        /* Additional Styling */
+        .container {
+            text-align: center;
+        }
+
+        .cta-button {
+            background-color: #ff6f61;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background-color: #e65c50;
+        }
         /* Reservation Header */
         .reservation-header {
             position: relative;
@@ -129,26 +164,8 @@
             font-weight: 600;
         }
 
-        /* Completed Reservation Item */
-        .reservation-item.completed {
-            background-color: #f8f9fa;
-            position: relative;
-            border-left: 5px solid #28a745;
-        }
 
-        .reservation-item.completed::before {
-            content: '숙박 완료';
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: #28a745;
-            color: #fff;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-weight: bold;
-            font-size: 14px;
-            z-index: 2;
-        }
+
 
         /* Review Button */
         .reservation-item.completed .review-button {
@@ -170,18 +187,6 @@
             color: #ffffff;
         }
 
-        /* Icon Styles */
-        .reservation-item.completed .icon {
-            display: inline-block;
-            margin-left: 10px;
-            color: #28a745;
-            font-size: 1.5rem;
-            vertical-align: middle;
-        }
-
-        .reservation-item.reserved {
-            opacity: 1;
-        }
 
         /* General Review Button Styles */
         .review-button {
@@ -226,43 +231,8 @@
             color: white;
         }
 
-        /* No Reservations Notice */
-        .no-reservations {
-            text-align: center;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.9);
-            margin: 20px auto;
-            max-width: 800px;
-            color: #ff6f61;
-        }
 
-        .no-reservations h2 {
-            margin: 0;
-            font-size: 20px;
-        }
 
-        /* Rejected Reservation Item */
-        .reservation-item.rejected {
-            background-color: #f8d7da;
-            position: relative;
-            border-left: 5px solid #dc3545;
-        }
-
-        .reservation-item.rejected::before {
-            content: '예약 거절';
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: #dc3545;
-            color: #fff;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-weight: bold;
-            font-size: 14px;
-            z-index: 2;
-        }
 
         /* Hide Elements for Rejected Reservations */
         .reservation-item.rejected .update-button,
@@ -270,13 +240,6 @@
             display: none;
         }
 
-        /* 전화번호 표시 스타일 */
-        .reservation-item.rejected .contact-info {
-            margin-top: 10px;
-            padding: 10px;
-            background-color: #f1f1f1;
-            border-radius: 5px;
-        }
     </style>
 </head>
 <body>
@@ -350,40 +313,48 @@
 
             </div>
         </div>
-정
 
 
 
-        <!-- 예약 내역이 없는 경우 -->
-        <div class="no-reservations" th:if="${#lists.isEmpty(reservations)}">
-            <h2>예약 내역이 없습니다.</h2>
-            <p>아직 예약이 없으신가요? <a href="/home/homepage">홈으로 돌아가기</a></p>
+        <div class="container">
+            <!-- 예약 내역이 없는 경우 -->
+            <div class="no-reservations" th:if="${#lists.isEmpty(reservations)}">
+                <h2>예약 내역이 없습니다.</h2>
+                <p>지금 바로 멋진 여행을 계획해보세요!</p>
+                <a href="/home/homepage">홈으로 돌아가기</a>
+                <br>
+                <button class="cta-button" onclick="window.location.href='/accommodation/byregion'">숙소 검색하기</button>
+            </div>
         </div>
 
         <!-- Pagination -->
-        <nav aria-label="Page navigation">
-            <ul class="pagination">
-                <!-- Previous Page Link -->
-                <li class="page-item" th:if="${currentPage > 0}">
-                    <a class="page-link" th:href="@{/reservationConfirm(page=${currentPage - 1})}"
-                       aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-                <!-- Page Number Links -->
-                <li class="page-item" th:each="page : ${#numbers.sequence(0, totalPages - 1)}"
-                    th:classappend="${page == currentPage ? 'active' : ''}">
-                    <a class="page-link" th:href="@{/reservationConfirm(page=${page})}" th:text="${page + 1}">1</a>
-                </li>
-                <!-- Next Page Link -->
-                <li class="page-item" th:if="${currentPage < totalPages - 1}">
-                    <a class="page-link" th:href="@{/reservationConfirm(page=${currentPage + 1})}" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
+        <div th:if="${totalPages > 1}">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <!-- Previous Page Link -->
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                        <a class="page-link" th:href="@{/reservationConfirm(page=${currentPage - 1})}"
+                           aria-label="Previous" th:disabled="${currentPage == 0}">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
 
+                    <!-- Page Number Links -->
+                    <li class="page-item" th:each="page : ${#numbers.sequence(0, totalPages - 1)}"
+                        th:classappend="${page == currentPage} ? 'active' : ''">
+                        <a class="page-link" th:href="@{/reservationConfirm(page=${page})}" th:text="${page + 1}"></a>
+                    </li>
+
+                    <!-- Next Page Link -->
+                    <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                        <a class="page-link" th:href="@{/reservationConfirm(page=${currentPage + 1})}"
+                           aria-label="Next" th:disabled="${currentPage == totalPages - 1}">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
     </div>
 </div>
 
