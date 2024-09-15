@@ -1,6 +1,7 @@
 package hello.yuhanTrip.service.member;
 
 import hello.yuhanTrip.domain.accommodation.Accommodation;
+import hello.yuhanTrip.domain.member.AuthProvider;
 import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.dto.member.LoginDTO;
 import hello.yuhanTrip.dto.member.LogoutDTO;
@@ -17,7 +18,7 @@ import java.util.List;
 public interface MemberService {
 
     // 회원 가입을 처리하는 메서드
-    String register(MemberRequestDTO memberRequestDTO);
+    String register(MemberRequestDTO memberRequestDTO, AuthProvider authProvider);
 
     // 로그인 요청을 처리하고, 인증 토큰을 반환하는 메서드
     TokenDTO login(LoginDTO loginDTO);
@@ -48,7 +49,6 @@ public interface MemberService {
 
     Member getUserDetails(String accessToken);
 
-    String registerKakaoUserOrLogin(KakaoUserInfoResponseDto kakaoUserInfo);
-
+    void validatePassword(String rawPassword, String encodedPassword);
 
 }

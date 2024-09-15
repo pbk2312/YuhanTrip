@@ -93,9 +93,6 @@ public class MemberViewController {
 
 
 
-
-
-
     @GetMapping("/email/input")
     public String showEmailInputPage(@RequestParam("id") Long userInfoId, Model model) {
         // userInfoId를 모델에 추가

@@ -6,15 +6,12 @@ import hello.yuhanTrip.dto.member.LoginDTO;
 import hello.yuhanTrip.dto.member.LogoutDTO;
 import hello.yuhanTrip.dto.member.WithdrawalMembershipDTO;
 import hello.yuhanTrip.dto.email.EmailRequestDTO;
-import hello.yuhanTrip.dto.kakao.KakaoUserInfoResponseDto;
 import hello.yuhanTrip.dto.payment.MypageMemberDTO;
 import hello.yuhanTrip.dto.register.MemberChangePasswordDTO;
 import hello.yuhanTrip.dto.register.MemberRequestDTO;
 import hello.yuhanTrip.dto.token.TokenDTO;
 import hello.yuhanTrip.email.EmailProvider;
-import hello.yuhanTrip.exception.InvalidHostException;
-import hello.yuhanTrip.exception.SpecificException;
-import hello.yuhanTrip.exception.UnauthorizedException;
+import hello.yuhanTrip.exception.*;
 import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.repository.EmailRepository;
 import hello.yuhanTrip.repository.MemberRepository;
@@ -41,81 +38,38 @@ public class MemberServiceImpl implements MemberService {
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final MemberRepository memberRepository;
-    private final EmailRepository emailRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
     private final ResetTokenRepository resetTokenReposiotry;
     private final EmailProvider emailProvider;
+    private final EmailRepository emailRepository;
 
 
-    public String register(MemberRequestDTO memberRequestDTO) {
-        String email = memberRequestDTO.getEmail();
-        String password = memberRequestDTO.getPassword();
-        String checkPassword = memberRequestDTO.getCheckPassword();
-
-
-        log.info("회원가입 진행...");
-
-        if (!password.equals(checkPassword)) {
-            throw new RuntimeException("비밀번호 불일치");
-        }
-
-        // 이메일 인증 상태 확인
-        boolean isEmailVerified = emailRepository.existsByCertificationEmailAndCheckCertificationIsTrue(email);
-        if (!isEmailVerified) {
-            throw new RuntimeException("이메일 인증이 완료되지 않았습니다.");
-        }
-
-        Member member = memberRequestDTO.toMember(passwordEncoder);
-
-        // 이메일로 인증번호 조회
-        EmailCertification emailCertification = emailRepository.findByCertificationEmail(memberRequestDTO.getEmail())
-                .orElseThrow(() -> new RuntimeException("인증번호를 찾을 수 없습니다."));
-
-        emailRepository.delete(emailCertification);
-
-        memberRepository.save(member);
-
-
-        return "회원가입 성공"; // 회원가입 성공 시 로그인 페이지로 리다이렉트
+    public String register(MemberRequestDTO memberRequestDTO, AuthProvider authProvider) {
+        MemberType memberType = getMemberType(authProvider);
+        Member member = memberType.register(memberRequestDTO);
+        log.info("회원 가입 :  {} ", member.getName());
+        return "회원 가입 완료";
     }
 
-    public String registerKakaoUserOrLogin(KakaoUserInfoResponseDto kakaoUserInfo) {
-        String kakaoId = kakaoUserInfo.getId().toString();
-        String email = kakaoUserInfo.getKakaoAccount().getEmail();
-
-
-        boolean existsByAuthProviderId = memberRepository.existsByAuthProviderId(kakaoId);
-
-        // 1. 카카오 사용자 확인 (이미 존재하는지 확인)
-        if (existsByAuthProviderId) {
-            // 회원이 이미 존재하면 로그인 처리
-            return "이미 가입된 회원입니다. 로그인 처리 중...";
+    private MemberType getMemberType(AuthProvider authProvider) {
+        switch (authProvider) {
+            case LOCAL:
+                return new LocalMemberRegister(passwordEncoder, emailRepository, memberRepository);
+            case KAKAO:
+                return new KakaoMemberRegister(passwordEncoder, memberRepository);
+            default:
+                throw new IllegalArgumentException("지원하지 않는 인증 제공자입니다.");
         }
-
-        // 2. 존재하지 않으면 새로 회원가입 처리
-        Member newMember = Member.builder()
-                .authProviderId(kakaoId)
-                .email(email)
-                .name(kakaoUserInfo.getKakaoAccount().getProfile().getNickName()) // 카카오 프로필 닉네임 사용
-                .authProvider(AuthProvider.KAKAO)
-                .memberRole(MemberRole.ROLE_MEMBER)
-                .password(passwordEncoder.encode("0000"))
-                .build();
-
-        // 회원 정보 저장
-        memberRepository.save(newMember);
-
-        return "카카오 회원가입 및 로그인 성공";
     }
-
 
 
     @Transactional
     public TokenDTO login(LoginDTO loginDTO) {
         log.info("로그인 시도: 사용자 아이디={}", loginDTO.getEmail());
-
+        Member member = findByEmail(loginDTO.getEmail());
+        validatePassword(loginDTO.getPassword(), member.getPassword());
         // 1. 로그인 ID/PW를 기반으로 AuthenticationToken 생성
         UsernamePasswordAuthenticationToken authenticationToken = loginDTO.toAuthentication();
 
@@ -154,7 +108,7 @@ public class MemberServiceImpl implements MemberService {
 
         // 회원 이메일 존재 여부 확인
         memberRepository.findByEmail(emailRequestDTO.getEmail())
-                .orElseThrow(() -> new SpecificException("존재하지 않는 회원입니다."));
+                .orElseThrow(() -> new EmailNotFoundException("존재하지 않는 회원입니다."));
 
         // 임시 비밀번호 생성
         String resetToken = generateResetToken();
@@ -203,10 +157,7 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public String deleteAccount(WithdrawalMembershipDTO withdrawalMembershipDTO) {
         Member member = memberRepository.findByEmail(withdrawalMembershipDTO.getEmail()).orElseThrow(() -> new RuntimeException("존재하지 않는 회원 입니다."));
-        if (!passwordEncoder.matches(withdrawalMembershipDTO.getPassword(), member.getPassword())) {
-            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
-
-        }
+        validatePassword(withdrawalMembershipDTO.getPassword(), member.getPassword());
         // 해당 회원의 RefreshToken을 삭제합니다.
         refreshTokenRepository.deleteByEmail(member.getEmail());
 
@@ -253,8 +204,14 @@ public class MemberServiceImpl implements MemberService {
     // 회원 찾기
     public Member findByEmail(String email) {
         return memberRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid user"));
+                .orElseThrow(() -> new EmailNotFoundException("이메일을 찾을 수 없습니다."));
 
+    }
+
+    public void validatePassword(String rawPassword, String encodedPassword) {
+        if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
+            throw new IncorrectPasswordException("비밀번호가 일치하지 않습니다.");
+        }
     }
 
 

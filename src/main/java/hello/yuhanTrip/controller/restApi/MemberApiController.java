@@ -1,5 +1,6 @@
 package hello.yuhanTrip.controller.restApi;
 
+import hello.yuhanTrip.domain.member.AuthProvider;
 import hello.yuhanTrip.domain.member.ResetToken;
 import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.dto.member.LoginDTO;
@@ -9,6 +10,8 @@ import hello.yuhanTrip.dto.email.EmailRequestDTO;
 import hello.yuhanTrip.dto.register.MemberChangePasswordDTO;
 import hello.yuhanTrip.dto.register.MemberRequestDTO;
 import hello.yuhanTrip.dto.token.TokenDTO;
+import hello.yuhanTrip.exception.EmailNotFoundException;
+import hello.yuhanTrip.exception.IncorrectPasswordException;
 import hello.yuhanTrip.exception.SpecificException;
 import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.repository.ResetTokenRepository;
@@ -34,13 +37,12 @@ public class MemberApiController {
 
     private final MemberService memberService;
     private final ResetTokenRepository resetTokenRepository;
-    private final TokenProvider tokenProvider;
 
     // 회원가입
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody MemberRequestDTO memberRequestDTO) {
         try {
-            String result = memberService.register(memberRequestDTO);
+            String result = memberService.register(memberRequestDTO, AuthProvider.LOCAL);
             log.info("Registration result: {}", result);
             return ResponseEntity.status(HttpStatus.CREATED).body("회원가입이 성공적으로 완료되었습니다.");
         } catch (SpecificException e) {
@@ -56,20 +58,40 @@ public class MemberApiController {
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody LoginDTO loginDTO, HttpServletResponse response, HttpServletRequest request) {
         log.info("로그인 요청...");
-        TokenDTO tokenDTO = memberService.login(loginDTO);
-        log.info("로그인이 완료되었습니다. 반환된 토큰: {}", tokenDTO);
-
-        addCookie(response, "accessToken", tokenDTO.getAccessToken(), 3600); // 한시간
-        addCookie(response,"refreshToken",tokenDTO.getRefreshToken(),36000); // 7일
-
-        String redirectUrl = (String) request.getSession().getAttribute("redirectUrl");
-        request.getSession().removeAttribute("redirectUrl");
 
         Map<String, String> responseMap = new HashMap<>();
-        responseMap.put("accessToken", tokenDTO.getAccessToken());
-        responseMap.put("redirectUrl", redirectUrl != null ? redirectUrl : "/home/homepage");
 
-        return ResponseEntity.ok(responseMap);
+        try {
+            // 이메일과 비밀번호를 검증한 후 토큰 반환
+            TokenDTO tokenDTO = memberService.login(loginDTO);
+            log.info("로그인이 완료되었습니다. 반환된 토큰: {}", tokenDTO);
+
+            addCookie(response, "accessToken", tokenDTO.getAccessToken(), 3600); // 한시간
+            addCookie(response, "refreshToken", tokenDTO.getRefreshToken(), 36000); // 7일
+
+            String redirectUrl = (String) request.getSession().getAttribute("redirectUrl");
+            request.getSession().removeAttribute("redirectUrl");
+
+            responseMap.put("accessToken", tokenDTO.getAccessToken());
+            responseMap.put("redirectUrl", redirectUrl != null ? redirectUrl : "/home/homepage");
+
+            return ResponseEntity.ok(responseMap);
+
+        } catch (EmailNotFoundException e) {
+            log.error("이메일을 찾을 수 없습니다: {}", loginDTO.getEmail());
+            responseMap.put("error", "이메일을 찾을 수 없습니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMap);
+
+        } catch (IncorrectPasswordException e) {
+            log.error("비밀번호가 잘못되었습니다.");
+            responseMap.put("error", "비밀번호가 잘못되었습니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMap);
+
+        } catch (Exception e) {
+            log.error("로그인 중 오류 발생: {}", e.getMessage());
+            responseMap.put("error", "로그인 중 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap);
+        }
     }
 
     // 로그아웃
@@ -140,9 +162,6 @@ public class MemberApiController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
-
-
 
 
     private void addCookie(HttpServletResponse response, String name, String value, int maxAge) {

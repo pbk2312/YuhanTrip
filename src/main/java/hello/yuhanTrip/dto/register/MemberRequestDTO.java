@@ -3,10 +3,7 @@ package hello.yuhanTrip.dto.register;
 import hello.yuhanTrip.domain.member.AuthProvider;
 import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.domain.member.MemberRole;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -18,12 +15,15 @@ import java.time.LocalDate;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-
+@Builder
 public class MemberRequestDTO {
 
     @NotBlank
     @Email
     private String email;
+
+    @NotBlank
+    private String kakaoId;
 
     @NotBlank
     private String password;

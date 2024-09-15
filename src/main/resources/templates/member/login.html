@@ -235,6 +235,10 @@
     document.getElementById('loginButton').addEventListener('click', function () {
         var email = document.getElementById('inputEmail').value;
         var password = document.getElementById('inputPassword').value;
+        if (!email || !password) {
+            alert('이메일과 비밀번호를 입력하세요.');
+            return;
+        }
         login(email, password);
     });
 
@@ -256,7 +260,7 @@
             .then(response => {
                 if (!response.ok) {
                     return response.json().then(err => {
-                        throw new Error(err.message || '로그인 실패');
+                        throw new Error(err.error || '로그인 실패');
                     });
                 }
                 return response.json();
