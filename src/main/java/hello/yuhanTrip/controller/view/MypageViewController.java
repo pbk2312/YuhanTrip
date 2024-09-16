@@ -7,10 +7,12 @@ import hello.yuhanTrip.domain.reservation.Reservation;
 import hello.yuhanTrip.domain.accommodation.Room;
 import hello.yuhanTrip.domain.admin.RoleChangeRequest;
 import hello.yuhanTrip.dto.accommodation.AccommodationDTO;
+import hello.yuhanTrip.dto.member.CouponDTO;
 import hello.yuhanTrip.dto.member.MemberDTO;
 import hello.yuhanTrip.mapper.AccommodationMapper;
 import hello.yuhanTrip.mapper.MemberMapper;
 import hello.yuhanTrip.service.Accomodation.AccommodationServiceImpl;
+import hello.yuhanTrip.service.discount.CouponService;
 import hello.yuhanTrip.service.reservation.ReservationService;
 import hello.yuhanTrip.service.member.MemberLikeService;
 import hello.yuhanTrip.service.member.MemberService;
@@ -40,6 +42,7 @@ public class MypageViewController {
     private final AccommodationServiceImpl accommodationService;
     private final RoleChangeRequestService roleChangeRequestService;
     private final MemberLikeService memberLikeService;
+    private final CouponService couponService;
 
     // 비밀번호 확인
     @GetMapping("/check")
@@ -109,7 +112,6 @@ public class MypageViewController {
         model.addAttribute("MypageMemberDTO", memberDTO);
         return "mypage/editMemberInfo";
     }
-
 
 
     // 숙소 등록 리스트
@@ -191,7 +193,6 @@ public class MypageViewController {
     }
 
 
-
     // 호스트 승급 신청 리스트
     @GetMapping("/roleChangeRequestList")
     public String roleChangeRequestList(
@@ -245,5 +246,17 @@ public class MypageViewController {
         }
     }
 
+    @GetMapping("couponList")
+    public String couponList(@CookieValue(value = "accessToken", required = false) String accessToken,
+                             Model model
+    ) {
+        Member member = memberService.getUserDetails(accessToken);
+
+        List<CouponDTO> listCoupon = couponService.getListCoupon(member);
+
+        model.addAttribute("listCoupon", listCoupon);
+
+        return "mypage/listCoupon";
+    }
 
 }

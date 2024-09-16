@@ -1,8 +1,6 @@
 package hello.yuhanTrip.dto.accommodation;
 
 
-import hello.yuhanTrip.domain.accommodation.AccommodationApplyStatus;
-import hello.yuhanTrip.domain.accommodation.AccommodationType;
 import lombok.*;
 
 import java.util.List;
@@ -40,8 +38,8 @@ public class AccommodationDTO {
     private int reviewCount;
     private Double averageRating;
     private Double averagePrice;
-    private AccommodationApplyStatus status;
-    private AccommodationType type;
-    private List<RoomDTO> rooms;  // RoomDTO는 Room 엔티티의 DTO
+    private String status;
+    private String type;
+    private Long memberId;
 
 }

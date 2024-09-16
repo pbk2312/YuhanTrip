@@ -1,12 +1,11 @@
 package hello.yuhanTrip.controller.view;
 
 import hello.yuhanTrip.domain.accommodation.*;
-import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.dto.accommodation.AccommodationDTO;
 import hello.yuhanTrip.dto.accommodation.AccommodationRegisterDTO;
 import hello.yuhanTrip.dto.accommodation.RoomDTO;
 import hello.yuhanTrip.mapper.AccommodationMapper;
-import hello.yuhanTrip.service.Accomodation.AccommodationServiceImpl;
+import hello.yuhanTrip.service.Accomodation.AccommodationService;
 import hello.yuhanTrip.service.member.MemberService;
 import hello.yuhanTrip.service.reservation.ReviewService;
 import lombok.RequiredArgsConstructor;
@@ -30,10 +29,10 @@ import java.util.List;
 @Log4j2
 public class AccommodationViewController {
 
-    private final AccommodationServiceImpl accommodationService;
+    private final AccommodationService accommodationService;
     private final MemberService memberService;
     private final ReviewService reviewService;
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 
     // @GetMapping("/byregion") 리팩토링
@@ -58,22 +57,15 @@ public class AccommodationViewController {
 
         Integer areaCode = (region != null && !region.isEmpty()) ? RegionCode.getCodeByRegion(region) : null;
 
-        // 필터링과 정렬을 기반으로 메소드를 호출
         if (type != null && checkin == null && checkout == null && numGuests == null && areaCode == null) {
-            // 숙소 유형만 제공된 경우
             accommodationsPage = accommodationService.fetchAccommodationsWithSortingAndFiltering(
-                    type, null, false, checkin, checkout, numGuests, page, size, sort
-            );
+                    type, null, false, checkin, checkout, numGuests, page, size, sort);
         } else if (checkin != null && checkout != null && numGuests != null && type != null) {
-            // 체크인, 체크아웃, 게스트 수, 숙소 유형이 제공된 경우
             accommodationsPage = accommodationService.fetchAccommodationsWithSortingAndFiltering(
-                    type, areaCode, true, checkin, checkout, numGuests, page, size, sort
-            );
+                    type, areaCode, true, checkin, checkout, numGuests, page, size, sort);
         } else {
-            // 필터링 없이 조회 (정렬 적용)
             accommodationsPage = accommodationService.fetchAccommodationsWithSortingAndFiltering(
-                    type, areaCode, false, checkin, checkout, numGuests, page, size, sort
-            );
+                    type, areaCode, false, checkin, checkout, numGuests, page, size, sort);
         }
 
 
@@ -158,7 +150,7 @@ public class AccommodationViewController {
             Model model,
             @CookieValue(value = "accessToken", required = false) String accessToken) {
 
-        Member member = memberService.validateHost(accessToken);
+        memberService.validateHost(accessToken);
 
         model.addAttribute("accommodationRegisterDTO", new AccommodationRegisterDTO());
         model.addAttribute("roomDTO", new RoomDTO());

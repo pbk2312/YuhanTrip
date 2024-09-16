@@ -3,6 +3,7 @@ package hello.yuhanTrip.service.discount;
 import hello.yuhanTrip.domain.coupon.Coupon;
 import hello.yuhanTrip.domain.coupon.DiscountType;
 import hello.yuhanTrip.domain.member.Member;
+import hello.yuhanTrip.dto.member.CouponDTO;
 import hello.yuhanTrip.repository.CouponRepository;
 import hello.yuhanTrip.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -70,6 +73,28 @@ public class CouponServiceImpl implements CouponService {
 
         // 쿠폰 삭제
         couponRepository.delete(coupon);
+    }
+
+
+    @Transactional
+    @Override
+    public List<CouponDTO> getListCoupon(Member member) {
+        // Member에서 Coupon 리스트를 가져옴
+        List<Coupon> coupons = member.getCoupons();
+
+        // Coupon 리스트를 CouponDTO 리스트로 변환
+        return coupons.stream().map(coupon -> {
+            CouponDTO dto = new CouponDTO();
+            dto.setId(coupon.getId());
+            dto.setCode(coupon.getCode());
+            dto.setDiscountType(coupon.getDiscountType());
+            dto.setDiscountValue(coupon.getDiscountValue());
+            dto.setStartDate(coupon.getStartDate());
+            dto.setEndDate(coupon.getEndDate());
+            dto.setUsed(coupon.getUsed());
+            dto.setMemberId(member.getId());
+            return dto;
+        }).collect(Collectors.toList());
     }
 
     // 랜덤 쿠폰 코드 생성
