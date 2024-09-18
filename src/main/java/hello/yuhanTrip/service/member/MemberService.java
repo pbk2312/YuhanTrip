@@ -7,7 +7,6 @@ import hello.yuhanTrip.dto.member.LoginDTO;
 import hello.yuhanTrip.dto.member.LogoutDTO;
 import hello.yuhanTrip.dto.member.WithdrawalMembershipDTO;
 import hello.yuhanTrip.dto.email.EmailRequestDTO;
-import hello.yuhanTrip.dto.kakao.KakaoUserInfoResponseDto;
 import hello.yuhanTrip.dto.payment.MypageMemberDTO;
 import hello.yuhanTrip.dto.register.MemberChangePasswordDTO;
 import hello.yuhanTrip.dto.register.MemberRequestDTO;

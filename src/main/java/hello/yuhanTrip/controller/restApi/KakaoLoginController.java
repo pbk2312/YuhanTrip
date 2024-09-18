@@ -106,7 +106,7 @@ public class KakaoLoginController {
     // 쿠키 설정
     private void addCookie(HttpServletResponse response, String name, String value, int maxAge) {
         Cookie cookie = new Cookie(name, value);
-        cookie.setHttpOnly(true); // 보안 강화
+        cookie.setHttpOnly(false); // https에서 사용하려면 true
         cookie.setSecure(true); // HTTPS에서만 작동
         cookie.setPath("/");
         cookie.setMaxAge(maxAge);

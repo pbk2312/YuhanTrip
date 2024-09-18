@@ -20,26 +20,38 @@ public class CouponController {
     private final CouponService couponService;
     private final MemberService memberService;
 
-    // 1. 고정 금액 할인 쿠폰 발급 API (예: 2000원 할인 쿠폰 발급)
+    private static final String LOGIN_REQUIRED_MESSAGE = "로그인이 필요합니다.";
+    private static final String COUPON_ALREADY_ISSUED_MESSAGE = "이미 발급된 쿠폰이 있습니다.";
+
+    // 액세스 토큰 검증 및 회원 조회 공통 메서드
+    private ResponseEntity<?> validateAndGetMember(String accessToken) {
+        if (accessToken == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(LOGIN_REQUIRED_MESSAGE);
+        }
+
+        Member member = memberService.getUserDetails(accessToken);
+        return ResponseEntity.ok(member);
+    }
+
+    // 고정 금액 할인 쿠폰 발급 API
     @PostMapping("/fixed")
     public ResponseEntity<?> generateFixedAmountCoupon(
             @CookieValue(value = "accessToken", required = false) String accessToken,
             @RequestParam Double discountAmount) {
 
-        if (accessToken == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        ResponseEntity<?> memberValidationResult = validateAndGetMember(accessToken);
+        if (memberValidationResult.getStatusCode() != HttpStatus.OK) {
+            return memberValidationResult;
         }
-
-        Member member = memberService.getUserDetails(accessToken);
+        Member member = (Member) memberValidationResult.getBody();
 
         // 이미 발급된 쿠폰 확인
         if (couponService.hasCoupon(member, DiscountType.FIXED)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 발급된 쿠폰이 있습니다.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(COUPON_ALREADY_ISSUED_MESSAGE);
         }
 
-        log.info("고정 금액 할인 쿠폰 발급");
+        log.info("고정 금액 할인 쿠폰 발급 - 회원 ID: {}", member.getId());
 
-        // FixedAmountDiscount 대신 DiscountType.FIXED 사용
         Coupon coupon = couponService.generateCoupon(member, DiscountType.FIXED, discountAmount);
         return ResponseEntity.ok(coupon);
     }
@@ -50,20 +62,19 @@ public class CouponController {
             @CookieValue(value = "accessToken", required = false) String accessToken,
             @RequestParam Double discountRate) {
 
-        if (accessToken == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        ResponseEntity<?> memberValidationResult = validateAndGetMember(accessToken);
+        if (memberValidationResult.getStatusCode() != HttpStatus.OK) {
+            return memberValidationResult;
         }
-
-        Member member = memberService.getUserDetails(accessToken);
+        Member member = (Member) memberValidationResult.getBody();
 
         // 이미 발급된 쿠폰 확인
         if (couponService.hasCoupon(member, DiscountType.PERCENTAGE)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 발급된 쿠폰이 있습니다.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(COUPON_ALREADY_ISSUED_MESSAGE);
         }
 
-        log.info("비율 할인 쿠폰 발급");
+        log.info("비율 할인 쿠폰 발급 - 회원 ID: {}", member.getId());
 
-        // PercentageDiscount 대신 DiscountType.PERCENTAGE 사용
         Coupon coupon = couponService.generateCoupon(member, DiscountType.PERCENTAGE, discountRate);
         return ResponseEntity.ok(coupon);
     }

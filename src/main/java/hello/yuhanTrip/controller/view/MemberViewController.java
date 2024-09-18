@@ -1,5 +1,6 @@
 package hello.yuhanTrip.controller.view;
 
+import hello.yuhanTrip.domain.member.AuthProvider;
 import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.domain.member.ResetToken;
 import hello.yuhanTrip.dto.email.EmailRequestDTO;
@@ -45,18 +46,17 @@ public class MemberViewController {
 
     // 로그인
     @GetMapping("/login")
-    public String showLogin(HttpServletRequest request, @ModelAttribute LoginDTO loginDTO,Model model) {
+    public String showLogin(HttpServletRequest request, @ModelAttribute LoginDTO loginDTO, Model model) {
         // Referer 헤더에서 원래 페이지 URL 추출
         String refererUrl = request.getHeader("Referer");
         if (refererUrl != null) {
             request.getSession().setAttribute("redirectUrl", refererUrl);
         }
-        String location = "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id="+client_id+"&redirect_uri="+redirect_uri;
+        String location = "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=" + client_id + "&redirect_uri=" + redirect_uri;
         model.addAttribute("location", location);
 
         return "member/login";
     }
-
 
 
     // 비밀번호 재설정
@@ -65,7 +65,6 @@ public class MemberViewController {
         model.addAttribute("emailRequestDTO", new EmailRequestDTO());
         return "member/resetPasswordForm";
     }
-
 
 
     // 비밀번호 재설정
@@ -80,18 +79,30 @@ public class MemberViewController {
     }
 
 
-
     // 회원 탈퇴
     @GetMapping("/withdrawalMembership")
     public String getWithdrawalMembershipForm(@CookieValue(value = "accessToken", required = false) String accessToken, Model model) {
+
+        // 회원 정보를 가져옵니다.
         Member member = memberService.getUserDetails(accessToken);
-        log.info("탈퇴 시도 유저 : {}", member.getEmail());
-        model.addAttribute("withdrawalMembershipDTO", new WithdrawalMembershipDTO());
+
+        WithdrawalMembershipDTO withdrawalMembershipDTO = new WithdrawalMembershipDTO();
+
+        // KAKAO 회원인 경우 비밀번호는 설정하지 않고 이메일만 설정
+        if (AuthProvider.KAKAO.equals(member.getAuthProvider())) {
+            withdrawalMembershipDTO.setEmail(member.getEmail());
+        } else {
+            // KAKAO가 아닌 회원은 이메일과 비밀번호 모두 설정
+            withdrawalMembershipDTO.setEmail(member.getEmail());
+            withdrawalMembershipDTO.setPassword(member.getPassword());
+        }
+
+        model.addAttribute("withdrawalMembershipDTO", withdrawalMembershipDTO);
+
+        log.info("탈퇴 시도 유저: ID={}, 이메일={}", member.getId(), member.getEmail());
 
         return "member/withdrawalMembership";
     }
-
-
 
     @GetMapping("/email/input")
     public String showEmailInputPage(@RequestParam("id") Long userInfoId, Model model) {

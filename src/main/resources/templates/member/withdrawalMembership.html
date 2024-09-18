@@ -60,9 +60,10 @@
                     <form id="deleteAccountForm" action="/api/member/deleteAccount" method="post">
                         <div class="form-group mb-3">
                             <div class="form-label-group">
-                                <input type="password" id="inputPassword" name="password" class="form-control"
-                                       placeholder="비밀번호" required autofocus>
-                                <label for="inputPassword">비밀번호</label>
+                                <div th:if="${withdrawalMembershipDTO.password != null}">
+                                    <label for="password">비밀번호:</label>
+                                    <input type="password" id="password" name="password" placeholder="비밀번호 입력">
+                                </div>
                             </div>
                         </div>
                         <input type="hidden" id="inputEmail" name="email">
