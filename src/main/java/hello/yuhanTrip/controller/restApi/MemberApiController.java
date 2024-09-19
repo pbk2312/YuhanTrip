@@ -13,7 +13,6 @@ import hello.yuhanTrip.dto.token.TokenDTO;
 import hello.yuhanTrip.exception.EmailNotFoundException;
 import hello.yuhanTrip.exception.IncorrectPasswordException;
 import hello.yuhanTrip.exception.SpecificException;
-import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.repository.ResetTokenRepository;
 import hello.yuhanTrip.service.member.MemberService;
 import jakarta.servlet.http.Cookie;
@@ -148,6 +147,10 @@ public class MemberApiController {
         withdrawalMembershipDTO.setEmail(member.getEmail());
 
         try {
+
+            if (AuthProvider.KAKAO.equals(member.getAuthProvider())) {
+                withdrawalMembershipDTO.setPassword("0000");
+            }
             String message = memberService.deleteAccount(withdrawalMembershipDTO);
             if ("회원 정보가 정상적으로 삭제되었습니다.".equals(message)) {
                 log.info("회원 정보 삭제 완료");

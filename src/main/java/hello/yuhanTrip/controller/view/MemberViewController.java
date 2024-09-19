@@ -88,7 +88,6 @@ public class MemberViewController {
 
         WithdrawalMembershipDTO withdrawalMembershipDTO = new WithdrawalMembershipDTO();
 
-        // KAKAO 회원인 경우 비밀번호는 설정하지 않고 이메일만 설정
         if (AuthProvider.KAKAO.equals(member.getAuthProvider())) {
             withdrawalMembershipDTO.setEmail(member.getEmail());
         } else {
