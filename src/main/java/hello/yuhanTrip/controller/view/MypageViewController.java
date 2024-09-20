@@ -2,6 +2,7 @@ package hello.yuhanTrip.controller.view;
 
 import hello.yuhanTrip.domain.accommodation.Accommodation;
 import hello.yuhanTrip.domain.member.AuthProvider;
+import hello.yuhanTrip.domain.member.Inquiry;
 import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.domain.reservation.Reservation;
 import hello.yuhanTrip.domain.accommodation.Room;
@@ -258,5 +259,17 @@ public class MypageViewController {
 
         return "mypage/listCoupon";
     }
+
+    @GetMapping("inquiriesList")
+    public String inquiriesList(@CookieValue(value = "accessToken", required = false) String accessToken,
+                                Model model) {
+        Member member = memberService.getUserDetails(accessToken);
+
+        List<Inquiry> inquiries = member.getInquiries();
+        model.addAttribute("inquiries", inquiries);
+
+        return "mypage/inquiriesList";
+    }
+
 
 }

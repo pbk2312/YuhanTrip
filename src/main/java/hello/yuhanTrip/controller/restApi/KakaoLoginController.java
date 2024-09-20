@@ -3,6 +3,7 @@ package hello.yuhanTrip.controller.restApi;
 import hello.yuhanTrip.domain.member.AuthProvider;
 import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.domain.member.MemberRole;
+import hello.yuhanTrip.dto.kakao.KakaoRegisterRequest;
 import hello.yuhanTrip.dto.kakao.KakaoUserInfoResponseDto;
 import hello.yuhanTrip.dto.member.LoginDTO;
 import hello.yuhanTrip.dto.register.MemberRequestDTO;
@@ -82,6 +83,27 @@ public class KakaoLoginController {
         }
     }
 
+    @PostMapping("/kakaoRegister")
+    public ResponseEntity<?> kakaoRegister(@RequestBody KakaoRegisterRequest request) {
+        try {
+            Long userInfoId = request.getId();
+            String email = request.getEmail();
+
+            Member member = memberRepository.findByAuthProviderId(userInfoId.toString());
+            if (member == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("회원 정보가 없습니다.");
+            }
+
+            member.setEmail(email);
+            memberRepository.save(member); // 변경된 이메일 저장
+
+            return ResponseEntity.ok("회원 가입 완료");
+        } catch (Exception e) {
+            log.error("회원 가입 처리 중 오류 발생: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원 가입 처리 중 오류 발생");
+        }
+    }
+
     // 회원가입 처리 로직 분리
     private Member registerNewMember(KakaoUserInfoResponseDto userInfo) {
         MemberRequestDTO memberRequestDTO = MemberRequestDTO.builder()
@@ -107,7 +129,7 @@ public class KakaoLoginController {
     private void addCookie(HttpServletResponse response, String name, String value, int maxAge) {
         Cookie cookie = new Cookie(name, value);
         cookie.setHttpOnly(false); // https에서 사용하려면 true
-        cookie.setSecure(true); // HTTPS에서만 작동
+        cookie.setSecure(false); // HTTPS에서만 작동
         cookie.setPath("/");
         cookie.setMaxAge(maxAge);
         response.addCookie(cookie);
