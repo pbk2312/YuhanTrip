@@ -15,11 +15,12 @@ public class InquiryController {
 
     private final InquiryService inquiryService;
     private final MemberService memberService;
+
     @PostMapping("/submit")
     public ResponseEntity<String> submitInquiry(@RequestBody InquiryDTO inquiryDTO,
                                                 @CookieValue(value = "accessToken", required = false) String accessToken) {
         Member member = memberService.getUserDetails(accessToken);
-        inquiryService.saveInquiry(inquiryDTO,member);
+        inquiryService.saveInquiry(inquiryDTO, member);
         return ResponseEntity.ok("문의가 성공적으로 접수되었습니다.");
     }
 }

@@ -143,13 +143,17 @@
         })
             .then(response => {
                 if (response.ok) {
-                    // 성공적으로 제출되면 홈 페이지로 리디렉션
-                    window.location.href = '/home/homepage';
+                    return response.text();  // 서버의 응답 메시지를 텍스트로 반환
                 } else {
-                    return response.text().then(text => { throw new Error(text); });
+                    return response.text().then(text => {
+                        throw new Error(text);
+                    });
                 }
             })
-            .then(data => alert(data))
+            .then(message => {
+                alert(message);  // 성공 메시지 출력
+                window.location.href = '/home/homepage';  // 리디렉션
+            })
             .catch(error => console.error('Error:', error));
     });
 </script>
