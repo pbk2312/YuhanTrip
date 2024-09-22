@@ -305,4 +305,11 @@
                 alert('회원가입 중 오류가 발생했습니다.');
             });
     });
+
+    document.getElementById('inputPhoneNumber').addEventListener('input', function (event) {
+        let input = event.target.value.replace(/\D/g, '');  // 숫자 이외의 문자는 모두 제거
+        if (input.length > 10) input = input.substring(0, 11);  // 최대 11자리로 제한
+        let formattedInput = input.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');  // xxx-xxxx-xxxx 형식 적용
+        event.target.value = formattedInput;
+    });
 </script>

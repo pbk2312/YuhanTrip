@@ -13,8 +13,11 @@ import hello.yuhanTrip.dto.token.TokenDTO;
 import hello.yuhanTrip.exception.EmailNotFoundException;
 import hello.yuhanTrip.exception.IncorrectPasswordException;
 import hello.yuhanTrip.exception.SpecificException;
+import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.repository.ResetTokenRepository;
 import hello.yuhanTrip.service.member.MemberService;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,6 +39,7 @@ public class MemberApiController {
 
     private final MemberService memberService;
     private final ResetTokenRepository resetTokenRepository;
+    private final TokenProvider tokenProvider;
 
     // 회원가입
     @PostMapping("/register")
@@ -166,6 +170,14 @@ public class MemberApiController {
         }
     }
 
+    @GetMapping("/validateToken")
+    public ResponseEntity<Map<String, Boolean>> validateToken(@CookieValue(value = "accessToken", required = false) String accessToken) {
+        boolean isLoggedIn = tokenProvider.validate(accessToken);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("isLoggedIn", isLoggedIn);
+
+        return ResponseEntity.ok(response);
+    }
 
     private void addCookie(HttpServletResponse response, String name, String value, int maxAge) {
         Cookie cookie = createCookie(name, value, maxAge);
