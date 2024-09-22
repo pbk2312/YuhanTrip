@@ -6,12 +6,15 @@ import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.dto.member.CouponDTO;
 import hello.yuhanTrip.repository.CouponRepository;
 import hello.yuhanTrip.repository.MemberRepository;
+import hello.yuhanTrip.service.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -23,11 +26,13 @@ public class CouponServiceImpl implements CouponService {
 
     private final CouponRepository couponRepository;
     private final MemberRepository memberRepository;
+    private final RedisService redisService;
 
 
     public boolean hasCoupon(Member member, DiscountType discountType) {
         return couponRepository.existsByMemberAndDiscountTypeAndUsed(member, discountType, false);
     }
+
 
     @Override
     @Transactional
@@ -53,48 +58,56 @@ public class CouponServiceImpl implements CouponService {
         coupon.setMember(member); // 쿠폰과 회원 연결
 
         member.getCoupons().add(coupon);
-        // 회원과 쿠폰 모두 저장
-        log.info("쿠폰 저장: {}", coupon);
-        memberRepository.save(member); // 회원 업데이트
-        return couponRepository.save(coupon); // 쿠폰 저장
+        memberRepository.save(member); // 회원 정보는 DB에 저장
+
+        // 쿠폰을 Redis에 저장 (만료 시간: 30일)
+        Long expirationTime = 30L * 24 * 60 * 60 * 1000; // 30일을 밀리초로 변환
+        redisService.saveCouponToRedis(coupon.getId(), coupon, expirationTime);
+
+        log.info("쿠폰이 Redis에 저장되었습니다: {}", coupon);
+        return coupon;
     }
+
 
     @Override
     public Coupon findCouponById(Long couponId) {
-        return couponRepository.findById(couponId)
-                .orElseThrow(() -> new IllegalArgumentException("쿠폰을 찾을 수 없습니다."));
+        return redisService.getCouponFromRedis(couponId);
     }
+
     @Transactional
     @Override
     public void deleteCoupon(Long couponId) {
-        // 쿠폰이 존재하는지 확인
-        Coupon coupon = couponRepository.findById(couponId)
-                .orElseThrow(() -> new IllegalArgumentException("쿠폰이 존재하지 않아요"));
-
-        // 쿠폰 삭제
-        couponRepository.delete(coupon);
+        redisService.deleteCouponFromRedis(couponId);
     }
 
 
     @Transactional
     @Override
     public List<CouponDTO> getListCoupon(Member member) {
-        // Member에서 Coupon 리스트를 가져옴
-        List<Coupon> coupons = member.getCoupons();
+        List<CouponDTO> couponDTOList = new ArrayList<>();
 
-        // Coupon 리스트를 CouponDTO 리스트로 변환
-        return coupons.stream().map(coupon -> {
+        // Redis에서 쿠폰 정보를 가져오는 로직
+        for (Coupon coupon : member.getCoupons()) {
+            Coupon redisCoupon = redisService.getCouponFromRedis(coupon.getId());
+
+            // Redis에 쿠폰이 없으면 기존 쿠폰 객체를 사용
+            Coupon couponToUse = (redisCoupon != null) ? redisCoupon : coupon;
+
+            // 쿠폰 정보를 CouponDTO로 변환
             CouponDTO dto = new CouponDTO();
-            dto.setId(coupon.getId());
-            dto.setCode(coupon.getCode());
-            dto.setDiscountType(coupon.getDiscountType());
-            dto.setDiscountValue(coupon.getDiscountValue());
-            dto.setStartDate(coupon.getStartDate());
-            dto.setEndDate(coupon.getEndDate());
-            dto.setUsed(coupon.getUsed());
+            dto.setId(couponToUse.getId());
+            dto.setCode(couponToUse.getCode());
+            dto.setDiscountType(couponToUse.getDiscountType());
+            dto.setDiscountValue(couponToUse.getDiscountValue());
+            dto.setStartDate(couponToUse.getStartDate());
+            dto.setEndDate(couponToUse.getEndDate());
+            dto.setUsed(couponToUse.getUsed());
             dto.setMemberId(member.getId());
-            return dto;
-        }).collect(Collectors.toList());
+
+            couponDTOList.add(dto);
+        }
+
+        return couponDTOList;
     }
 
     // 랜덤 쿠폰 코드 생성

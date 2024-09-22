@@ -1,4 +1,4 @@
-package hello.yuhanTrip.controller;
+package hello.yuhanTrip.controller.view;
 
 import hello.yuhanTrip.domain.accommodation.Accommodation;
 import hello.yuhanTrip.domain.member.Member;

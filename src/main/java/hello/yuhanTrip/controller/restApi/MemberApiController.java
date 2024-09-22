@@ -15,9 +15,8 @@ import hello.yuhanTrip.exception.IncorrectPasswordException;
 import hello.yuhanTrip.exception.SpecificException;
 import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.repository.ResetTokenRepository;
+import hello.yuhanTrip.service.RedisService;
 import hello.yuhanTrip.service.member.MemberService;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -110,6 +110,51 @@ public class MemberApiController {
         return ResponseEntity.ok("로그아웃 완료");
     }
 
+    @GetMapping("/validateToken")
+    public ResponseEntity<Map<String, Object>> validateToken(
+            @CookieValue(value = "accessToken", required = false) String accessToken,
+            @CookieValue(value = "refreshToken", required = false) String refreshToken,
+            HttpServletResponse response) {
+
+        Map<String, Object> responseMap = new HashMap<>();
+
+        try {
+            // Access Token 검증
+            if (accessToken != null && tokenProvider.validate(accessToken)) {
+                responseMap.put("isLoggedIn", true);
+                return ResponseEntity.ok(responseMap);
+            }
+
+            // Access Token이 만료된 경우 Refresh Token 확인
+            if (refreshToken != null && tokenProvider.validate(refreshToken)) {
+                // Redis에서 Refresh Token 확인
+                Member member = memberService.findByRefreshToken(refreshToken);
+                if (member != null) {
+                    // 새 Access Token 발급
+                    Authentication authentication = tokenProvider.getAuthenticationFromRefreshToken(refreshToken);
+                    TokenDTO newTokenDTO = tokenProvider.generateTokenDto(authentication);
+
+                    // 새 Access Token을 쿠키에 저장
+                    addCookie(response, "accessToken", newTokenDTO.getAccessToken(), 3600); // 1시간 유효
+
+                    responseMap.put("isLoggedIn", true);
+                    responseMap.put("accessToken", newTokenDTO.getAccessToken());
+                    return ResponseEntity.ok(responseMap);
+                }
+            }
+
+            // Refresh Token이 유효하지 않은 경우
+            responseMap.put("isLoggedIn", false);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMap);
+
+        } catch (Exception e) {
+            log.error("토큰 검증 중 오류 발생", e);
+            responseMap.put("isLoggedIn", false);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMap);
+        }
+    }
+
+
     // 비밀번호 재설정 이메일
     @PostMapping("/sendResetPasswordEmail")
     public ResponseEntity<String> sendResetPasswordEmail(@RequestBody EmailRequestDTO emailRequestDTO) {
@@ -170,14 +215,6 @@ public class MemberApiController {
         }
     }
 
-    @GetMapping("/validateToken")
-    public ResponseEntity<Map<String, Boolean>> validateToken(@CookieValue(value = "accessToken", required = false) String accessToken) {
-        boolean isLoggedIn = tokenProvider.validate(accessToken);
-        Map<String, Boolean> response = new HashMap<>();
-        response.put("isLoggedIn", isLoggedIn);
-
-        return ResponseEntity.ok(response);
-    }
 
     private void addCookie(HttpServletResponse response, String name, String value, int maxAge) {
         Cookie cookie = createCookie(name, value, maxAge);
@@ -191,8 +228,8 @@ public class MemberApiController {
 
     private Cookie createCookie(String name, String value, int maxAge) {
         Cookie cookie = new Cookie(name, value);
-        cookie.setHttpOnly(false); // https 환경에서 사용하려면 true로
-        cookie.setSecure(false);
+        cookie.setHttpOnly(true); // https 환경에서 사용하려면 true로
+        cookie.setSecure(true);
         cookie.setPath("/");
         cookie.setMaxAge(maxAge);
         return cookie;

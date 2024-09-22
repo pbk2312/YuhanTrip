@@ -197,40 +197,35 @@
 <script src="js/scripts.js"></script>
 <script>
 
-    // 쿠키에서 특정 이름의 쿠키 값을 가져오는 함수
-    function getCookie(name) {
-        const cookieArray = document.cookie.split('; ');
-        for (let cookie of cookieArray) {
-            const [key, value] = cookie.split('=');
-            if (key === name) {
-                return decodeURIComponent(value);
-            }
-        }
-        return null;
-    }
-
-    // accessToken을 가져와서 페이지 상태를 변경하는 함수
     function checkAuth() {
-        const accessToken = getCookie('accessToken'); // 쿠키에서 accessToken 가져오기
-        const authButton = document.getElementById('authButton');
-        const mypageButton = document.getElementById('mypageButton');
+        fetch('/api/member/validateToken', {
+            method: 'GET',
+            credentials: 'include' // 쿠키를 포함하여 요청
+        })
+            .then(response => response.json())
+            .then(data => {
+                const isLoggedIn = data.isLoggedIn;
+                const authButton = document.getElementById('authButton');
+                const mypageButton = document.getElementById('mypageButton');
 
-        if (accessToken) {
-            // 로그인 상태: 로그아웃 버튼으로 전환 및 마이페이지 버튼 활성화
-            authButton.innerText = '로그아웃';
-            authButton.addEventListener('click', confirmLogout); // 로그아웃 확인
-            mypageButton.style.display = 'block'; // 마이페이지 버튼 표시
-            mypageButton.addEventListener('click', () => {
-                window.location.href = '/mypage/check'; // 마이페이지로 이동
-            });
-        } else {
-            // 로그아웃 상태: 로그인 버튼으로 전환
-            authButton.innerText = '로그인';
-            authButton.addEventListener('click', function () {
-                window.location.href = '/member/login'; // 로그인 페이지로 이동
-            });
-            mypageButton.style.display = 'none'; // 마이페이지 버튼 숨기기
-        }
+                if (isLoggedIn) {
+                    // 로그인 상태: 로그아웃 버튼으로 전환 및 마이페이지 버튼 활성화
+                    authButton.innerText = '로그아웃';
+                    authButton.addEventListener('click', confirmLogout); // 로그아웃 확인
+                    mypageButton.style.display = 'block'; // 마이페이지 버튼 표시
+                    mypageButton.addEventListener('click', () => {
+                        window.location.href = '/mypage/check'; // 마이페이지로 이동
+                    });
+                } else {
+                    // 로그아웃 상태: 로그인 버튼으로 전환
+                    authButton.innerText = '로그인/회원가입';
+                    authButton.addEventListener('click', function () {
+                        window.location.href = '/member/login'; // 로그인 페이지로 이동
+                    });
+                    mypageButton.style.display = 'none'; // 마이페이지 버튼 숨기기
+                }
+            })
+            .catch(error => console.error('로그인 상태 확인 중 오류 발생:', error));
     }
 
     // 로그아웃 확인 후 처리

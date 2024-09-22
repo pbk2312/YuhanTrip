@@ -415,7 +415,8 @@
                         <li>
                             <hr class="dropdown-divider"/>
                         </li>
-                        <li><a class="dropdown-item" href="/accommodation/byregion?sort=averageRating">Popular Items</a></li>
+                        <li><a class="dropdown-item" href="/accommodation/byregion?sort=averageRating">Popular Items</a>
+                        </li>
                     </ul>
                 </li>
             </ul>
@@ -443,7 +444,6 @@
                     <h1 class="card-title" th:text="${accommodation.title}">숙소 제목</h1>
                 </div>
             </div>
-
 
 
             <!-- 상세 정보 섹션 -->
@@ -612,58 +612,35 @@
 <!-- Core theme JS-->
 <script src="js/scripts.js"></script>
 <script>
-    // 쿠키에서 특정 이름의 쿠키 값을 가져오는 함수
-    function getCookie(name) {
-        const cookieArray = document.cookie.split('; ');
-        for (let cookie of cookieArray) {
-            const [key, value] = cookie.split('=');
-            if (key === name) {
-                return decodeURIComponent(value);
-            }
-        }
-        return null;
-    }
-
-
-    function isTokenExpired(token) {
-        try {
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            const currentTime = Math.floor(Date.now() / 1000);
-            return payload.exp < currentTime;
-        } catch (e) {
-            console.error('토큰 파싱 중 오류 발생:', e);
-            return true;
-        }
-    }
-
-    // accessToken을 가져와서 페이지 상태를 변경하는 함수
     function checkAuth() {
-        const accessToken = getCookie('accessToken'); // 쿠키에서 accessToken 가져오기
-        const authButton = document.getElementById('authButton');
-        const mypageButton = document.getElementById('mypageButton');
+        fetch('/api/member/validateToken', {
+            method: 'GET',
+            credentials: 'include' // 쿠키를 포함하여 요청
+        })
+            .then(response => response.json())
+            .then(data => {
+                const isLoggedIn = data.isLoggedIn;
+                const authButton = document.getElementById('authButton');
+                const mypageButton = document.getElementById('mypageButton');
 
-        if (accessToken) {
-            if (isTokenExpired(accessToken)){
-                logout();
-                window.location.reload();
-            }
-            else {
-                // 로그인 상태: 로그아웃 버튼으로 전환 및 마이페이지 버튼 활성화
-                authButton.innerText = '로그아웃';
-                authButton.addEventListener('click', confirmLogout); // 로그아웃 확인
-                mypageButton.style.display = 'block'; // 마이페이지 버튼 표시
-                mypageButton.addEventListener('click', () => {
-                    window.location.href = '/mypage/check'; // 마이페이지로 이동
-                });
-            }
-        } else {
-            // 로그아웃 상태: 로그인 버튼으로 전환
-            authButton.innerText = '로그인';
-            authButton.addEventListener('click', function () {
-                window.location.href = '/member/login'; // 로그인 페이지로 이동
-            });
-            mypageButton.style.display = 'none'; // 마이페이지 버튼 숨기기
-        }
+                if (isLoggedIn) {
+                    // 로그인 상태: 로그아웃 버튼으로 전환 및 마이페이지 버튼 활성화
+                    authButton.innerText = '로그아웃';
+                    authButton.addEventListener('click', confirmLogout); // 로그아웃 확인
+                    mypageButton.style.display = 'block'; // 마이페이지 버튼 표시
+                    mypageButton.addEventListener('click', () => {
+                        window.location.href = '/mypage/check'; // 마이페이지로 이동
+                    });
+                } else {
+                    // 로그아웃 상태: 로그인 버튼으로 전환
+                    authButton.innerText = '로그인/회원가입';
+                    authButton.addEventListener('click', function () {
+                        window.location.href = '/member/login'; // 로그인 페이지로 이동
+                    });
+                    mypageButton.style.display = 'none'; // 마이페이지 버튼 숨기기
+                }
+            })
+            .catch(error => console.error('로그인 상태 확인 중 오류 발생:', error));
     }
 
     // 로그아웃 확인 후 처리
@@ -693,6 +670,7 @@
             })
             .catch(error => console.error('로그아웃 요청 중 오류 발생:', error));
     }
+
     // 페이지 로드 시 인증 상태 및 팝업 표시 확인
     window.onload = function () {
         checkAuth();
@@ -728,30 +706,29 @@
     });
 
 
-        // 예약 버튼 클릭 이벤트 처리
-        document.querySelectorAll('.reservation-button').forEach(button => {
-            const accessToken = getCookie('accessToken'); // 쿠키에서 accessToken 가져오기
-            button.addEventListener('click', function (event) {
-                const roomCard = this.closest('.room-card'); // 클릭한 버튼의 가장 가까운 room-card 요소 찾기
-                const loginMessage = roomCard.querySelector('.login-message'); // 해당 room-card 내의 로그인 메시지 찾기
+    // 예약 버튼 클릭 이벤트 처리
+    document.querySelectorAll('.reservation-button').forEach(button => {
+        const accessToken = getCookie('accessToken'); // 쿠키에서 accessToken 가져오기
+        button.addEventListener('click', function (event) {
+            const roomCard = this.closest('.room-card'); // 클릭한 버튼의 가장 가까운 room-card 요소 찾기
+            const loginMessage = roomCard.querySelector('.login-message'); // 해당 room-card 내의 로그인 메시지 찾기
 
-                if (!accessToken) {
-                    loginMessage.style.display = 'block'; // 로그인 메시지 표시
-                    event.preventDefault(); // 클릭 이벤트 중단
-                    return;
-                }
+            if (!accessToken) {
+                loginMessage.style.display = 'block'; // 로그인 메시지 표시
+                event.preventDefault(); // 클릭 이벤트 중단
+                return;
+            }
 
-                // 체크인 및 체크아웃 날짜 가져오기
-                const checkin = document.getElementById('checkin').value;
-                const checkout = document.getElementById('checkout').value;
+            // 체크인 및 체크아웃 날짜 가져오기
+            const checkin = document.getElementById('checkin').value;
+            const checkout = document.getElementById('checkout').value;
 
-                // 예약하기 버튼 클릭 시, 예약 페이지로 이동
-                const roomId = this.getAttribute('data-id');
-                const url = `/reservation?id=${roomId}&checkin=${checkin}&checkout=${checkout}`;
-                window.location.href = url;
-            });
+            // 예약하기 버튼 클릭 시, 예약 페이지로 이동
+            const roomId = this.getAttribute('data-id');
+            const url = `/reservation?id=${roomId}&checkin=${checkin}&checkout=${checkout}`;
+            window.location.href = url;
         });
-
+    });
 
 
     document.addEventListener('DOMContentLoaded', () => {

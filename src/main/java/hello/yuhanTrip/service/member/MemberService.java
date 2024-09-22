@@ -50,4 +50,6 @@ public interface MemberService {
 
     void validatePassword(String rawPassword, String encodedPassword);
 
+    Member findByRefreshToken(String refreshToken);
+
 }

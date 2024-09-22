@@ -66,6 +66,9 @@ dependencies {
 
     implementation 'com.github.iamport:iamport-rest-client-java:0.2.21'
 
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.1'
+
 
     //Webflux
     implementation 'org.springframework.boot:spring-boot-starter-webflux'

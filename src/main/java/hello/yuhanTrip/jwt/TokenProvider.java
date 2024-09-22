@@ -58,8 +58,9 @@ public class TokenProvider {
                 .setExpiration(accessTokenExpiresIn)        // payload "exp"
                 .compact();
 
-        // Refresh Token 생성
+        // Refresh Token 생성 (권한 정보 제외)
         String refreshToken = Jwts.builder()
+                .setSubject(authentication.getName()) // 사용자 이름
                 .signWith(key, SignatureAlgorithm.HS512)
                 .setExpiration(new Date(now + REFRESH_TOKEN_EXPIRE_TIME))
                 .compact();
@@ -72,7 +73,6 @@ public class TokenProvider {
                 .accessTokenExpiresIn(accessTokenExpiresIn.getTime())
                 .build();
     }
-
 
 
     public Authentication getAuthentication(String accessToken) {
@@ -98,6 +98,39 @@ public class TokenProvider {
         return new UsernamePasswordAuthenticationToken(userDetails, accessToken, authorities);
     }
 
+    public Authentication getAuthenticationFromRefreshToken(String refreshToken) {
+        // refreshToken 복호화
+        Claims claims = parseClaims(refreshToken);
+
+        if (claims == null || claims.getSubject() == null) {
+            log.error("refreshToken이 올바르지 않습니다. Claims: {}, Subject: {}", claims, claims != null ? claims.getSubject() : "null");
+            throw new RuntimeException("refreshToken이 올바르지 않습니다.");
+        }
+
+        log.info("refreshToken에서 추출한 사용자 이름: {}", claims.getSubject());
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(claims.getSubject());
+
+        if (userDetails == null) {
+            log.error("유저 정보를 찾을 수 없습니다. 사용자 이름: {}", claims.getSubject());
+            throw new RuntimeException("유저 정보를 찾을 수 없습니다.");
+        }
+
+        // 유저 권한 가져오기
+        Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
+
+        // 새로운 Access Token 생성
+        String newAccessToken = Jwts.builder()
+                .claim(AUTHORITIES_KEY, authorities.stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .collect(Collectors.toList()))
+                .setSubject(claims.getSubject())
+                .signWith(key, SignatureAlgorithm.HS512)
+                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRE_TIME))
+                .compact();
+
+        // Authentication 객체 반환
+        return new UsernamePasswordAuthenticationToken(userDetails, newAccessToken, authorities);
+    }
 
     private Collection<? extends GrantedAuthority> extractAuthorities(Claims claims) {
         // 토큰에서 권한 정보 추출
