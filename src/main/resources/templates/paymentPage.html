@@ -109,7 +109,7 @@
         function requestPay() {
             var reservationUid = '[[${requestDto.reservationUid}]]';
             var roomId = '[[${requestDto.roomId}]]';
-            var totalPrice = [[${requestDto.totalPrice}]];
+            var totalPrice = [[${requestDto.discountedPrice}]];
             var buyerName = '[[${requestDto.buyerName}]]';
             var phoneNumber = '[[${requestDto.phoneNumber}]]';
             var addr = '[[${requestDto.addr}]]';
@@ -221,7 +221,8 @@
     <div class="info">
         <p><strong>숙소 이름:</strong> <span th:text="${requestDto.accommodationTitle}">숙소 이름</span></p>
         <p><strong>객실 이름:</strong> <span th:text="${requestDto.roomNm}">객실 이름</span></p>
-        <p><strong class="highlight">결제해야 할 가격:</strong> <span class="price"><span class="amount" th:text="${requestDto.totalPrice}">0</span>원</span></p>
+        <p><strong class="highlight">가격:</strong> <span class="price"><span class="amount" th:text="${requestDto.totalPrice}">0</span>원</span></p>
+        <p><strong class="highlight">쿠폰 적용된 가격(실제 결제 금액):</strong> <span class="price"><span class="amount" th:text="${requestDto.discountedPrice}">0</span>원</span></p>
         <p><strong>예약자 성함:</strong> <span th:text="${requestDto.buyerName}">예약자 성함</span></p>
         <p><strong>전화번호:</strong> <span th:text="${requestDto.phoneNumber}">전화번호</span></p>
         <p><strong class="highlight">체크인 날짜:</strong> <span class="highlight" th:text="${requestDto.checkInDate}">체크인 날짜</span></p>

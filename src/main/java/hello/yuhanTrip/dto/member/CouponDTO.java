@@ -1,7 +1,7 @@
 package hello.yuhanTrip.dto.member;
 
 
-import hello.yuhanTrip.domain.coupon.DiscountType;
+import hello.yuhanTrip.dto.coupon.DiscountType;
 import lombok.Getter;
 import lombok.Setter;
 

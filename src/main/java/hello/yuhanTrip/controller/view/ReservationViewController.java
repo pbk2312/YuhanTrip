@@ -1,12 +1,13 @@
 package hello.yuhanTrip.controller.view;
 
 import hello.yuhanTrip.domain.accommodation.Room;
-import hello.yuhanTrip.domain.coupon.Coupon;
+import hello.yuhanTrip.dto.coupon.Coupon;
 import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.domain.reservation.Reservation;
 import hello.yuhanTrip.domain.reservation.ReservationStatus;
 import hello.yuhanTrip.dto.accommodation.ReservationDTO;
 import hello.yuhanTrip.service.Accomodation.AccommodationService;
+import hello.yuhanTrip.service.RedisService;
 import hello.yuhanTrip.service.reservation.ReservationService;
 import hello.yuhanTrip.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class ReservationViewController {
     private final MemberService memberService;
     private final AccommodationService accommodationService;
     private final ReservationService reservationService;
+    private final RedisService redisService;
 
 
     // 예약하기 페이지
@@ -45,16 +47,19 @@ public class ReservationViewController {
         Member member = memberService.getUserDetails(accessToken);
         Room room = accommodationService.getRoomInfo(roomId);
 
+        // 예약 정보를 생성
         ReservationDTO reservationDTO = createReservationDTO(room, checkin, checkout, member);
 
-        List<Coupon> coupons = member.getCoupons();
+        // Redis에서 멤버의 쿠폰을 가져옴
+        List<Coupon> coupons = redisService.getCouponsFromRedis(member);
 
+        // 모델에 데이터를 추가
         model.addAttribute("reservation", reservationDTO);
-        model.addAttribute("coupons",coupons);
+        model.addAttribute("coupons", coupons); // 가져온 쿠폰들을 모델에 추가
         model.addAttribute("room", room);
+
         return "reservation/reservation";
     }
-
 
     // 예약실패
     @GetMapping("/reservation/fail")

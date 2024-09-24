@@ -5,7 +5,7 @@ import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.request.CancelData;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
-import hello.yuhanTrip.domain.coupon.Coupon;
+import hello.yuhanTrip.dto.coupon.Coupon;
 import hello.yuhanTrip.domain.reservation.PaymentStatus;
 import hello.yuhanTrip.domain.reservation.Reservation;
 import hello.yuhanTrip.dto.payment.PaymentCallbackRequest;
@@ -47,8 +47,8 @@ public class PaymentServiceImpl implements PaymentService {
 
         // 쿠폰 적용 여부 확인 및 처리
         Double discountedPriceAsDouble = totalPriceAsDouble;
-        if (reservation.getCouponId() != null) {
-            Coupon coupon = couponService.findCouponById(reservation.getCouponId());
+        if (reservation.getCouponCode() != null) {
+            Coupon coupon = couponService.findCouponById(reservation.getCouponCode(),reservation.getMember());
             discountedPriceAsDouble = coupon.applyDiscount(totalPriceAsDouble); // 쿠폰이 있는 경우 할인 적용
         }
 
@@ -118,12 +118,12 @@ public class PaymentServiceImpl implements PaymentService {
             reservation.getPayment().changePaymentBySuccess(PaymentStatus.COMPLETED, iamportResponse.getResponse().getImpUid());
 
             // 쿠폰 삭제
-            Long couponId = reservation.getCouponId();
-            if (couponId == null) {
+            String couponCode = reservation.getCouponCode();
+            if (couponCode == null) {
                 log.info("쿠폰 미적용");
             } else {
-                log.info("Deleting coupon with ID: {}", couponId);
-                couponService.deleteCoupon(couponId);
+                log.info("Deleting coupon with ID: {}", couponCode);
+                couponService.deleteCoupon(couponCode,reservation.getMember());
             }
             log.info("결제 완료...");
             return iamportResponse;

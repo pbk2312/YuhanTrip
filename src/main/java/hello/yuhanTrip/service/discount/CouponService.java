@@ -1,7 +1,7 @@
 package hello.yuhanTrip.service.discount;
 
-import hello.yuhanTrip.domain.coupon.Coupon;
-import hello.yuhanTrip.domain.coupon.DiscountType;
+import hello.yuhanTrip.dto.coupon.Coupon;
+import hello.yuhanTrip.dto.coupon.DiscountType;
 import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.dto.member.CouponDTO;
 
@@ -12,11 +12,10 @@ public interface CouponService {
     Coupon generateCoupon(Member member, DiscountType discountType, Double discountValue);
 
     // 쿠폰 ID로 쿠폰을 찾는 메서드 추가
-    Coupon findCouponById(Long couponId);
+    Coupon findCouponById(String couponCode,Member member);
 
-    void deleteCoupon(Long couponId); // 쿠폰 삭제 메서드 추가
+    void deleteCoupon(String couponCode,Member member);
 
-    boolean hasCoupon(Member member, DiscountType discountType);
 
-    List<CouponDTO >getListCoupon(Member member);
+
 }

@@ -1,4 +1,4 @@
-package hello.yuhanTrip.domain.coupon;
+package hello.yuhanTrip.dto.coupon;
 
 import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.service.discount.DiscountStrategy;
@@ -11,15 +11,10 @@ import lombok.extern.log4j.Log4j2;
 
 import java.time.LocalDateTime;
 
-@Entity
 @Getter
 @Setter
 @Log4j2
 public class Coupon {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     private String code;            // 쿠폰 코드
 
@@ -32,9 +27,6 @@ public class Coupon {
     private LocalDateTime endDate;    // 쿠폰 만료일
     private Boolean used = false;     // 사용 여부
 
-    @ManyToOne
-    @JoinColumn(name = "member_id")
-    private Member member;
 
     // 할인 적용 로직
     public Double applyDiscount(Double originalPrice) {

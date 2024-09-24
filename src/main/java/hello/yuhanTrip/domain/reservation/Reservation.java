@@ -75,8 +75,8 @@ public class Reservation {
     private Review review;
 
     // 쿠폰 ID 추가
-    @Column(name = "coupon_id")
-    private Long couponId; // 쿠폰 ID를 저장하는 필드 추가
+    @Column(name = "coupon_Code")
+    private String couponCode; // 쿠폰 ID를 저장하는 필드 추가
 
 
 

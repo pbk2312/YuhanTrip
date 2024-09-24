@@ -247,18 +247,6 @@ public class MypageViewController {
         }
     }
 
-    @GetMapping("couponList")
-    public String couponList(@CookieValue(value = "accessToken", required = false) String accessToken,
-                             Model model
-    ) {
-        Member member = memberService.getUserDetails(accessToken);
-
-        List<CouponDTO> listCoupon = couponService.getListCoupon(member);
-
-        model.addAttribute("listCoupon", listCoupon);
-
-        return "mypage/listCoupon";
-    }
 
     @GetMapping("inquiriesList")
     public String inquiriesList(@CookieValue(value = "accessToken", required = false) String accessToken,

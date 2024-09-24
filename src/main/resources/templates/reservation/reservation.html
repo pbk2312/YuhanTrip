@@ -274,10 +274,10 @@
 
                 <!-- 쿠폰 선택 추가 -->
                 <div class="form-group">
-                    <label for="couponId">쿠폰 선택</label>
-                    <select id="couponId" name="couponId" class="form-control">
+                    <label for="couponCode">쿠폰 선택</label>
+                    <select id="couponCode" name="couponCode" class="form-control">
                         <option value="">쿠폰을 선택하세요</option>
-                        <option th:each="coupon : ${coupons}" th:value="${coupon.id}">
+                        <option th:each="coupon : ${coupons}" th:value="${coupon.code}">
         <span th:switch="${coupon.discountType.name()}">
             <span th:case="'FIXED'">
                 <span th:text="'고정 금액 할인: ' + ${coupon.discountValue} + '원 할인'"></span>

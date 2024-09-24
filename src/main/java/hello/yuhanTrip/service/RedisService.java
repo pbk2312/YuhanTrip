@@ -2,13 +2,17 @@ package hello.yuhanTrip.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import hello.yuhanTrip.domain.coupon.Coupon;
+import hello.yuhanTrip.dto.coupon.Coupon;
+import hello.yuhanTrip.domain.member.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -44,39 +48,74 @@ public class RedisService {
     }
 
     // 쿠폰을 Redis에 저장하는 메서드
-    public void saveCouponToRedis(Long couponId, Coupon coupon, Long expirationTime) {
+    public void saveCouponToRedis(Member member,Coupon coupon, Long expirationTime) {
         ValueOperations<String, String> valueOperations = stringRedisTemplate.opsForValue();
         String couponJson = convertCouponToJson(coupon);
         if (couponJson != null) {
-            valueOperations.set("coupon:" + couponId, couponJson, expirationTime, TimeUnit.MILLISECONDS);
-            log.info("쿠폰이 Redis에 저장되었습니다. couponId: {}", couponId);
+            valueOperations.set("coupon:" + member.getId()+ ":" +  coupon.getCode(), couponJson, expirationTime, TimeUnit.MILLISECONDS);
+            log.info("쿠폰이 Redis에 저장되었습니다. couponCode: {}", coupon.getCode());
         } else {
             log.error("쿠폰을 JSON으로 변환하는 데 실패했습니다.");
         }
     }
 
-    // Redis에서 쿠폰을 조회하는 메서드
-    public Coupon getCouponFromRedis(Long couponId) {
-        ValueOperations<String, String> valueOperations = stringRedisTemplate.opsForValue();
-        String couponJson = valueOperations.get("coupon:" + couponId);
-        if (couponJson != null) {
-            return convertJsonToCoupon(couponJson);
+    // Redis에서 멤버의 모든 쿠폰을 리스트로 반환하는 메서드
+    public List<Coupon> getCouponsFromRedis(Member member) {
+        List<Coupon> coupons = new ArrayList<>();
+        String keyPattern = "coupon:" + member.getId() + ":*"; // 멤버 ID에 해당하는 쿠폰 키 패턴
+
+        // 키 패턴에 맞는 모든 쿠폰 키를 조회
+        Set<String> keys = stringRedisTemplate.keys(keyPattern);
+
+        if (keys != null && !keys.isEmpty()) {
+            for (String key : keys) {
+                ValueOperations<String, String> valueOperations = stringRedisTemplate.opsForValue();
+                String couponJson = valueOperations.get(key); // 쿠폰 JSON 문자열 가져오기
+
+                if (couponJson != null) {
+                    // JSON 문자열을 Coupon 객체로 변환
+                    Coupon coupon = convertJsonToCoupon(couponJson);
+                    if (coupon != null) { // 변환 성공 시 리스트에 추가
+                        coupons.add(coupon);
+                    }
+                }
+            }
         } else {
-            log.info("Redis에서 쿠폰을 찾을 수 없습니다. couponId: {}", couponId);
+            log.info("Redis에서 멤버의 쿠폰을 찾을 수 없습니다. memberId: {}", member.getId());
+        }
+
+        return coupons;
+    }
+
+    // Redis에서 쿠폰을 조회하는 메서드
+    // Redis에서 쿠폰을 조회하는 메서드
+    public Coupon getFromRedis(String couponCode, Member member) {
+        ValueOperations<String, String> valueOperations = stringRedisTemplate.opsForValue();
+        String key = "coupon:" + member.getId() + ":" + couponCode; // memberId와 couponCode로 키 생성
+        String couponJson = valueOperations.get(key); // Redis에서 쿠폰 JSON 가져오기
+
+        if (couponJson != null) {
+            Coupon coupon = convertJsonToCoupon(couponJson); // JSON 문자열을 Coupon 객체로 변환
+            log.info("Redis에서 쿠폰을 찾았습니다. memberId: {}, couponCode: {}", member.getId(), couponCode); // 성공 로그 추가
+            return coupon;
+        } else {
+            log.info("Redis에서 쿠폰을 찾을 수 없습니다. memberId: {}, couponCode: {}", member.getId(), couponCode);
             return null;
         }
     }
 
     // Redis에서 쿠폰을 삭제하는 메서드
-    public void deleteCouponFromRedis(Long couponId) {
-        String key = "coupon:" + couponId;
-        Boolean isDeleted = stringRedisTemplate.delete(key);
+    public void deleteCouponFromRedis(String couponCode, Member member) {
+        String key = "coupon:" + member.getId() + ":" + couponCode; // memberId와 couponCode로 키 생성
+        Boolean isDeleted = stringRedisTemplate.delete(key); // Redis에서 쿠폰 삭제
+
         if (isDeleted != null && isDeleted) {
-            log.info("Redis에서 쿠폰이 삭제되었습니다. couponId: {}", couponId);
+            log.info("Redis에서 쿠폰이 삭제되었습니다. memberId: {}, couponCode: {}", member.getId(), couponCode);
         } else {
-            log.warn("Redis에서 쿠폰을 삭제하는 데 실패했습니다. couponId: {}", couponId);
+            log.warn("Redis에서 쿠폰을 삭제하는 데 실패했습니다. memberId: {}, couponCode: {}", member.getId(), couponCode);
         }
     }
+
 
     // 쿠폰 정보를 JSON으로 변환하는 메서드
     private String convertCouponToJson(Coupon coupon) {

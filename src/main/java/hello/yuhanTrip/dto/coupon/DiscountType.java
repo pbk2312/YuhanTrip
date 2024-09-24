@@ -1,4 +1,4 @@
-package hello.yuhanTrip.domain.coupon;
+package hello.yuhanTrip.dto.coupon;
 
 public enum DiscountType {
     FIXED,      // 고정 금액 할인

@@ -193,7 +193,7 @@ public class ReservationServiceImpl implements ReservationService {
                 .numberOfGuests(reservationDTO.getNumberOfGuests())
                 .accommodationId(room.getAccommodation().getId())
                 .reservationStatus(ReservationStatus.RESERVED)
-                .couponId(reservationDTO.getCouponId())
+                .couponCode(reservationDTO.getCouponCode())
                 .build();
     }
 }

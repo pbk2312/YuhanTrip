@@ -1,7 +1,7 @@
 package hello.yuhanTrip.controller.restApi;
 
-import hello.yuhanTrip.domain.coupon.Coupon;
-import hello.yuhanTrip.domain.coupon.DiscountType;
+import hello.yuhanTrip.dto.coupon.Coupon;
+import hello.yuhanTrip.dto.coupon.DiscountType;
 import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.service.discount.CouponService;
 import hello.yuhanTrip.service.member.MemberService;
@@ -45,10 +45,7 @@ public class CouponController {
         }
         Member member = (Member) memberValidationResult.getBody();
 
-        // 이미 발급된 쿠폰 확인
-        if (couponService.hasCoupon(member, DiscountType.FIXED)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(COUPON_ALREADY_ISSUED_MESSAGE);
-        }
+
 
         log.info("고정 금액 할인 쿠폰 발급 - 회원 ID: {}", member.getId());
 
@@ -68,10 +65,7 @@ public class CouponController {
         }
         Member member = (Member) memberValidationResult.getBody();
 
-        // 이미 발급된 쿠폰 확인
-        if (couponService.hasCoupon(member, DiscountType.PERCENTAGE)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(COUPON_ALREADY_ISSUED_MESSAGE);
-        }
+
 
         log.info("비율 할인 쿠폰 발급 - 회원 ID: {}", member.getId());
 

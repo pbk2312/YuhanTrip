@@ -2,7 +2,7 @@ package hello.yuhanTrip.domain.member;
 
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import hello.yuhanTrip.domain.coupon.Coupon;
+import hello.yuhanTrip.dto.coupon.Coupon;
 import hello.yuhanTrip.domain.accommodation.Accommodation;
 import hello.yuhanTrip.domain.accommodation.Review;
 import hello.yuhanTrip.domain.admin.RoleChangeRequest;
@@ -69,8 +69,7 @@ public class Member {
     @OneToMany(mappedBy = "member")
     private List<RoleChangeRequest> roleChangeRequests;  // 추가된 부분
 
-    @OneToMany(mappedBy = "member")
-    private List<Coupon> coupons;
+
 
 }
 

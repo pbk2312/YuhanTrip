@@ -708,28 +708,39 @@
 
     // 예약 버튼 클릭 이벤트 처리
     document.querySelectorAll('.reservation-button').forEach(button => {
-        const accessToken = getCookie('accessToken'); // 쿠키에서 accessToken 가져오기
         button.addEventListener('click', function (event) {
             const roomCard = this.closest('.room-card'); // 클릭한 버튼의 가장 가까운 room-card 요소 찾기
             const loginMessage = roomCard.querySelector('.login-message'); // 해당 room-card 내의 로그인 메시지 찾기
 
-            if (!accessToken) {
-                loginMessage.style.display = 'block'; // 로그인 메시지 표시
-                event.preventDefault(); // 클릭 이벤트 중단
-                return;
-            }
+            // 서버에 로그인 여부 확인 요청
+            fetch('/api/member/validateToken', {
+                method: 'GET',
+                credentials: 'include' // 쿠키 포함
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.isLoggedIn) {
+                        // 로그인되지 않은 상태면 로그인 메시지 표시
+                        loginMessage.style.display = 'block';
+                        event.preventDefault(); // 클릭 이벤트 중단
+                        return;
+                    }
 
-            // 체크인 및 체크아웃 날짜 가져오기
-            const checkin = document.getElementById('checkin').value;
-            const checkout = document.getElementById('checkout').value;
+                    // 체크인 및 체크아웃 날짜 가져오기
+                    const checkin = document.getElementById('checkin').value;
+                    const checkout = document.getElementById('checkout').value;
 
-            // 예약하기 버튼 클릭 시, 예약 페이지로 이동
-            const roomId = this.getAttribute('data-id');
-            const url = `/reservation?id=${roomId}&checkin=${checkin}&checkout=${checkout}`;
-            window.location.href = url;
+                    // 예약하기 버튼 클릭 시, 예약 페이지로 이동
+                    const roomId = this.getAttribute('data-id');
+                    const url = `/reservation?id=${roomId}&checkin=${checkin}&checkout=${checkout}`;
+                    window.location.href = url;
+                })
+                .catch(error => {
+                    console.error('로그인 상태 확인 중 오류 발생:', error);
+                    event.preventDefault(); // 에러 발생 시 예약 진행 중단
+                });
         });
     });
-
 
     document.addEventListener('DOMContentLoaded', () => {
         const form = document.querySelector('form');
