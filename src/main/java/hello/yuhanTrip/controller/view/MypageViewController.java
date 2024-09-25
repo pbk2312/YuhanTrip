@@ -8,7 +8,6 @@ import hello.yuhanTrip.domain.reservation.Reservation;
 import hello.yuhanTrip.domain.accommodation.Room;
 import hello.yuhanTrip.domain.admin.RoleChangeRequest;
 import hello.yuhanTrip.dto.accommodation.AccommodationDTO;
-import hello.yuhanTrip.dto.member.CouponDTO;
 import hello.yuhanTrip.dto.member.MemberDTO;
 import hello.yuhanTrip.mapper.AccommodationMapper;
 import hello.yuhanTrip.mapper.MemberMapper;
@@ -43,7 +42,6 @@ public class MypageViewController {
     private final AccommodationServiceImpl accommodationService;
     private final RoleChangeRequestService roleChangeRequestService;
     private final MemberLikeService memberLikeService;
-    private final CouponService couponService;
 
     // 비밀번호 확인
     @GetMapping("/check")

@@ -15,7 +15,6 @@ import hello.yuhanTrip.exception.IncorrectPasswordException;
 import hello.yuhanTrip.exception.SpecificException;
 import hello.yuhanTrip.jwt.TokenProvider;
 import hello.yuhanTrip.repository.ResetTokenRepository;
-import hello.yuhanTrip.service.RedisService;
 import hello.yuhanTrip.service.member.MemberService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;

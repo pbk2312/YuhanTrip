@@ -2,13 +2,9 @@ package hello.yuhanTrip.controller.restApi;
 
 import hello.yuhanTrip.domain.accommodation.Room;
 import hello.yuhanTrip.domain.member.Member;
-import hello.yuhanTrip.domain.reservation.Payment;
-import hello.yuhanTrip.domain.reservation.PaymentStatus;
 import hello.yuhanTrip.domain.reservation.Reservation;
-import hello.yuhanTrip.domain.reservation.ReservationStatus;
 import hello.yuhanTrip.dto.accommodation.ReservationDTO;
 import hello.yuhanTrip.dto.accommodation.ReservationUpdateDTO;
-import hello.yuhanTrip.repository.PaymentRepository;
 import hello.yuhanTrip.service.Accomodation.AccommodationService;
 import hello.yuhanTrip.service.reservation.ReservationService;
 import hello.yuhanTrip.service.member.MemberService;
@@ -22,10 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 
 @RestController
