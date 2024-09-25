@@ -104,6 +104,7 @@ public class MemberApiController {
 
         memberService.logout(new LogoutDTO(member.getEmail()));
         removeCookie(response, "accessToken");
+        removeCookie(response, "refreshToken");
 
         log.info("로그아웃 완료");
         return ResponseEntity.ok("로그아웃 완료");
