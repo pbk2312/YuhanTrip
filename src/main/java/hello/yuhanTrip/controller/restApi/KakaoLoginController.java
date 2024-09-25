@@ -21,6 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @Log4j2
 @RestController
 @RequiredArgsConstructor
@@ -52,7 +54,7 @@ public class KakaoLoginController {
             // 5. 이메일 정보가 없으면 이메일 입력 페이지로 리다이렉트
             if (existingMember.getEmail() == null) {
                 String redirectUrl = String.format("/member/email/input?id=%s", kakaoId);
-                return ResponseEntity.status(HttpStatus.SEE_OTHER)
+                return ResponseEntity.status(HttpStatus.FOUND)
                         .header("Location", redirectUrl)
                         .build();
             }
@@ -61,18 +63,14 @@ public class KakaoLoginController {
             TokenDTO tokenDTO = handleLogin(existingMember);
 
             // 쿠키에 토큰 추가
-            addCookie(response, "accessToken", tokenDTO.getAccessToken(), 3600);
-            addCookie(response, "refreshToken", tokenDTO.getRefreshToken(), 600 * 600);
+            addCookie(response, "accessToken", tokenDTO.getAccessToken(), 3600, request);
+            addCookie(response, "refreshToken", tokenDTO.getRefreshToken(), 600 * 600, request);
 
             // 로그인 후 리다이렉트할 URL을 세션에 저장
-            String previousUrl = (String) request.getSession().getAttribute("redirectUrl");
-            if (previousUrl != null) {
-                return ResponseEntity.status(HttpStatus.SEE_OTHER)
-                        .header("Location", previousUrl)
-                        .build();
-            }
-
-            return ResponseEntity.ok(tokenDTO.getAccessToken());
+            Optional<String> redirectUrl = Optional.ofNullable((String) request.getSession().getAttribute("redirectUrl"));
+            return redirectUrl
+                    .map(url -> ResponseEntity.status(HttpStatus.FOUND).header("Location", url).build())
+                    .orElse(ResponseEntity.ok(tokenDTO.getAccessToken()));
 
         } catch (KakaoApiException e) {
             log.error("카카오 API 호출 실패: {}", e.getMessage());
@@ -126,10 +124,10 @@ public class KakaoLoginController {
     }
 
     // 쿠키 설정
-    private void addCookie(HttpServletResponse response, String name, String value, int maxAge) {
+    private void addCookie(HttpServletResponse response, String name, String value, int maxAge, HttpServletRequest request) {
         Cookie cookie = new Cookie(name, value);
-        cookie.setHttpOnly(true); // https에서 사용하려면 true
-        cookie.setSecure(true); // HTTPS에서만 작동
+        cookie.setHttpOnly(true);
+        cookie.setSecure(request.isSecure()); // HTTPS 여부에 따라 쿠키의 보안 설정
         cookie.setPath("/");
         cookie.setMaxAge(maxAge);
         response.addCookie(cookie);
