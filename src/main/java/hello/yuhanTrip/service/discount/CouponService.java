@@ -3,9 +3,6 @@ package hello.yuhanTrip.service.discount;
 import hello.yuhanTrip.dto.coupon.Coupon;
 import hello.yuhanTrip.dto.coupon.DiscountType;
 import hello.yuhanTrip.domain.member.Member;
-import hello.yuhanTrip.dto.member.CouponDTO;
-
-import java.util.List;
 
 public interface CouponService {
 
@@ -15,6 +12,8 @@ public interface CouponService {
     Coupon findCouponById(String couponCode,Member member);
 
     void deleteCoupon(String couponCode,Member member);
+
+    boolean hasCoupon(Long memberId);
 
 
 

@@ -49,6 +49,10 @@ public class CouponServiceImpl implements CouponService {
         return coupon;
     }
 
+    public boolean hasCoupon(Long memberId) {
+        // Redis 또는 DB에서 쿠폰 발급 여부 확인 로직
+        return redisService.hasCoupon(memberId);
+    }
 
     @Override
     public Coupon findCouponById(String couponCode,Member member) {
