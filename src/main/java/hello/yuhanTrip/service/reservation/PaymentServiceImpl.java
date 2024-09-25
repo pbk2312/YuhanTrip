@@ -46,10 +46,15 @@ public class PaymentServiceImpl implements PaymentService {
         Double totalPriceAsDouble = totalPrice.doubleValue(); // Long을 Double로 변환
 
         // 쿠폰 적용 여부 확인 및 처리
-        Double discountedPriceAsDouble = totalPriceAsDouble;
+        Double discountedPriceAsDouble = totalPriceAsDouble; // 기본적으로 원래 가격으로 초기화
+
         if (reservation.getCouponCode() != null) {
-            Coupon coupon = couponService.findCouponById(reservation.getCouponCode(),reservation.getMember());
-            discountedPriceAsDouble = coupon.applyDiscount(totalPriceAsDouble); // 쿠폰이 있는 경우 할인 적용
+            Coupon coupon = couponService.findCouponById(reservation.getCouponCode(), reservation.getMember());
+
+            // 쿠폰이 유효한 경우에만 할인 적용
+            if (coupon != null) {
+                discountedPriceAsDouble = coupon.applyDiscount(totalPriceAsDouble); // 쿠폰이 있는 경우 할인 적용
+            }
         }
 
         Long discountedPrice = Math.round(discountedPriceAsDouble); // 할인된 가격을 Long으로 변환
