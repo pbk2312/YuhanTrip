@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -61,21 +61,21 @@
 
 <div class="coupon-container" id="coupon-popup">
     <!-- 고정 금액 할인 쿠폰 -->
-    <div id="fixed-coupon" style="display: none;">
+    <div th:if="${discountType == 'fixed'}">
         <h2>🎉 자정 이벤트! 할인 쿠폰을 받으세요! 🎉</h2>
-        <p>할인 금액: <strong id="fixed-discount"></strong></p>
+        <p>할인 금액: <strong th:text="'10,000원'"></strong></p>
         <button class="coupon-button" onclick="requestCoupon('fixed', 10000)">쿠폰 받기</button>
     </div>
 
     <!-- 비율 할인 쿠폰 -->
-    <div id="percentage-coupon" style="display: none;">
+    <div th:if="${discountType == 'percentage'}">
         <h2>🎉 저녁 6시 이벤트! 할인 쿠폰을 받으세요! 🎉</h2>
-        <p>할인 비율: <strong id="percentage-discount"></strong></p>
+        <p>할인 비율: <strong th:text="'20%'"></strong></p>
         <button class="coupon-button" onclick="requestCoupon('percentage', 0.2)">쿠폰 받기</button>
     </div>
 
     <!-- 이벤트가 없는 경우 -->
-    <div id="no-event" style="display: none;">
+    <div th:if="${discountType == 'none'}">
         <p class="none-message">현재 이벤트가 없습니다.</p>
         <div class="event-info">
             <p>하지만 걱정 마세요! 매일 자정과 저녁 6시에 특별 할인 쿠폰을 발급합니다.</p>
@@ -113,56 +113,9 @@
             document.getElementById('coupon-popup').style.display = 'none';
             return;
         }
-
-        // 실제 discountType 값을 서버에서 가져와야 합니다.
-        const discountType = /*[[${discountType}]]*/ 'none';
-
-        if (discountType === 'fixed') {
-            document.getElementById('fixed-coupon').style.display = 'block';
-            document.getElementById('fixed-discount').innerText = '10,000원';
-        } else if (discountType === 'percentage') {
-            document.getElementById('percentage-coupon').style.display = 'block';
-            document.getElementById('percentage-discount').innerText = '20%';
-        } else {
-            document.getElementById('no-event').style.display = 'block';
-        }
     });
 
-    function checkAuth() {
-        fetch('/api/member/validateToken', {
-            method: 'GET',
-            credentials: 'include' // 쿠키를 포함하여 요청
-        })
-            .then(response => response.json())
-            .then(data => {
-                const isLoggedIn = data.isLoggedIn;
-                const authButton = document.getElementById('authButton');
-                const mypageButton = document.getElementById('mypageButton');
-
-                if (isLoggedIn) {
-                    // 로그인 상태: 로그아웃 버튼으로 전환 및 마이페이지 버튼 활성화
-                    authButton.innerText = '로그아웃';
-                    authButton.addEventListener('click', confirmLogout); // 로그아웃 확인
-                    mypageButton.style.display = 'block'; // 마이페이지 버튼 표시
-                    mypageButton.addEventListener('click', () => {
-                        window.location.href = '/mypage/check'; // 마이페이지로 이동
-                    });
-                } else {
-                    // 로그아웃 상태: 로그인 버튼으로 전환
-                    authButton.innerText = '로그인/회원가입';
-                    authButton.addEventListener('click', function () {
-                        window.location.href = '/member/login'; // 로그인 페이지로 이동
-                    });
-                    mypageButton.style.display = 'none'; // 마이페이지 버튼 숨기기
-                }
-            })
-            .catch(error => console.error('로그인 상태 확인 중 오류 발생:', error));
-    }
-
-
     async function requestCoupon(discountType, discountValue) {
-
-        checkAuth();
         let endpoint = '';
         if (discountType === 'fixed') {
             endpoint = `/api/coupons/fixed?discountAmount=${discountValue}`;

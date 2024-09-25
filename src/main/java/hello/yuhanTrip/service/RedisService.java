@@ -104,6 +104,14 @@ public class RedisService {
         }
     }
 
+    // 특정 회원이 이미 쿠폰을 발급받았는지 확인하는 메서드
+    public boolean hasCoupon(Long memberId) {
+        String keyPattern = "coupon:" + memberId + ":*"; // 회원 ID에 해당하는 쿠폰 키 패턴
+        Set<String> keys = stringRedisTemplate.keys(keyPattern); // 패턴에 맞는 쿠폰 키를 조회
+
+        // 쿠폰 키가 존재하면 true, 없으면 false 반환
+        return keys != null && !keys.isEmpty();
+    }
     // Redis에서 쿠폰을 삭제하는 메서드
     public void deleteCouponFromRedis(String couponCode, Member member) {
         String key = "coupon:" + member.getId() + ":" + couponCode; // memberId와 couponCode로 키 생성
