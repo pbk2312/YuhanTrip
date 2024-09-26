@@ -44,4 +44,6 @@ public interface ReservationService {
     boolean cancelReservation(String reservationUid);
 
     Reservation createReservation(Member member, Room room, ReservationDTO reservationDTO);
+
+    void updateCompletedReservations();
 }

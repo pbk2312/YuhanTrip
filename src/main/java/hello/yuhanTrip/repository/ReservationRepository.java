@@ -53,4 +53,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("SELECT r FROM Reservation r WHERE r.member = :member AND r.reservationStatus != :status")
     Page<Reservation> findByMember(@Param("member") Member member, @Param("status") ReservationStatus status, Pageable pageable);
 
+    List<Reservation> findByReservationStatusAndCheckOutDateBefore(ReservationStatus status, LocalDate date);
+
 }

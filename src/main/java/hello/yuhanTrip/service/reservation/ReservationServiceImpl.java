@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -195,5 +196,20 @@ public class ReservationServiceImpl implements ReservationService {
                 .reservationStatus(ReservationStatus.RESERVED)
                 .couponCode(reservationDTO.getCouponCode())
                 .build();
+    }
+
+
+    // 예약 상태를 업데이트하는 메서드
+    @Override
+    @Scheduled(cron = "0 0 0 * * *") // 매일 자정에 실행
+    public void updateCompletedReservations() {
+        LocalDate today = LocalDate.now();
+        List<Reservation> reservations = reservationRepository.findByReservationStatusAndCheckOutDateBefore(ReservationStatus.RESERVED, today);
+
+        for (Reservation reservation : reservations) {
+            reservation.setReservationStatus(ReservationStatus.COMPLETED);
+        }
+
+        reservationRepository.saveAll(reservations);
     }
 }
