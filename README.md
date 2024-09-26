@@ -104,3 +104,28 @@
 
 ![image](https://github.com/user-attachments/assets/ba1ac1d7-1ef2-4073-89fd-363315a1d17e)
 
+----
+
+### 시연 영상
+
+
+
+#### 로그인 및 숙소 조회
+
+
+카카오 로그인은 카카오 내부적으로 로그인을 한 기록이 있기 때문에 카카오 로그인 없이 미리 넘어갔습니다.
+
+
+https://github.com/user-attachments/assets/ae8739b4-971d-4a06-8cc6-92698224f13f
+
+#### 예약 하기 및 결제하기 
+
+
+
+
+https://github.com/user-attachments/assets/95df5538-bf67-4809-a305-a8964ff57f6e
+----
+
+
+
+
