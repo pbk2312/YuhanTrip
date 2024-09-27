@@ -2,10 +2,10 @@ package hello.yuhanTrip.service.member;
 
 import hello.yuhanTrip.domain.accommodation.Accommodation;
 import hello.yuhanTrip.domain.member.*;
+import hello.yuhanTrip.dto.email.EmailRequestDTO;
 import hello.yuhanTrip.dto.member.LoginDTO;
 import hello.yuhanTrip.dto.member.LogoutDTO;
 import hello.yuhanTrip.dto.member.WithdrawalMembershipDTO;
-import hello.yuhanTrip.dto.email.EmailRequestDTO;
 import hello.yuhanTrip.dto.payment.MypageMemberDTO;
 import hello.yuhanTrip.dto.register.MemberChangePasswordDTO;
 import hello.yuhanTrip.dto.register.MemberRequestDTO;
@@ -13,7 +13,6 @@ import hello.yuhanTrip.dto.token.TokenDTO;
 import hello.yuhanTrip.email.EmailProvider;
 import hello.yuhanTrip.exception.*;
 import hello.yuhanTrip.jwt.TokenProvider;
-import hello.yuhanTrip.repository.EmailRepository;
 import hello.yuhanTrip.repository.MemberRepository;
 import hello.yuhanTrip.repository.ResetTokenRepository;
 import hello.yuhanTrip.service.RedisService;
@@ -42,7 +41,6 @@ public class MemberServiceImpl implements MemberService {
     private final TokenProvider tokenProvider;
     private final ResetTokenRepository resetTokenReposiotry;
     private final EmailProvider emailProvider;
-    private final EmailRepository emailRepository;
     private final RedisService redisService;
 
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;  // 7일
@@ -58,7 +56,7 @@ public class MemberServiceImpl implements MemberService {
     private MemberType getMemberType(AuthProvider authProvider) {
         switch (authProvider) {
             case LOCAL:
-                return new LocalMemberRegister(passwordEncoder, emailRepository, memberRepository,redisService);
+                return new LocalMemberRegister(passwordEncoder,memberRepository,redisService);
             case KAKAO:
                 return new KakaoMemberRegister(passwordEncoder, memberRepository);
             default:

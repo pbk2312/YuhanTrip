@@ -1,9 +1,7 @@
 package hello.yuhanTrip.service.member;
 
-import hello.yuhanTrip.domain.member.EmailCertification;
 import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.dto.register.MemberRequestDTO;
-import hello.yuhanTrip.repository.EmailRepository;
 import hello.yuhanTrip.repository.MemberRepository;
 import hello.yuhanTrip.service.RedisService;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +11,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class LocalMemberRegister implements MemberType {
 
     private final PasswordEncoder passwordEncoder;
-    private final EmailRepository emailRepository;
     private final MemberRepository memberRepository;
     private final RedisService redisService;
     // 필요한 생성자 정의

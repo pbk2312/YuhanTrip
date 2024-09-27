@@ -1,10 +1,8 @@
 package hello.yuhanTrip.service.member;
 
 
-import hello.yuhanTrip.domain.member.EmailCertification;
 import hello.yuhanTrip.dto.email.EmailRequestDTO;
 import hello.yuhanTrip.exception.CustomException;
-import hello.yuhanTrip.repository.EmailRepository;
 import hello.yuhanTrip.email.EmailProvider;
 import hello.yuhanTrip.repository.MemberRepository;
 import hello.yuhanTrip.service.RedisService;
@@ -20,7 +18,6 @@ import java.util.Random;
 @Log4j2
 public class EmailService {
 
-    private final EmailRepository emailRepository;
     private final EmailProvider emailProvider;
     private final MemberRepository memberRepository;
     private final RedisService redisService;

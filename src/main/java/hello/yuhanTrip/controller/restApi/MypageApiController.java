@@ -2,6 +2,7 @@ package hello.yuhanTrip.controller.restApi;
 
 import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.dto.payment.MypageMemberDTO;
+import hello.yuhanTrip.exception.CustomException;
 import hello.yuhanTrip.service.reservation.ReservationService;
 import hello.yuhanTrip.service.member.RoleChangeRequestService;
 import hello.yuhanTrip.service.member.MemberService;
@@ -121,7 +122,7 @@ public class MypageApiController {
 
     private void validatePassword(String rawPassword, String encodedPassword) {
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
-            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+            throw new CustomException("비밀번호가 일치하지 않습니다.");
         }
     }
 }
