@@ -8,6 +8,7 @@ import hello.yuhanTrip.domain.accommodation.Room;
 import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.domain.reservation.ReservationStatus;
 import hello.yuhanTrip.dto.accommodation.AccommodationRegisterDTO;
+import hello.yuhanTrip.exception.CustomException;
 import hello.yuhanTrip.repository.AccommodationRepository;
 import hello.yuhanTrip.repository.RoomRepository;
 import hello.yuhanTrip.service.member.MemberService;
@@ -105,14 +106,14 @@ public class AccommodationServiceImpl implements AccommodationService {
     @Override
     public Accommodation getAccommodationInfo(Long id) {
         return accommodationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 숙소입니다."));
+                .orElseThrow(() -> new CustomException("존재하지 않는 숙소입니다."));
     }
 
 
     @Override
     public Room getRoomInfo(Long id) {
         return roomRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("객실 정보 없음"));
+                .orElseThrow(() -> new CustomException("객실 정보 없음"));
     }
 
 
