@@ -3,9 +3,11 @@ package hello.yuhanTrip.service.member;
 
 import hello.yuhanTrip.domain.member.EmailCertification;
 import hello.yuhanTrip.dto.email.EmailRequestDTO;
+import hello.yuhanTrip.exception.CustomException;
 import hello.yuhanTrip.repository.EmailRepository;
 import hello.yuhanTrip.email.EmailProvider;
 import hello.yuhanTrip.repository.MemberRepository;
+import hello.yuhanTrip.service.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,7 @@ public class EmailService {
     private final EmailRepository emailRepository;
     private final EmailProvider emailProvider;
     private final MemberRepository memberRepository;
+    private final RedisService redisService;
 
     @Transactional
     public String sendCertificationMail(EmailRequestDTO emailRequestDTO) {
@@ -28,16 +31,17 @@ public class EmailService {
 
         // 인증번호가 일치하고, 해당 이메일로 가입된 회원이 있는지 확인
         if (memberRepository.existsByEmail(emailRequestDTO.getEmail())) {
-            throw new RuntimeException("이미 가입되어 있는 회원입니다");
+            throw new CustomException("이미 가입되어 있는 회원입니다");
         }
 
         String certificationNumber = generateCertificationNumber();
         boolean emailsuccess = emailProvider.sendCertificationMail(emailRequestDTO.getEmail(), certificationNumber);
         if (!emailsuccess) {
-            throw new RuntimeException("이메일 발송 실패");
+            throw new CustomException("이메일 발송 실패");
         }
-        EmailCertification email = emailRequestDTO.toEmail(certificationNumber);
-        emailRepository.save(email);
+
+        redisService.saveEmailCertificationToRedis(emailRequestDTO.getEmail(), certificationNumber); // 60분
+
         return "이메일 전송 성공";
 
 
@@ -45,23 +49,31 @@ public class EmailService {
 
     @Transactional
     public String verifyEmail(String email, String certificationNumber) {
+        String value = redisService.getEmailCertificationFromRedis(email);
 
-        EmailCertification emailCertification = emailRepository.findByCertificationEmail(email)
-                .orElseThrow(() -> new RuntimeException("인증번호를 찾을 수 없습니다."));
-
-        // 사용자가 입력한 인증번호와 DB에 저장된 인증번호를 비교합니다.
-        if (!emailCertification.getCertificationNumber().equals(certificationNumber)) {
-            throw new RuntimeException("인증번호가 일치하지 않습니다.");
+        // Redis에서 가져온 값이 null인 경우 처리
+        if (value == null) {
+            throw new CustomException("인증번호가 만료되었거나 존재하지 않습니다.");
         }
 
+        String[] parts = value.split(":");
+        String storedCertificationNumber = parts[0]; // 저장된 인증번호
+        boolean isVerified = Boolean.parseBoolean(parts[1]); // 현재 인증 상태
 
+        // 사용자가 입력한 인증번호와 Redis에 저장된 인증번호 비교
+        if (!storedCertificationNumber.equals(certificationNumber)) {
+            throw new CustomException("인증번호가 일치하지 않습니다.");
+        }
 
-        // 인증이 성공했으므로 checkcertification 값을 true로 변경합니다.
-        emailCertification.setCheckCertification(true);
-        emailRepository.save(emailCertification); // 변경된 상태를 저장합니다.
+        if (isVerified) {
+            throw new CustomException("이미 인증된 이메일입니다.");
+        }
+
+        // 인증 성공 시 상태 변경
+        String updatedValue = storedCertificationNumber + ":true"; // 상태를 true로 변경
+        redisService.updateEmailCertificationInRedis(email, updatedValue); // 업데이트 메서드 호출
+
         return "인증번호 인증 성공";
-
-
     }
 
 

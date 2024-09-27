@@ -58,7 +58,7 @@ public class MemberServiceImpl implements MemberService {
     private MemberType getMemberType(AuthProvider authProvider) {
         switch (authProvider) {
             case LOCAL:
-                return new LocalMemberRegister(passwordEncoder, emailRepository, memberRepository);
+                return new LocalMemberRegister(passwordEncoder, emailRepository, memberRepository,redisService);
             case KAKAO:
                 return new KakaoMemberRegister(passwordEncoder, memberRepository);
             default:

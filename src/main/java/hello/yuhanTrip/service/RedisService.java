@@ -123,7 +123,33 @@ public class RedisService {
             log.warn("Redis에서 쿠폰을 삭제하는 데 실패했습니다. memberId: {}, couponCode: {}", member.getId(), couponCode);
         }
     }
+    // 이메일 인증번호를 Redis에 저장하는 메서드
+    public void saveEmailCertificationToRedis(String email, String certificationNumber) {
+        String value = certificationNumber + ":false"; // 초기 상태는 false
+        ValueOperations<String, String> valueOperations = stringRedisTemplate.opsForValue();
+        valueOperations.set("emailCertification:" + email, value, 60 * 60, TimeUnit.SECONDS); // 1시간 유효
+        log.info("이메일 인증번호가 Redis에 저장되었습니다. email: {}", email);
+    }
+    // 이메일 인증번호를 Redis에서 가져오는 메서드
+    public String getEmailCertificationFromRedis(String email) {
+        ValueOperations<String, String> valueOperations = stringRedisTemplate.opsForValue();
+        String key = "emailCertification:" + email; // 이메일을 기반으로 키 생성
+        String certificationNumber = valueOperations.get(key); // Redis에서 인증번호 가져오기
 
+        if (certificationNumber != null) {
+            log.info("Redis에서 인증번호를 찾았습니다. email: {}, 인증번호: {}", email, certificationNumber);
+            return certificationNumber;
+        } else {
+            log.warn("Redis에서 인증번호를 찾을 수 없습니다. email: {}", email);
+            return null;
+        }
+    }
+
+    public void updateEmailCertificationInRedis(String email, String updatedValue) {
+        ValueOperations<String, String> valueOperations = stringRedisTemplate.opsForValue();
+        valueOperations.set("emailCertification:" + email, updatedValue);
+        log.info("이메일 인증 상태가 Redis에서 업데이트되었습니다. email: {}", email);
+    }
 
     // 쿠폰 정보를 JSON으로 변환하는 메서드
     private String convertCouponToJson(Coupon coupon) {

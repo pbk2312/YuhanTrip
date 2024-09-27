@@ -1,6 +1,7 @@
 package hello.yuhanTrip.controller.restApi;
 
 import hello.yuhanTrip.dto.email.EmailRequestDTO;
+import hello.yuhanTrip.exception.CustomException;
 import hello.yuhanTrip.service.member.EmailService;
 import hello.yuhanTrip.dto.email.EmailVerificationRequestDTO;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +23,14 @@ public class EmailController {
     @PostMapping("/sendCertificationMail")
     public ResponseEntity<String> sendCertificationMail(@RequestBody EmailRequestDTO emailRequestDTO) {
         try {
-            emailService.sendCertificationMail(emailRequestDTO);
-            return new ResponseEntity<>("이메일 전송이 완료되었습니다.", HttpStatus.OK);
-        } catch (Exception e) {
+            String message = emailService.sendCertificationMail(emailRequestDTO);
+            return new ResponseEntity<>(message, HttpStatus.OK);
+        } catch (CustomException e) {
             log.error("이메일 전송 실패: {}", e.getMessage());
-            return new ResponseEntity<>("이메일 전송에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            log.error("알 수 없는 오류 발생: {}", e.getMessage());
+            return new ResponseEntity<>("이메일 전송 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
