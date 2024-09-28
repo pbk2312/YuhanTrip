@@ -405,29 +405,39 @@
             credentials: 'include' // 쿠키를 포함하여 요청
         })
             .then(response => response.json())
-            .then(data => {
-                const isLoggedIn = data.isLoggedIn;
+            .then(responseData => {
+                const message = responseData.message; // 응답 메시지
+                const data = responseData.data; // 실제 데이터
+
+                const isLoggedIn = data.isLoggedIn; // 로그인 상태 확인
                 const authButton = document.getElementById('authButton');
                 const mypageButton = document.getElementById('mypageButton');
 
                 if (isLoggedIn) {
                     // 로그인 상태: 로그아웃 버튼으로 전환 및 마이페이지 버튼 활성화
                     authButton.innerText = '로그아웃';
+                    authButton.removeEventListener('click', confirmLogout); // 기존 이벤트 리스너 제거
                     authButton.addEventListener('click', confirmLogout); // 로그아웃 확인
                     mypageButton.style.display = 'block'; // 마이페이지 버튼 표시
+                    mypageButton.removeEventListener('click', () => {}); // 기존 이벤트 리스너 제거
                     mypageButton.addEventListener('click', () => {
                         window.location.href = '/mypage/check'; // 마이페이지로 이동
                     });
                 } else {
                     // 로그아웃 상태: 로그인 버튼으로 전환
                     authButton.innerText = '로그인/회원가입';
+                    authButton.removeEventListener('click', confirmLogout); // 기존 이벤트 리스너 제거
                     authButton.addEventListener('click', function () {
                         window.location.href = '/member/login'; // 로그인 페이지로 이동
                     });
                     mypageButton.style.display = 'none'; // 마이페이지 버튼 숨기기
                 }
             })
-            .catch(error => console.error('로그인 상태 확인 중 오류 발생:', error));
+            .catch(error => {
+                // 토큰 검증 중 오류 발생 시
+                console.error('로그인 상태 확인 중 오류 발생:', error);
+                // 여기서 추가적인 오류 처리를 할 수 있습니다 (예: 사용자에게 메시지 표시 등)
+            });
     }
 
     // 로그아웃 확인 후 처리
@@ -466,7 +476,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         const likeButtons = document.querySelectorAll('.like-button');
-
+        checkAuth();
         likeButtons.forEach(button => {
             button.addEventListener('click', event => {
                 event.preventDefault();
@@ -481,7 +491,6 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
                     },
                 })
                     .then(response => {
@@ -495,13 +504,11 @@
                             // 하트 아이콘을 토글
                             icon.classList.toggle('bi-heart-fill', !isLiked);
                             icon.classList.toggle('bi-heart', isLiked);
-                        } else {
-                            alert(data.message || '좋아요 요청이 실패했습니다. 다시 시도해 주세요.');
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('로그인 후 이용해주세요');
+                        alert('로그인 후 이용해주세요.');
                     });
             });
         });
@@ -519,15 +526,12 @@
                 .then(data => {
                     if (data.status === 'success') {
                         const icon = button.querySelector('i');
-                        icon.classList.toggle('bi-heart-fill', data.isLiked);
-                        icon.classList.toggle('bi-heart', !data.isLiked);
-                    } else {
-                        console.error(data.message || '좋아요 상태 확인에 실패했습니다.');
+                        icon.classList.toggle('bi-heart-fill', data.data); // 좋아요 상태에 따라 아이콘 변경
+                        icon.classList.toggle('bi-heart', !data.data);
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('좋아요 상태 확인에 실패했습니다. 다시 시도해 주세요.');
                 });
         });
     });

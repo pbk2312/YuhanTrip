@@ -35,7 +35,6 @@ public class PaymentViewController {
     @GetMapping("/paymentPage")
     public String paymentPage(
             @RequestParam("reservationId") Long reservationId,
-            @RequestParam("totalPrice") Long totalPrice,
             @CookieValue(value = "accessToken", required = false) String accessToken,
             Model model
     ) {

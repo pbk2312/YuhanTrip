@@ -45,5 +45,6 @@ public interface ReservationService {
 
     Reservation createReservation(Member member, Room room, ReservationDTO reservationDTO);
 
+
     void updateCompletedReservations();
 }

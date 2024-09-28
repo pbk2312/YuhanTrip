@@ -60,8 +60,7 @@ public class ReservationApiController {
             // 성공적인 응답
             Map<String, Object> response = Map.of(
                     "message", "예약이 성공적으로 완료되었습니다.",
-                    "reservationId", reservation.getId(),
-                    "totalPrice", reservation.getPayment().getPrice()
+                    "reservationId", reservation.getId()
             );
 
             return ResponseEntity.ok(response);

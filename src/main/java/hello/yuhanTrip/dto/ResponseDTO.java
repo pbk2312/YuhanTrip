@@ -1,4 +1,4 @@
-package hello.yuhanTrip.dto.coupon;
+package hello.yuhanTrip.dto;
 
 
 import lombok.AllArgsConstructor;

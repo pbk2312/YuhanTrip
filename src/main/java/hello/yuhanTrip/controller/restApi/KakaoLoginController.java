@@ -3,6 +3,7 @@ package hello.yuhanTrip.controller.restApi;
 import hello.yuhanTrip.domain.member.AuthProvider;
 import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.domain.member.MemberRole;
+import hello.yuhanTrip.dto.ResponseDTO;
 import hello.yuhanTrip.dto.kakao.KakaoRegisterRequest;
 import hello.yuhanTrip.dto.kakao.KakaoUserInfoResponseDto;
 import hello.yuhanTrip.dto.member.LoginDTO;
@@ -34,7 +35,10 @@ public class KakaoLoginController {
     private final MemberRepository memberRepository;
 
     @GetMapping("/callback")
-    public ResponseEntity<?> callback(@RequestParam("code") String code, HttpServletResponse response, HttpServletRequest request) {
+    public ResponseEntity<ResponseDTO<?>> callback(
+            @RequestParam("code") String code,
+            HttpServletResponse response,
+            HttpServletRequest request) {
         try {
             // 1. 카카오에서 AccessToken 가져오기
             String accessToken = kakaoService.getAccessTokenFromKakao(code);
@@ -54,9 +58,10 @@ public class KakaoLoginController {
             // 5. 이메일 정보가 없으면 이메일 입력 페이지로 리다이렉트
             if (existingMember.getEmail() == null) {
                 String redirectUrl = String.format("/member/email/input?id=%s", kakaoId);
+                ResponseDTO<String> responseDTO = new ResponseDTO<>("이메일 입력 페이지로 리다이렉트합니다.", null);
                 return ResponseEntity.status(HttpStatus.FOUND)
                         .header("Location", redirectUrl)
-                        .build();
+                        .body(responseDTO);
             }
 
             // 6. 이메일 정보가 있으면 로그인 처리
@@ -68,39 +73,52 @@ public class KakaoLoginController {
 
             // 로그인 후 리다이렉트할 URL을 세션에 저장
             Optional<String> redirectUrl = Optional.ofNullable((String) request.getSession().getAttribute("redirectUrl"));
-            return redirectUrl
-                    .map(url -> ResponseEntity.status(HttpStatus.FOUND).header("Location", url).build())
-                    .orElse(ResponseEntity.ok(tokenDTO.getAccessToken()));
+            if (redirectUrl.isPresent()) {
+                ResponseDTO<String> responseDTO = new ResponseDTO<>("리다이렉트합니다.", null);
+                return ResponseEntity.status(HttpStatus.FOUND)
+                        .header("Location", redirectUrl.get())
+                        .body(responseDTO);
+            } else {
+                ResponseDTO<String> responseDTO = new ResponseDTO<>("로그인 성공", tokenDTO.getAccessToken());
+                return ResponseEntity.ok(responseDTO);
+            }
 
         } catch (KakaoApiException e) {
             log.error("카카오 API 호출 실패: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body("카카오 API 호출 실패");
+            ResponseDTO<String> responseDTO = new ResponseDTO<>("카카오 API 호출 실패", null);
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(responseDTO);
         } catch (Exception e) {
             log.error("카카오 로그인 실패: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("카카오 로그인 실패");
+            ResponseDTO<String> responseDTO = new ResponseDTO<>("카카오 로그인 실패", null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseDTO);
         }
     }
 
+
     @PostMapping("/kakaoRegister")
-    public ResponseEntity<?> kakaoRegister(@RequestBody KakaoRegisterRequest request) {
+    public ResponseEntity<ResponseDTO<?>> kakaoRegister(@RequestBody KakaoRegisterRequest request) {
         try {
             Long userInfoId = request.getId();
             String email = request.getEmail();
 
             Member member = memberRepository.findByAuthProviderId(userInfoId.toString());
             if (member == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("회원 정보가 없습니다.");
+                ResponseDTO<String> responseDTO = new ResponseDTO<>("회원 정보가 없습니다.", null);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseDTO);
             }
 
             member.setEmail(email);
             memberRepository.save(member); // 변경된 이메일 저장
 
-            return ResponseEntity.ok("회원 가입 완료");
+            ResponseDTO<String> responseDTO = new ResponseDTO<>("회원 가입 완료", null);
+            return ResponseEntity.ok(responseDTO);
         } catch (Exception e) {
             log.error("회원 가입 처리 중 오류 발생: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원 가입 처리 중 오류 발생");
+            ResponseDTO<String> responseDTO = new ResponseDTO<>("회원 가입 처리 중 오류 발생", null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseDTO);
         }
     }
+
 
     // 회원가입 처리 로직 분리
     private Member registerNewMember(KakaoUserInfoResponseDto userInfo) {

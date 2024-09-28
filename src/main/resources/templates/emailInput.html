@@ -140,9 +140,11 @@
       },
       body: JSON.stringify({ email: email })
     })
-            .then(response => response.text())
-            .then(data => {
-              alert(data);
+            .then(response => response.json()) // 응답을 JSON으로 파싱
+            .then(responseData => {
+              if (responseData.message) {
+                alert(responseData.message); // 서버에서 반환된 메시지를 알림으로 표시
+              }
               document.getElementById('verificationForm').classList.remove('hidden');
             })
             .catch(error => {
@@ -163,10 +165,12 @@
       },
       body: JSON.stringify({ email: emailForVerification, certificationNumber: certificationNumber })
     })
-            .then(response => response.text())
-            .then(data => {
-              alert(data);
-              if (data.includes("인증번호 인증이 완료되었습니다.")) {
+            .then(response => response.json()) // 응답을 JSON으로 파싱
+            .then(responseData => {
+              if (responseData.message) {
+                alert(responseData.message); // 서버에서 반환된 메시지를 알림으로 표시
+              }
+              if (responseData.message.includes("인증번호 인증이 완료 되었습니다.")) {
                 document.getElementById('registerButton').style.display = 'block';
               }
             })
@@ -184,9 +188,11 @@
       },
       body: JSON.stringify({ id: userInfoId, email: emailForVerification })
     })
-            .then(response => response.text())
-            .then(data => {
-              alert(data);
+            .then(response => response.json()) // 응답을 JSON으로 파싱
+            .then(responseData => {
+              if (responseData.message) {
+                alert(responseData.message); // 서버에서 반환된 메시지를 알림으로 표시
+              }
               window.location.href = '/member/login';
             })
             .catch(error => {

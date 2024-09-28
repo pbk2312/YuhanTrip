@@ -61,21 +61,7 @@ public class ReservationViewController {
         return "reservation/reservation";
     }
 
-    // 예약실패
-    @GetMapping("/reservation/fail")
-    public String reservationFailAndGoHome(@RequestParam("reservationId") String reservationUId, Model model) {
-        try {
-            reservationService.removeReservation(reservationUId);
-        } catch (RuntimeException e) {
-            model.addAttribute("errorMessage", "예약 정보가 없습니다.");
-            return "accommodation/accommodations";
-        } catch (Exception e) {
-            model.addAttribute("errorMessage", "예약 삭제 중 오류가 발생했습니다.");
-            return "accommodation/accommodations";
-        }
 
-        return "redirect:/home/homepage";
-    }
 
 
 

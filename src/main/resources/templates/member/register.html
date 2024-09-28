@@ -218,19 +218,12 @@
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({email: email})
+            body: JSON.stringify({ email: email })
         })
-            .then(response => {
-                if (!response.ok) {
-                    return response.text().then(text => {
-                        throw new Error(text);
-                    });
-                }
-                return response.text();
-            })
+            .then(response => response.json())  // JSON으로 응답 처리
             .then(data => {
                 console.log(data); // 서버에서 반환한 응답 처리
-                alert(data); // 성공 메시지 표시
+                alert(data.message); // 성공 메시지 표시
             })
             .catch(error => {
                 console.error('에러:', error);
@@ -257,23 +250,18 @@
                 certificationNumber: certificationNumber
             })
         })
-            .then(response => {
-                if (!response.ok) {
-                    return response.text().then(text => {
-                        throw new Error(text);
-                    });
-                }
-                return response.text();
-            })
+            .then(response => response.json())  // JSON으로 응답 처리
             .then(data => {
                 console.log(data); // 서버에서 반환한 응답 처리
-                alert(data); // 성공 메시지 표시
+                alert(data.message); // 성공 메시지 표시
             })
             .catch(error => {
                 console.error('에러:', error);
                 alert(error.message); // 실패 메시지 표시
             });
     }
+
+    // 회원가입 폼 제출 이벤트 핸들러
     document.querySelector('form').addEventListener('submit', function (event) {
         event.preventDefault(); // 기본 폼 제출 방지
 
@@ -287,17 +275,10 @@
             },
             body: JSON.stringify(data),
         })
-            .then(response => {
-                if (!response.ok) {
-                    return response.text().then(text => {
-                        throw new Error(text);
-                    });
-                }
-                return response.text();
-            })
+            .then(response => response.json())  // JSON으로 응답 처리
             .then(data => {
                 console.log(data);
-                alert('회원가입이 성공적으로 완료되었습니다.');
+                alert(data.message); // 회원가입 성공 메시지 표시
                 window.location.href = '/member/login'; // 로그인 페이지로 리디렉션
             })
             .catch(error => {
@@ -306,6 +287,7 @@
             });
     });
 
+    // 전화번호 입력 시 포맷 적용
     document.getElementById('inputPhoneNumber').addEventListener('input', function (event) {
         let input = event.target.value.replace(/\D/g, '');  // 숫자 이외의 문자는 모두 제거
         if (input.length > 10) input = input.substring(0, 11);  // 최대 11자리로 제한

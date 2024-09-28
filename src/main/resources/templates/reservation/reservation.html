@@ -341,10 +341,9 @@
                 if (response.ok) {
                     const result = await response.json();
                     const reservationId = result.reservationId; // 서버에서 반환된 예약 ID
-                    const totalPrice = result.totalPrice; // 서버에서 반환된 총 가격
 
                     // 결제 페이지로 리디렉션
-                    window.location.href = `/paymentPage?reservationId=${reservationId}&totalPrice=${totalPrice}`;
+                    window.location.href = `/paymentPage?reservationId=${reservationId}`;
                 } else {
                     const errorResponse = await response.json();
                     alert(`예약에 실패했습니다: ${errorResponse.message}`);
@@ -357,5 +356,4 @@
     });
 </script>
 
-</body>
 </html>

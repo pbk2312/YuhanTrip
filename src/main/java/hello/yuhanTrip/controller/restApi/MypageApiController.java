@@ -1,6 +1,7 @@
 package hello.yuhanTrip.controller.restApi;
 
 import hello.yuhanTrip.domain.member.Member;
+import hello.yuhanTrip.dto.ResponseDTO;
 import hello.yuhanTrip.dto.payment.MypageMemberDTO;
 import hello.yuhanTrip.exception.CustomException;
 import hello.yuhanTrip.service.reservation.ReservationService;
@@ -31,7 +32,7 @@ public class MypageApiController {
 
     // 비밀번호 확인
     @PostMapping("/checkPassword")
-    public ResponseEntity<Void> checkPassword(
+    public ResponseEntity<ResponseDTO<Void>> checkPassword(
             @RequestParam("password") String password,
             @CookieValue(value = "accessToken", required = false) String accessToken,
             HttpSession session
@@ -39,12 +40,13 @@ public class MypageApiController {
         Member member = memberService.getUserDetails(accessToken);
         validatePassword(password, member.getPassword());
         session.setAttribute("passwordChecked", true);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(new ResponseDTO<>("비밀번호 확인이 완료되었습니다.", null));
     }
+
 
     // 개인정보 수정
     @PostMapping("/editMemberInfoSubmit")
-    public ResponseEntity<String> editMemberInfoSubmit(
+    public ResponseEntity<ResponseDTO<Void>> editMemberInfoSubmit(
             @CookieValue(value = "accessToken", required = false) String accessToken,
             @RequestParam("email") String email,
             @RequestParam("name") String name,
@@ -54,44 +56,44 @@ public class MypageApiController {
             @RequestParam("address") String address
     ) {
         if (accessToken == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDTO<>("로그인이 필요합니다.", null));
         }
 
         try {
             Member member = memberService.getUserDetails(accessToken);
             if (member == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("회원 정보를 찾을 수 없습니다.");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseDTO<>("회원 정보를 찾을 수 없습니다.", null));
             }
-            LocalDate Birth = LocalDate.parse(dateOfBirth); // String을 LocalDate로 변환
-            MypageMemberDTO mypageMemberDTO = new MypageMemberDTO(email, name, nickname, phoneNumber,address, Birth);
+            LocalDate birth = LocalDate.parse(dateOfBirth); // String을 LocalDate로 변환
+            MypageMemberDTO mypageMemberDTO = new MypageMemberDTO(email, name, nickname, phoneNumber, address, birth);
             memberService.updateMember(member, mypageMemberDTO);
 
-            return ResponseEntity.ok("회원 정보가 성공적으로 수정되었습니다.");
+            return ResponseEntity.ok(new ResponseDTO<>("회원 정보가 성공적으로 수정되었습니다.", null));
         } catch (Exception e) {
             log.error("회원 정보 수정 중 오류 발생: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원 정보 수정 중 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseDTO<>("회원 정보 수정 중 오류가 발생했습니다.", null));
         }
     }
 
 
+
     // 예약 취소
     @PostMapping("/cancelReservation")
-    public ResponseEntity<String> cancelReservation(
+    public ResponseEntity<ResponseDTO<Void>> cancelReservation(
             @CookieValue(value = "accessToken", required = false) String accessToken,
             @RequestParam("reservationUid") String reservationUid
     ) {
-
         Member member = memberService.getUserDetails(accessToken);
         try {
             log.info("예약 거절 요청 - reservationUid: {}", reservationUid);
             boolean isCancelled = reservationService.cancelReservation(reservationUid);
             return isCancelled
-                    ? ResponseEntity.ok("예약이 성공적으로 취소되었습니다.")
-                    : ResponseEntity.status(HttpStatus.NOT_FOUND).body("예약을 찾을 수 없습니다.");
+                    ? ResponseEntity.ok(new ResponseDTO<>("예약이 성공적으로 취소되었습니다.", null))
+                    : ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseDTO<>("예약을 찾을 수 없습니다.", null));
         } catch (Exception e) {
             log.error("예약 취소 중 오류 발생: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("예약 취소 중 오류가 발생했습니다.");
+                    .body(new ResponseDTO<>("예약 취소 중 오류가 발생했습니다.", null));
         }
     }
 
@@ -119,6 +121,7 @@ public class MypageApiController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("역할 변경 요청 처리 중 오류가 발생했습니다.");
         }
     }
+
 
     private void validatePassword(String rawPassword, String encodedPassword) {
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {

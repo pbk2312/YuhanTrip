@@ -3,7 +3,7 @@ package hello.yuhanTrip.controller.restApi;
 import hello.yuhanTrip.dto.coupon.Coupon;
 import hello.yuhanTrip.dto.coupon.DiscountType;
 import hello.yuhanTrip.domain.member.Member;
-import hello.yuhanTrip.dto.coupon.ResponseDTO;
+import hello.yuhanTrip.dto.ResponseDTO;
 import hello.yuhanTrip.exception.UnauthorizedException;
 import hello.yuhanTrip.service.discount.CouponService;
 import hello.yuhanTrip.service.member.MemberService;
@@ -34,21 +34,22 @@ public class CouponController {
     }
 
     // 쿠폰 발급 공통 메서드
-    private ResponseEntity<ResponseDTO> generateCoupon(Member member, DiscountType discountType, Double discountValue) {
+    private ResponseEntity<ResponseDTO<?>> generateCoupon(Member member, DiscountType discountType, Double discountValue) {
         if (couponService.hasCoupon(member.getId())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ResponseDTO("해당 계정은 이미 쿠폰을 발급받았습니다.", null));
+            ResponseDTO<String> response = new ResponseDTO<>("해당 계정은 이미 쿠폰을 받았습니다.", null);
+            return ResponseEntity.badRequest().body(response);
         }
-
         Coupon coupon = couponService.generateCoupon(member, discountType, discountValue);
         log.info("{} 할인 쿠폰 발급 - 회원 ID: {}", discountType, member.getId());
 
-        return ResponseEntity.ok(new ResponseDTO("쿠폰 발급이 완료되었습니다.", coupon));
+        ResponseDTO<Coupon> response = new ResponseDTO<>("쿠폰 발급이 완료되었습니다.", coupon);
+        return ResponseEntity.ok(response);
     }
+
 
     // 쿠폰 발급 API (고정 금액/비율 공통 처리)
     @PostMapping("/{type}")
-    public ResponseEntity<ResponseDTO> generateCoupon(
+    public ResponseEntity<ResponseDTO<?>> generateCoupon(
             @CookieValue(value = "accessToken", required = false) String accessToken,
             @PathVariable String type,
             @RequestParam(required = false) Double discountAmount,

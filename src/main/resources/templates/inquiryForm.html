@@ -141,20 +141,17 @@
             },
             body: JSON.stringify(data),
         })
-            .then(response => {
-                if (response.ok) {
-                    return response.text();  // 서버의 응답 메시지를 텍스트로 반환
-                } else {
-                    return response.text().then(text => {
-                        throw new Error(text);
-                    });
+            .then(response => response.json())  // JSON 형태로 응답을 받음
+            .then(responseData => {
+                if (responseData.message) {
+                    alert(responseData.message);  // 성공 메시지 출력
+                    window.location.href = '/home/homepage';  // 리디렉션
                 }
             })
-            .then(message => {
-                alert(message);  // 성공 메시지 출력
-                window.location.href = '/home/homepage';  // 리디렉션
-            })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.error('Error:', error);
+                alert('문의 접수 중 오류가 발생했습니다. 다시 시도해주세요.');
+            });
     });
 </script>
 

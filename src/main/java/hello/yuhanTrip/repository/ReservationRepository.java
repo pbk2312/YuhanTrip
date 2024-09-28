@@ -55,4 +55,5 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     List<Reservation> findByReservationStatusAndCheckOutDateBefore(ReservationStatus status, LocalDate date);
 
+
 }

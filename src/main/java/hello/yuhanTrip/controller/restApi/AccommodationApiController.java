@@ -1,6 +1,7 @@
 package hello.yuhanTrip.controller.restApi;
 
 
+import hello.yuhanTrip.dto.ResponseDTO;
 import hello.yuhanTrip.dto.accommodation.AccommodationRegisterDTO;
 import hello.yuhanTrip.service.Accomodation.AccommodationServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -16,14 +17,14 @@ public class AccommodationApiController {
 
     private final AccommodationServiceImpl accommodationService;
 
-    // 숙소 등록
     @PostMapping("/register")
-    public ResponseEntity<String> registerAccommodation(
+    public ResponseEntity<ResponseDTO<String>> registerAccommodation(
             @CookieValue(value = "accessToken", required = false) String accessToken,
             @ModelAttribute AccommodationRegisterDTO dto) throws IOException {
 
         accommodationService.registerAccommodation(accessToken, dto);
 
-        return ResponseEntity.ok("숙소 저장 성공");
+        ResponseDTO<String> response = new ResponseDTO<>("숙소 저장 성공", null);
+        return ResponseEntity.ok(response);
     }
 }
