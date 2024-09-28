@@ -128,7 +128,15 @@ https://github.com/user-attachments/assets/95df5538-bf67-4809-a305-a8964ff57f6e
 
 ----
 
-#### 겪었던 문제점 및 아쉬웠던 점
+#### 카카오 로그인
+
+https://github.com/user-attachments/assets/9bf4c572-ed6f-420f-9dcb-dcfe7f0df71e
+
+
+
+
+---- 
+### 겪었던 문제점 및 아쉬웠던 점
 
 ##### 아쉬웠던 점
 
