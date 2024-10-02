@@ -255,6 +255,29 @@
             font-size: 18px;
             font-weight: bold;
         }
+        .find-accommodation-btn {
+            background-color: #17a2b8;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .find-accommodation-btn i {
+            margin-right: 5px;
+            font-size: 1.0rem;
+        }
+
+        .find-accommodation-btn:hover {
+            background-color: #138496;
+            transform: scale(1.05);
+        }
     </style>
 
 </head>
@@ -353,78 +376,88 @@
     </div>
 
 
-        <!-- 숙소 목록 표시 영역 -->
-        <div class="accommodations-container bg-white p-4 rounded">
-            <section class="accommodation-selection"  style="margin-bottom: 40px;">
-                <div class="selection-wrapper">
-                    <div class="selection-container" style="display: flex; justify-content: space-between; gap: 20px;">
-                        <div class="selection">
-                            <a href="/accommodation/byregion?type=HOTEL">
-                                <div class="highlight-card">
-                                    <div class="icon-container">
-                                        <i class="bi bi-building"></i>
-                                    </div>
-                                    <div class="details">
-                                        <p>호텔</p>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
 
-                        <div class="selection">
-                            <a href="/accommodation/byregion?type=MOTEL">
-                                <div class="highlight-card">
-                                    <div class="icon-container">
-                                        <i class="bi bi-house-door"></i>
-                                    </div>
-                                    <div class="details">
-                                        <p>모텔</p>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
 
-                        <div class="selection">
-                            <a href="/accommodation/byregion?type=PENSION">
-                                <div class="highlight-card">
-                                    <div class="icon-container">
-                                        <i class="bi bi-tree"></i>
-                                    </div>
-                                    <div class="details">
-                                        <p>펜션</p>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
 
-                        <div class="selection">
-                            <a href="/accommodation/byregion?type=GUESTHOUSE">
-                                <div class="highlight-card">
-                                    <div class="icon-container">
-                                        <i class="bi bi-house"></i>
-                                    </div>
-                                    <div class="details">
-                                        <p>게스트하우스</p>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
 
-                        <div class="selection">
-                            <a href="/accommodation/byregion?type=OTHER">
-                                <div class="highlight-card">
-                                    <div class="icon-container">
-                                        <i class="bi bi-box"></i>
-                                    </div>
-                                    <div class="details">
-                                        <p>기타</p>
-                                    </div>
+    <!-- 숙소 목록 표시 영역 -->
+    <div class="accommodations-container bg-white p-4 rounded">
+        <section class="accommodation-selection"  style="margin-bottom: 40px;">
+            <div class="d-flex justify-content-start mt-4" style="margin-left: 20px; margin-bottom: 30px;">
+                <a href="http://localhost:8080/accommodation/locations" class="btn btn-lg btn-info find-accommodation-btn">
+                    <i class="bi bi-geo-alt-fill"></i> 지도에서 숙소 찾기
+                </a>
+            </div>
+
+            <div class="selection-wrapper">
+                <div class="selection-container" style="display: flex; justify-content: space-between; gap: 20px;">
+                    <div class="selection">
+                        <a href="/accommodation/byregion?type=HOTEL">
+                            <div class="highlight-card">
+                                <div class="icon-container">
+                                    <i class="bi bi-building"></i>
                                 </div>
-                            </a>
-                        </div>
+                                <div class="details">
+                                    <p>호텔</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="selection">
+                        <a href="/accommodation/byregion?type=MOTEL">
+                            <div class="highlight-card">
+                                <div class="icon-container">
+                                    <i class="bi bi-house-door"></i>
+                                </div>
+                                <div class="details">
+                                    <p>모텔</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="selection">
+                        <a href="/accommodation/byregion?type=PENSION">
+                            <div class="highlight-card">
+                                <div class="icon-container">
+                                    <i class="bi bi-tree"></i>
+                                </div>
+                                <div class="details">
+                                    <p>펜션</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="selection">
+                        <a href="/accommodation/byregion?type=GUESTHOUSE">
+                            <div class="highlight-card">
+                                <div class="icon-container">
+                                    <i class="bi bi-house"></i>
+                                </div>
+                                <div class="details">
+                                    <p>게스트하우스</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="selection">
+                        <a href="/accommodation/byregion?type=OTHER">
+                            <div class="highlight-card">
+                                <div class="icon-container">
+                                    <i class="bi bi-box"></i>
+                                </div>
+                                <div class="details">
+                                    <p>기타</p>
+                                </div>
+                            </div>
+                        </a>
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
 
         <div class="section-header d-flex justify-content-between align-items-center">
             <h2 class="section-title">인기 추천 숙소</h2>
@@ -465,6 +498,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+
 <!-- Core theme JS -->
 <script src="js/scripts.js"></script>
 <script>
