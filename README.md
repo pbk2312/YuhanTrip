@@ -9,6 +9,7 @@
 - 사용자는 평점과 후기를 참고하여 원하는 숙소를 쉽게 예약할 수 있습니다. 또한, 18시와 24시에 진행하는 쿠폰 이벤트를 통해 더 저렴하게 예약할 수 있습니다.
 - 호스트로 등록된 사용자는 손쉽게 숙소를 등록하고, 예약 확인 및 취소 기능을 통해 숙소 예약을 효율적으로 관리할 수 있습니다.
 - 공공데이터를 활용히여 숙소들 정보들을 보고 숙소 예약 및 결제 기능을 제공합니다.
+- 사용자는 카카오 지도 API를 통해 숙소를 찾아 볼 수 있습니다
 
 
 
@@ -131,6 +132,10 @@ https://github.com/user-attachments/assets/95df5538-bf67-4809-a305-a8964ff57f6e
 #### 카카오 로그인
 
 https://github.com/user-attachments/assets/9bf4c572-ed6f-420f-9dcb-dcfe7f0df71e
+
+#### 카카오 지도로 숙소 찾기 추가 
+
+https://github.com/user-attachments/assets/396faf26-ceac-4607-852f-bdbf2ec071df
 
 
 
