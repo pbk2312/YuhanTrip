@@ -103,7 +103,7 @@
       <button class="btn btn-primary" onclick="moveToLocation('chungbuk')">충청북도</button>
       <button class="btn btn-primary" onclick="moveToLocation('chungnam')">충청남도</button>
       <button class="btn btn-primary" onclick="moveToLocation('jeonbuk')">전라북도</button>
-      <button class="btn btn가primary" onclick="moveToLocation('jeonnam')">전라남도</button>
+      <button class="btn btn-primary" onclick="moveToLocation('jeonnam')">전라남도</button>
       <button class="btn btn-primary" onclick="moveToLocation('gyeongbuk')">경상북도</button>
       <button class="btn btn-primary" onclick="moveToLocation('gyeongnam')">경상남도</button>
       <button class="btn btn-primary" onclick="moveToLocation('sejong')">세종시</button>
@@ -115,7 +115,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=aae66002a493a70e0b9dba7685eb4299"></script>
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=//"></script>
 <script>
   // 지역 좌표 정의
   const locations = {
@@ -194,6 +194,79 @@
             // 로딩 애니메이션 숨기기
             document.getElementById('loading').style.display = 'none';
           });
+  function checkAuth() {
+    fetch('/api/member/validateToken', {
+      method: 'GET',
+      credentials: 'include' // 쿠키를 포함하여 요청
+    })
+            .then(response => response.json())
+            .then(responseData => {
+              const message = responseData.message; // 응답 메시지
+              const data = responseData.data; // 실제 데이터
+
+              const isLoggedIn = data.isLoggedIn; // 로그인 상태 확인
+              const authButton = document.getElementById('authButton');
+              const mypageButton = document.getElementById('mypageButton');
+
+              if (isLoggedIn) {
+                // 로그인 상태: 로그아웃 버튼으로 전환 및 마이페이지 버튼 활성화
+                authButton.innerText = '로그아웃';
+                authButton.removeEventListener('click', confirmLogout); // 기존 이벤트 리스너 제거
+                authButton.addEventListener('click', confirmLogout); // 로그아웃 확인
+                mypageButton.style.display = 'block'; // 마이페이지 버튼 표시
+                mypageButton.removeEventListener('click', () => {}); // 기존 이벤트 리스너 제거
+                mypageButton.addEventListener('click', () => {
+                  window.location.href = '/mypage/check'; // 마이페이지로 이동
+                });
+              } else {
+                // 로그아웃 상태: 로그인 버튼으로 전환
+                authButton.innerText = '로그인/회원가입';
+                authButton.removeEventListener('click', confirmLogout); // 기존 이벤트 리스너 제거
+                authButton.addEventListener('click', function () {
+                  window.location.href = '/member/login'; // 로그인 페이지로 이동
+                });
+                mypageButton.style.display = 'none'; // 마이페이지 버튼 숨기기
+              }
+            })
+            .catch(error => {
+              // 토큰 검증 중 오류 발생 시
+              console.error('로그인 상태 확인 중 오류 발생:', error);
+              // 여기서 추가적인 오류 처리를 할 수 있습니다 (예: 사용자에게 메시지 표시 등)
+            });
+  }
+  // 로그아웃 확인 후 처리
+  function confirmLogout() {
+    if (confirm('로그아웃 하시겠습니까?')) {
+      logout();
+    }
+  }
+
+  // 로그아웃 처리 함수
+  function logout() {
+    // 서버에 로그아웃 요청
+    fetch('/api/member/logout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+            .then(response => {
+              if (response.ok) {
+                // 쿠키에서 accessToken 삭제
+                document.cookie = "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                window.location.reload(); // 페이지 새로고침
+              } else {
+                console.error('로그아웃 요청 실패');
+              }
+            })
+            .catch(error => console.error('로그아웃 요청 중 오류 발생:', error));
+  }
+
+  // 페이지 로드 시 인증 상태 및 팝업 표시 확인
+  window.onload = function () {
+    checkAuth();
+  };
+
 </script>
 </body>
 </html>
