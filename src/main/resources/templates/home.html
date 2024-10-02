@@ -471,7 +471,7 @@
     function checkAuth() {
         fetch('/api/member/validateToken', {
             method: 'GET',
-            credentials: 'include' // 쿠키를 포함하여 요청
+            credentials: 'include'
         })
             .then(response => response.json())
             .then(responseData => {

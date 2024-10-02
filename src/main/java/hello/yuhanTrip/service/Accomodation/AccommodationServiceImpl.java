@@ -7,6 +7,7 @@ import hello.yuhanTrip.domain.accommodation.AccommodationType;
 import hello.yuhanTrip.domain.accommodation.Room;
 import hello.yuhanTrip.domain.member.Member;
 import hello.yuhanTrip.domain.reservation.ReservationStatus;
+import hello.yuhanTrip.dto.accommodation.AccommodationLocationDTO;
 import hello.yuhanTrip.dto.accommodation.AccommodationRegisterDTO;
 import hello.yuhanTrip.exception.CustomException;
 import hello.yuhanTrip.repository.AccommodationRepository;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -224,5 +226,19 @@ public class AccommodationServiceImpl implements AccommodationService {
     public Page<Accommodation> getAccommodationsByTypeOrderByPriceAsc(AccommodationType type, Pageable pageable) {
         // `type` 필터링과 동시에 가격 오름차순 정렬된 결과 반환
         return accommodationRepository.findByStatusAndTypeOrderByPriceAsc(AccommodationApplyStatus.APPROVED,type, pageable);
+    }
+
+    public List<AccommodationLocationDTO> getAllAccommodationLocations() {
+        return accommodationRepository.findAll()
+                .stream()
+                .map(accommodation -> {
+                    AccommodationLocationDTO dto = new AccommodationLocationDTO();
+                    dto.setId(accommodation.getId());
+                    dto.setTitle(accommodation.getTitle());
+                    dto.setMapx(Double.parseDouble(accommodation.getMapx()));
+                    dto.setMapy(Double.parseDouble(accommodation.getMapy()));
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 }

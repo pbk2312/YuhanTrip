@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kakao 지도 숙소 마커 표시</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex items-center justify-center h-screen bg-gray-100">
+<div class="relative w-full h-full max-w-screen-lg">
+  <!-- 로딩 애니메이션 -->
+  <div id="loading" class="absolute inset-0 flex items-center justify-center bg-white z-10">
+    <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-32 w-32"></div>
+  </div>
+  <!-- 지도 영역 -->
+  <div id="map" class="w-full h-full rounded-lg shadow-lg"></div>
+</div>
+
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=aae66002a493a70e0b9dba7685eb4299"></script>
+<script>
+  // 로딩 애니메이션 스타일
+  document.head.insertAdjacentHTML('beforeend', `
+      <style>
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      </style>
+    `);
+
+  // 지도 생성
+  var mapContainer = document.getElementById('map'),
+          mapOption = {
+            center: new kakao.maps.LatLng(37.5665, 126.9780), // 서울 시청 기준 좌표
+            level: 8 // 지도 확대 레벨
+          };
+  var map = new kakao.maps.Map(mapContainer, mapOption);
+
+  // 숙소 데이터를 가져와서 마커 추가
+  fetch('/api/accommodation/locations')
+          .then(response => response.json())
+          .then(data => {
+            data.forEach(accommodation => {
+              var markerPosition = new kakao.maps.LatLng(accommodation.mapy, accommodation.mapx);
+
+              // 마커 생성
+              var marker = new kakao.maps.Marker({
+                position: markerPosition,
+                map: map
+              });
+              // 정보 창 생성
+              var infoWindowContent = `<div class="p-3 bg-white rounded-lg shadow-lg">
+                                      <a href="/accommodation/info?id=${accommodation.id}" class="text-blue-600 hover:underline">
+                                        <strong>${accommodation.title}</strong>
+                                      </a>
+                                    </div>`;
+              var infoWindow = new kakao.maps.InfoWindow({
+                content: infoWindowContent
+              });
+
+              // 마커에 마우스를 올리면 정보 창 표시
+              kakao.maps.event.addListener(marker, 'mouseover', function() {
+                infoWindow.open(map, marker);
+              });
+
+              // 마커에서 마우스를 떼면 정보 창 닫기
+              kakao.maps.event.addListener(marker, 'mouseout', function() {
+                infoWindow.close();
+              });
+
+              // 마커 클릭 시 숙소 상세 정보 페이지로 이동
+              kakao.maps.event.addListener(marker, 'click', function() {
+                window.location.href = `/accommodation/info?id=${accommodation.id}`;
+              });
+            });
+          })
+          .catch(error => console.error('Error:', error))
+          .finally(() => {
+            document.getElementById('loading').style.display = 'none'; // 로딩 애니메이션 숨기기
+          });
+</script>
+</body>
+</html>

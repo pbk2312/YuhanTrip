@@ -175,4 +175,11 @@ public class AccommodationViewController {
         model.addAttribute("accommodations", accommodationDTOs);
     }
 
+    @GetMapping("/locations")
+    public String getAllAccommodationLocations() {
+
+        return "accommodation/mapsAccommodations";
+
+    }
+
 }

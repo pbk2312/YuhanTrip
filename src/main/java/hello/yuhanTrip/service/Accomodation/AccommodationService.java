@@ -3,6 +3,7 @@ package hello.yuhanTrip.service.Accomodation;
 import hello.yuhanTrip.domain.accommodation.Accommodation;
 import hello.yuhanTrip.domain.accommodation.AccommodationType;
 import hello.yuhanTrip.domain.accommodation.Room;
+import hello.yuhanTrip.dto.accommodation.AccommodationLocationDTO;
 import hello.yuhanTrip.dto.accommodation.AccommodationRegisterDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -82,4 +83,6 @@ public interface AccommodationService {
 
     // 유형에 따라 가격을 기준으로 오름차순 정렬된 숙소 목록을 반환하는 메서드
     Page<Accommodation> getAccommodationsByTypeOrderByPriceAsc(AccommodationType type, Pageable pageable);
+
+    List<AccommodationLocationDTO> getAllAccommodationLocations();
 }
