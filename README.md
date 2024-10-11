@@ -167,6 +167,7 @@ https://github.com/user-attachments/assets/396faf26-ceac-4607-852f-bdbf2ec071df
   - 해결 : 스왑 메모리 활용
 * AWS 배포후 카카오 로그인 에러
   - 카카오 developer에서도 Redirect URI를 내가 쓰는 도메인 주소로 변경해줘야하는걸 인지
+* 리팩토링,클린 코드 부족
   
 
 
